@@ -42,3 +42,19 @@ Inner page shell, as on the source:
 - Inner pages: left column (`lg:w-1/2`) scrolls over a fixed right-half photo; the Menu button stays fixed; the top-left logo fades out over the first 220px.
 - Smooth scrolling is Lenis (`duration 1.2`, expo easing). Reveals use Motion `whileInView`, `once`, margins around `-10%`/`-15%`.
 - The reservation form posts to `/api/reservation` on the source. The local clone does not send data; it reproduces the UI, validation, and confirmation screen as a demo.
+
+## Checks (10 October 2026)
+
+- `npm run check` passes: ESLint, TypeScript, and a production build of all routes plus icons, Open Graph images, `robots.txt`, and `sitemap.xml`.
+- Production build compared with the source at 390×844, 1440×900, and 1920×1080 for all seven routes (including a 404 URL): document heights are identical on every route and size, with no horizontal overflow, console errors, or broken images. Page builders also checked 768×1024 and 1024×768, and About at 1280, 1536, and 2560 wide.
+- Exercised: navigation dialog (open, hover seals, mobile), menu filters, About timeline and count-up reveals, every reservation step with its validation errors, the pending state, and the confirmation screen (source submissions were intercepted in the test browser and never reached its API), the preloader, the logo-click replay on the home page, and the error boundary through a temporary route.
+- Page titles, descriptions, canonical paths, and Open Graph tags match the source.
+- Comparison screenshots: `docs/design-references/nokto/` (left: source, right: local).
+
+## Remaining differences
+
+- Reservation is a demo: submission is simulated (900ms) and nothing is sent. The confirmation screen adds one line, "Demo — no reservation was sent." The source's network-failure message is not reproduced because the demo cannot fail.
+- The date picker's minimum is the real tomorrow; the source shows its build-time date.
+- Canonical and Open Graph URLs use `NEXT_PUBLIC_SITE_URL` (default `http://localhost:3000`) instead of the source domain.
+- Inner pages also emit Open Graph/Twitter image tags from the shared `opengraph-image.png`/`twitter-image.png`; the source only emits them on the home page.
+- Vercel Analytics is not included.

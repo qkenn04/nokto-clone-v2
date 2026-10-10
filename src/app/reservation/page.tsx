@@ -1,14 +1,34 @@
+import type { Metadata } from "next";
+import { Suspense } from "react";
 import { FixedPhoto } from "@/components/sites/nokto/chrome/FixedPhoto";
 import { SiteFooter } from "@/components/sites/nokto/chrome/SiteFooter";
-import { siteImage } from "@/components/sites/nokto/site";
+import { reservation } from "@/components/sites/nokto/reservation/content";
+import { ReservationForm } from "@/components/sites/nokto/reservation/ReservationForm";
+import { ReservationHero } from "@/components/sites/nokto/reservation/ReservationHero";
+import { ReservationLoading } from "@/components/sites/nokto/reservation/ReservationLoading";
+import { site } from "@/components/sites/nokto/site";
 
-// Placeholder until the reservation page is built.
+const { title, description } = reservation.metadata;
+
+export const metadata: Metadata = {
+  title,
+  description,
+  alternates: { canonical: "/reservation" },
+  // The root title template does not apply to Open Graph titles, so the full title is spelled out.
+  openGraph: { title: `${title} — ${site.name} ${site.location}`, description, url: "/reservation", type: "website" },
+};
+
 export default function ReservationPage() {
   return (
-    <main id="main-content" className="relative w-full">
-      <FixedPhoto src={siteImage("hero-reservations.jpg")} />
-      <div className="relative z-10 min-h-[200dvh] lg:w-1/2" />
-      <SiteFooter />
-    </main>
+    <Suspense fallback={<ReservationLoading />}>
+      <main id="main-content" className="relative w-full">
+        <FixedPhoto src={reservation.image.src} alt={reservation.image.alt} />
+        <div className="relative z-10 lg:w-1/2">
+          <ReservationHero />
+          <ReservationForm />
+        </div>
+        <SiteFooter />
+      </main>
+    </Suspense>
   );
 }

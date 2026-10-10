@@ -1,14 +1,9 @@
-import { FixedPhoto } from "@/components/sites/nokto/chrome/FixedPhoto";
-import { SiteFooter } from "@/components/sites/nokto/chrome/SiteFooter";
-import { siteImage } from "@/components/sites/nokto/site";
+import type { Metadata } from "next";
+import { LegalPage } from "@/components/sites/nokto/legal/LegalPage";
+import { legalMetadata, terms } from "@/components/sites/nokto/legal/content";
 
-// Placeholder until the terms page is built.
+export const metadata: Metadata = legalMetadata(terms);
+
 export default function TermsPage() {
-  return (
-    <main id="main-content" className="relative w-full">
-      <FixedPhoto src={siteImage("terms.jpg")} />
-      <div className="relative z-10 min-h-[200dvh] lg:w-1/2" />
-      <SiteFooter />
-    </main>
-  );
+  return <LegalPage content={terms} />;
 }

@@ -10,15 +10,14 @@ export function cx(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(" ");
 }
 
-type Responsive<T extends string | number> = T | Partial<Record<"base" | "sm" | "md" | "lg" | "xl" | "2xl", T>>;
+type Breakpoint = "base" | "sm" | "md" | "lg" | "xl" | "2xl";
+type Responsive<T extends string> = T | Partial<Record<Breakpoint, T>>;
 
-function responsive<T extends string | number>(value: Responsive<T> | undefined, map: Record<T, string>) {
+/** Picks literal class names per breakpoint; `classes` must spell every variant out for Tailwind to see it. */
+function responsive<T extends string>(value: Responsive<T> | undefined, classes: Record<Breakpoint, Record<T, string>>) {
   if (value === undefined) return "";
-  if (typeof value !== "object") return map[value];
-  return (["base", "sm", "md", "lg", "xl", "2xl"] as const)
-    .filter((bp) => value[bp] !== undefined)
-    .map((bp) => (bp === "base" ? map[value[bp] as T] : `${bp}:${map[value[bp] as T]}`))
-    .join(" ");
+  if (typeof value !== "object") return classes.base[value];
+  return (Object.keys(value) as Breakpoint[]).map((bp) => classes[bp][value[bp] as T]).join(" ");
 }
 
 // Tailwind only generates classes it can see, so every responsive variant is spelled out.
@@ -94,15 +93,40 @@ const sectionPadY = {
   "lg-loose": "section-pad-y-lg-loose",
 } as const;
 
-const sectionMinH = {
-  none: "",
-  dvh: "min-h-dvh",
-  screen: "min-h-screen",
-  "60dvh": "min-h-[60dvh]",
-  "80dvh": "min-h-[80dvh]",
-  "90dvh": "min-h-[90dvh]",
-  "100dvh": "min-h-[100dvh]",
-} as const;
+type MinHeight = "none" | "dvh" | "screen" | "60dvh" | "80dvh" | "90dvh" | "100dvh" | "110dvh" | "120dvh" | "140dvh";
+
+const sectionMinH: Record<Breakpoint, Record<MinHeight, string>> = {
+  base: {
+    none: "", dvh: "min-h-dvh", screen: "min-h-screen", "60dvh": "min-h-[60dvh]", "80dvh": "min-h-[80dvh]",
+    "90dvh": "min-h-[90dvh]", "100dvh": "min-h-[100dvh]", "110dvh": "min-h-[110dvh]", "120dvh": "min-h-[120dvh]",
+    "140dvh": "min-h-[140dvh]",
+  },
+  sm: {
+    none: "", dvh: "sm:min-h-dvh", screen: "sm:min-h-screen", "60dvh": "sm:min-h-[60dvh]", "80dvh": "sm:min-h-[80dvh]",
+    "90dvh": "sm:min-h-[90dvh]", "100dvh": "sm:min-h-[100dvh]", "110dvh": "sm:min-h-[110dvh]",
+    "120dvh": "sm:min-h-[120dvh]", "140dvh": "sm:min-h-[140dvh]",
+  },
+  md: {
+    none: "", dvh: "md:min-h-dvh", screen: "md:min-h-screen", "60dvh": "md:min-h-[60dvh]", "80dvh": "md:min-h-[80dvh]",
+    "90dvh": "md:min-h-[90dvh]", "100dvh": "md:min-h-[100dvh]", "110dvh": "md:min-h-[110dvh]",
+    "120dvh": "md:min-h-[120dvh]", "140dvh": "md:min-h-[140dvh]",
+  },
+  lg: {
+    none: "", dvh: "lg:min-h-dvh", screen: "lg:min-h-screen", "60dvh": "lg:min-h-[60dvh]", "80dvh": "lg:min-h-[80dvh]",
+    "90dvh": "lg:min-h-[90dvh]", "100dvh": "lg:min-h-[100dvh]", "110dvh": "lg:min-h-[110dvh]",
+    "120dvh": "lg:min-h-[120dvh]", "140dvh": "lg:min-h-[140dvh]",
+  },
+  xl: {
+    none: "", dvh: "xl:min-h-dvh", screen: "xl:min-h-screen", "60dvh": "xl:min-h-[60dvh]", "80dvh": "xl:min-h-[80dvh]",
+    "90dvh": "xl:min-h-[90dvh]", "100dvh": "xl:min-h-[100dvh]", "110dvh": "xl:min-h-[110dvh]",
+    "120dvh": "xl:min-h-[120dvh]", "140dvh": "xl:min-h-[140dvh]",
+  },
+  "2xl": {
+    none: "", dvh: "2xl:min-h-dvh", screen: "2xl:min-h-screen", "60dvh": "2xl:min-h-[60dvh]",
+    "80dvh": "2xl:min-h-[80dvh]", "90dvh": "2xl:min-h-[90dvh]", "100dvh": "2xl:min-h-[100dvh]",
+    "110dvh": "2xl:min-h-[110dvh]", "120dvh": "2xl:min-h-[120dvh]", "140dvh": "2xl:min-h-[140dvh]",
+  },
+};
 
 /** Full-width section with the source's responsive gutters (`section-pad`). */
 export function Section({
@@ -112,6 +136,8 @@ export function Section({
   minH = "none",
   tone = "transparent",
   relative = false,
+  isolate = false,
+  center = false,
   className,
   children,
   ...rest
@@ -119,9 +145,12 @@ export function Section({
   as?: ElementType;
   padX?: boolean;
   padY?: keyof typeof sectionPadY;
-  minH?: Responsive<keyof typeof sectionMinH>;
+  minH?: Responsive<MinHeight>;
   tone?: "background" | "surface" | "transparent";
   relative?: boolean;
+  isolate?: boolean;
+  /** Vertically centre the content (flex row, items-center). */
+  center?: boolean;
   className?: string;
   children?: ReactNode;
 } & Omit<ComponentPropsWithoutRef<"section">, "className" | "children">) {
@@ -130,6 +159,8 @@ export function Section({
       className={cx(
         "w-full",
         relative && "relative",
+        isolate && "isolate",
+        center && "flex items-center",
         padX && "section-pad",
         sectionPadY[padY],
         responsive(minH, sectionMinH),
