@@ -1,130 +1,317 @@
 @import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
 
-@custom-variant dark (&:is(.dark *));
+/*
+ * NOKTO design tokens, matched to the declared values in the source stylesheet.
+ * Type sizes scale with both viewport width and height, so they must stay as clamp() expressions.
+ */
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: "Geist", "Geist Fallback", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Geist Mono", "Geist Mono Fallback", ui-monospace, monospace;
-  --font-heading: var(--font-sans);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+@font-face {
+  font-family: "Inter Tight";
+  font-style: normal;
+  font-weight: 300 600;
+  font-display: swap;
+  src: url("/sites/nokto/fonts/inter-tight-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
+@font-face {
+  font-family: "Inter Tight";
+  font-style: normal;
+  font-weight: 300 600;
+  font-display: swap;
+  src: url("/sites/nokto/fonts/inter-tight-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Inter Tight Fallback";
+  src: local("Arial");
+  ascent-override: 100.51%;
+  descent-override: 25.03%;
+  line-gap-override: 0%;
+  size-adjust: 96.39%;
+}
+
+@font-face {
+  font-family: "Fraunces";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/sites/nokto/fonts/fraunces-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: "Fraunces";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/sites/nokto/fonts/fraunces-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Fraunces";
+  font-style: italic;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/sites/nokto/fonts/fraunces-italic-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: "Fraunces";
+  font-style: italic;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/sites/nokto/fonts/fraunces-italic-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Fraunces Fallback";
+  src: local("Times New Roman");
+  ascent-override: 84.71%;
+  descent-override: 22.09%;
+  line-gap-override: 0%;
+  size-adjust: 115.45%;
+}
+
+@theme {
+  --font-sans: "Inter Tight", "Inter Tight Fallback", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Fraunces", "Fraunces Fallback", ui-serif, "Times New Roman", serif;
+
+  --color-background: var(--color-zinc-950);
+  --color-surface: var(--color-zinc-900);
+  --color-foreground: var(--color-stone-100);
+  --color-muted: var(--color-zinc-400);
+  --color-subtle: var(--color-zinc-500);
+  --color-border: var(--color-zinc-800);
+  --color-border-subtle: var(--color-zinc-900);
+  --color-accent: var(--color-amber-200);
+  --color-accent-foreground: var(--color-zinc-950);
+  --color-error: var(--color-red-400);
+
+  --text-display: clamp(2.75rem, min(7.5vw, 11vh), 7.5rem);
+  --text-h1: clamp(2rem, min(5.5vw, 9vh), 4.5rem);
+  --text-h2: clamp(1.5rem, min(3.25vw, 5.5vh), 2.75rem);
+  --text-h3: clamp(1.125rem, min(1.75vw, 3vh), 1.5rem);
+  --text-editorial: clamp(1rem, min(1.75vw, 2.8vh), 1.75rem);
+  --text-body: clamp(1rem, min(1vw, 1.6vh), 1.125rem);
+  --text-label: 0.6875rem;
+  --text-small: 0.8125rem;
+  --text-category-name: clamp(1.5rem, min(2.5vw, 4vh), 2rem);
+  --text-nav-item: clamp(2.25rem, min(7vw, 11vh), 5.5rem);
+  --text-closing: clamp(2rem, min(4.5vw, 7vh), 3.5rem);
+  --text-stat: clamp(4rem, min(12vw, 18vh), 9rem);
+  --text-signature: clamp(1rem, 1.4vw, 1.375rem);
+
+  --tracking-tight: -0.03em;
+  --tracking-display: -0.04em;
+  --tracking-label: 0.14em;
+  --leading-tight: 0.95;
+  --leading-snug: 1.35;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+  --leading-display: 0.9;
+  --leading-none: 1.05;
+  --leading-narrow: 1.2;
+  --leading-body: 1.6;
+
+  --duration-fast: 0.24s;
+  --ease-cinema: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Tailwind's arbitrary values in the source reference these unprefixed names. */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-}
-
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --font-inter-tight: "Inter Tight", "Inter Tight Fallback";
+  --font-fraunces: "Fraunces", "Fraunces Fallback";
 }
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
   html {
-    @apply font-sans;
+    background: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background: inherit;
+    color: inherit;
+  }
+
+  /* The home page is one locked viewport on desktop; ScrollManager adds route-scroll elsewhere. */
+  @media (width >= 64rem) {
+    html,
+    body {
+      height: 100%;
+      overflow: hidden;
+    }
+  }
+
+  html.route-scroll,
+  html.route-scroll body {
+    height: auto;
+    overflow: hidden visible;
+  }
+
+  html.lenis,
+  html.lenis body {
+    scroll-behavior: auto;
+  }
+
+  ::selection {
+    background: var(--color-accent);
+    color: var(--color-accent-foreground);
+  }
+
+  /* The custom cursor replaces the system pointer on fine-pointer devices. */
+  @media (hover: hover) and (pointer: fine) {
+    html,
+    body,
+    a,
+    button,
+    input,
+    select,
+    textarea,
+    [role="button"] {
+      cursor: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+    }
+  }
+}
+
+@utility type-label {
+  font-size: var(--text-label);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+@utility type-serif-editorial {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 300;
+  font-size: var(--text-editorial);
+  letter-spacing: -0.015em;
+  line-height: 1.35;
+}
+
+@utility mask-fade-right {
+  -webkit-mask-image: linear-gradient(90deg, #000 0 25%, #00000080 60%, #0000);
+  mask-image: linear-gradient(90deg, #000 0 25%, #00000080 60%, #0000);
+}
+
+@utility mask-fade-bottom {
+  -webkit-mask-image: linear-gradient(#000 60%, #0000);
+  mask-image: linear-gradient(#000 60%, #0000);
+}
+
+@utility mask-fade-right-hero {
+  -webkit-mask-image: linear-gradient(90deg, #000 0 15%, #00000080 55%, #0000 95%);
+  mask-image: linear-gradient(90deg, #000 0 15%, #00000080 55%, #0000 95%);
+}
+
+@utility ease-cinema {
+  --tw-ease: var(--ease-cinema);
+  transition-timing-function: var(--ease-cinema);
+}
+
+@utility section-pad {
+  padding-inline: 2rem;
+
+  @media (width >= 40rem) {
+    padding-inline: 3rem;
+  }
+  @media (width >= 48rem) {
+    padding-inline: 4rem;
+  }
+  @media (width >= 64rem) {
+    padding-inline: 5rem;
+  }
+  @media (width >= 80rem) {
+    padding-inline: 6rem;
+  }
+}
+
+@utility section-pad-y {
+  padding-block: 2rem;
+
+  @media (width >= 40rem) {
+    padding-block: 3rem;
+  }
+  @media (width >= 48rem) {
+    padding-block: 4rem;
+  }
+  @media (width >= 64rem) {
+    padding-block: 5rem;
+  }
+  @media (width >= 80rem) {
+    padding-block: 6rem;
+  }
+}
+
+@utility section-pad-y-sm {
+  padding-block: 1.5rem;
+}
+
+@utility section-pad-y-lg {
+  padding-block: 6rem;
+
+  @media (width >= 40rem) {
+    padding-block: 8rem;
+  }
+  @media (width >= 48rem) {
+    padding-block: 10rem;
+  }
+  @media (width >= 64rem) {
+    padding-block: 8rem;
+  }
+}
+
+@utility section-pad-y-lg-tight {
+  padding-block: 5rem;
+
+  @media (width >= 40rem) {
+    padding-block: 6rem;
+  }
+  @media (width >= 48rem) {
+    padding-block: 7rem;
+  }
+  @media (width >= 64rem) {
+    padding-block: 6rem;
+  }
+}
+
+@utility section-pad-y-lg-loose {
+  padding-block: 6rem;
+
+  @media (width >= 40rem) {
+    padding-block: 8rem;
+  }
+  @media (width >= 48rem) {
+    padding-block: 10rem;
+  }
+  @media (width >= 64rem) {
+    padding-block: 12rem;
   }
 }
