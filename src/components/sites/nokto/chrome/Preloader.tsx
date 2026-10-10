@@ -32,9 +32,14 @@ export function Preloader() {
     // sessionStorage is browser-only, so the overlay can only be mounted after hydration.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setVisible(true);
+  }, []);
+
+  // Separate from the effect above so a re-run (Strict Mode, reduced-motion change) cannot cancel the exit.
+  useEffect(() => {
+    if (!visible) return;
     const timer = window.setTimeout(() => setVisible(false), reduce ? 500 : 1600);
     return () => window.clearTimeout(timer);
-  }, [reduce]);
+  }, [visible, reduce]);
 
   return (
     <AnimatePresence>
