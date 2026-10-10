@@ -32,6 +32,16 @@ RUN --mount=type=cache,target=/root/.npm \
   fi
 
 # ============================================
+# Stage 1b: Quality gate — CI runs `docker build --target check .`
+# ============================================
+
+# Lint and typecheck against the same lockfile install as the build. BuildKit skips
+# this stage when building `--target runner`, so it never slows down the image build.
+FROM dependencies AS check
+COPY . .
+RUN npm run lint && npm run typecheck
+
+# ============================================
 # Stage 2: Build Next.js application in standalone mode
 # ============================================
 
@@ -48,10 +58,14 @@ COPY . .
 
 ENV NODE_ENV=production
 
+# Public origin of the deployment. layout.tsx (metadataBase), robots.ts and sitemap.ts read it
+# at build time; without it the sitemap and Open Graph URLs point at http://localhost:3000.
+ARG NEXT_PUBLIC_SITE_URL
+ENV NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL}
+
 # Next.js collects completely anonymous telemetry data about general usage.
 # Learn more here: https://nextjs.org/telemetry
-# Uncomment the following line in case you want to disable telemetry during the build.
-# ENV NEXT_TELEMETRY_DISABLED=1
+ENV NEXT_TELEMETRY_DISABLED=1
 
 # Build Next.js application
 # If you want to speed up Docker rebuilds, you can cache the build artifacts
@@ -85,8 +99,7 @@ ENV HOSTNAME="0.0.0.0"
 
 # Next.js collects completely anonymous telemetry data about general usage.
 # Learn more here: https://nextjs.org/telemetry
-# Uncomment the following line in case you want to disable telemetry during the run time.
-# ENV NEXT_TELEMETRY_DISABLED=1
+ENV NEXT_TELEMETRY_DISABLED=1
 
 # Copy production assets
 COPY --from=builder --chown=node:node /app/public ./public
@@ -109,6 +122,10 @@ USER node
 
 # Expose port 3000 to allow HTTP traffic
 EXPOSE 3000
+
+# The slim base image has no wget/curl, so probe the server with Node's built-in fetch.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --start-interval=2s --retries=3 \
+  CMD ["node", "-e", "fetch('http://127.0.0.1:3000/').then((r) => process.exit(r.ok ? 0 : 1), () => process.exit(1))"]
 
 # Start Next.js standalone server
 CMD ["node", "server.js"]

@@ -44,6 +44,10 @@ Dockerfile
 docker-compose.yml
 .dockerignore
 
+# CI pipeline (runs on the Jenkins agent, not in the image)
+Jenkinsfile
+ci
+
 # Misc
 *.tsbuildinfo
 README.md

@@ -4,8 +4,8 @@ services:
       context: .
       dockerfile: Dockerfile
       target: runner
-    image: ai-website-cloner:latest
-    container_name: ai-website-cloner
+    image: nokto-clone-v2:latest
+    container_name: nokto-clone-v2
     restart: unless-stopped
     ports:
       - "${PORT:-3000}:3000"
@@ -17,19 +17,14 @@ services:
         required: false
       - path: .env
         required: false
-    healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/ || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
+    # Healthcheck comes from the image (Dockerfile HEALTHCHECK); the slim image has no wget.
 
   dev:
     build:
       context: .
       dockerfile: Dockerfile.dev
-    image: ai-website-cloner:dev
-    container_name: ai-website-cloner-dev
+    image: nokto-clone-v2:dev
+    container_name: nokto-clone-v2-dev
     restart: unless-stopped
     ports:
       - "${DEV_PORT:-3001}:3000"

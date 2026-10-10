@@ -1,17 +1,17 @@
 {
-  "name": "ai-website-clone-template",
+  "name": "nokto-clone-v2",
   "version": "0.6.1",
   "private": true,
-  "description": "Clone any website into a clean, modern Next.js codebase using AI coding agents",
+  "description": "Next.js recreation of the NOKTO restaurant template, built and deployed through Jenkins + Harbor",
   "author": "JCodesMore",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/JCodesMore/ai-website-cloner-template.git"
+    "url": "https://github.com/qkenn04/nokto-clone-v2.git"
   },
-  "homepage": "https://github.com/JCodesMore/ai-website-cloner-template",
+  "homepage": "https://nokto.qkenn.cloud",
   "bugs": {
-    "url": "https://github.com/JCodesMore/ai-website-cloner-template/issues"
+    "url": "https://github.com/qkenn04/nokto-clone-v2/issues"
   },
   "keywords": [
     "claude-code",

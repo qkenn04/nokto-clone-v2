@@ -14,6 +14,26 @@ npm run check      # lint + typecheck + production build
 
 `scripts/download-nokto-assets.mjs` re-downloads the images, SVGs, fonts, and icons from the source site.
 
+## CI/CD
+
+Every push to `main` is built and deployed to https://nokto.qkenn.cloud:
+
+```
+GitHub main ──poll 5 min──▶ Jenkins (qkenn-ci, WSL) ──push──▶ Harbor (qkenn-ci) ◀──pull── VPS
+                            check → build → smoke test                         /srv/nokto/deploy.sh
+```
+
+- `Jenkinsfile` — `docker build --target check` (lint + typecheck), build the `runner` image with `NEXT_PUBLIC_SITE_URL`, run `ci/smoke-test.sh`, push `nokto/web:<commit sha>` to Harbor, then SSH to the VPS with `deploy <sha>`.
+- The VPS side (forced-command `deploy.sh`, compose stack, Nginx vhost) and the Jenkins/Harbor setup live in [`qkenn04/infra-qkenn`](https://github.com/qkenn04/infra-qkenn) (`stacks/nokto/`, `ci/`).
+- `deploy.sh` waits for the container healthcheck and rolls back to the previous image if it fails; it keeps the last 3 images for manual rollback.
+- Test the image locally the way CI does:
+
+  ```bash
+  docker build --target check .
+  docker build --target runner --build-arg NEXT_PUBLIC_SITE_URL=https://nokto.qkenn.cloud -t nokto:local .
+  ci/smoke-test.sh nokto:local
+  ```
+
 ## Routes
 
 | Source | Local |
@@ -40,4 +60,4 @@ The form reproduces the source's three steps, validation, and confirmation scree
 
 - Inspection notes and the build brief: `docs/research/nokto/brief.md`. Comparison screenshots: `docs/design-references/nokto/`.
 - The legal pages reproduce the source template's sample text; they do not describe this app.
-- Images, logo, fonts, and copy belong to the source template's owner. Keep the repository private and check the template's licence before any public use.
+- Images, logo, fonts, and copy belong to the source template's owner. This repository and the deployment at nokto.qkenn.cloud are public as a learning project; the deployment sends `X-Robots-Tag: noindex, nofollow` so search engines do not index it. Check the template's licence before any other public use.
