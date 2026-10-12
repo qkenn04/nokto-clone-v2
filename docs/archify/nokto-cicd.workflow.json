@@ -1,0 +1,250 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "nokto — Luồng CI/CD từ push main tới VPS",
+    "output": "nokto-cicd.html",
+    "quality_profile": "showcase",
+    "legend": {
+      "mode": "auto",
+      "entries": {
+        "backend": {
+          "label": "Bước chạy"
+        },
+        "security": {
+          "label": "Cổng kiểm tra / chặn"
+        },
+        "database": {
+          "label": "Registry"
+        },
+        "external": {
+          "label": "Bên ngoài"
+        }
+      }
+    }
+  },
+  "lanes": [
+    {
+      "id": "src",
+      "label": "GitHub"
+    },
+    {
+      "id": "ci",
+      "label": "Máy CI qkenn-ci · Jenkins + Harbor"
+    },
+    {
+      "id": "vps",
+      "label": "VPS · /srv/nokto/deploy.sh"
+    },
+    {
+      "id": "fail",
+      "label": "Khi thất bại",
+      "variant": "exception"
+    }
+  ],
+  "phases": [
+    {
+      "id": "trigger",
+      "label": "Kích hoạt",
+      "fromCol": 0,
+      "toCol": 0
+    },
+    {
+      "id": "verify",
+      "label": "Kiểm tra + build",
+      "fromCol": 1,
+      "toCol": 2,
+      "variant": "emphasis"
+    },
+    {
+      "id": "publish",
+      "label": "Đẩy image",
+      "fromCol": 3,
+      "toCol": 3
+    },
+    {
+      "id": "release",
+      "label": "Triển khai",
+      "fromCol": 4,
+      "toCol": 5,
+      "variant": "security"
+    }
+  ],
+  "mainPath": [
+    "push",
+    "check",
+    "smoke",
+    "image",
+    "deploy",
+    "health"
+  ],
+  "nodes": [
+    {
+      "id": "push",
+      "lane": "src",
+      "col": 0,
+      "type": "external",
+      "label": "git push main",
+      "sublabel": "Jenkins poll H/5 · tối đa 5 phút",
+      "width": 200
+    },
+    {
+      "id": "check",
+      "lane": "ci",
+      "col": 1,
+      "type": "security",
+      "label": "Check + Build",
+      "sublabel": "lint · typecheck · image :sha",
+      "width": 200
+    },
+    {
+      "id": "smoke",
+      "lane": "ci",
+      "col": 2,
+      "type": "security",
+      "label": "Smoke test",
+      "sublabel": "6 trang 200 · 404 · robots.txt",
+      "width": 200
+    },
+    {
+      "id": "image",
+      "lane": "ci",
+      "col": 3,
+      "type": "database",
+      "label": "push nokto/web:<sha>",
+      "sublabel": "robot jenkins-push · Trivy quét",
+      "width": 200
+    },
+    {
+      "id": "deploy",
+      "lane": "vps",
+      "col": 4,
+      "type": "backend",
+      "label": "pull + up -d",
+      "sublabel": "SSH forced command · flock",
+      "width": 200
+    },
+    {
+      "id": "health",
+      "lane": "vps",
+      "col": 5,
+      "type": "security",
+      "label": "Healthcheck",
+      "sublabel": "healthy + curl :3006 = 200",
+      "tag": "ghi .env · giữ 3 image",
+      "width": 200
+    },
+    {
+      "id": "stop",
+      "lane": "fail",
+      "col": 2,
+      "type": "security",
+      "label": "Dừng, VPS không bị đụng",
+      "sublabel": "build đỏ · site giữ bản cũ",
+      "width": 200
+    },
+    {
+      "id": "rollback",
+      "lane": "fail",
+      "col": 5,
+      "type": "backend",
+      "label": "Rollback bản cũ",
+      "sublabel": "up -d PREV_TAG · exit 1",
+      "width": 200
+    }
+  ],
+  "edges": [
+    {
+      "id": "detect",
+      "from": "push",
+      "to": "check",
+      "label": "commit mới",
+      "variant": "emphasis"
+    },
+    {
+      "id": "checked",
+      "from": "check",
+      "to": "smoke",
+      "variant": "emphasis"
+    },
+    {
+      "id": "smoked",
+      "from": "smoke",
+      "to": "image",
+      "label": "smoke OK",
+      "variant": "emphasis"
+    },
+    {
+      "id": "ssh",
+      "from": "image",
+      "to": "deploy",
+      "label": "ssh deploy <sha>",
+      "variant": "security"
+    },
+    {
+      "id": "started",
+      "from": "deploy",
+      "to": "health"
+    },
+    {
+      "id": "check-fail",
+      "from": "check",
+      "to": "stop",
+      "label": "lint/build hỏng",
+      "variant": "dashed",
+      "role": "error"
+    },
+    {
+      "id": "smoke-fail",
+      "from": "smoke",
+      "to": "stop",
+      "label": "smoke hỏng",
+      "variant": "dashed",
+      "role": "error"
+    },
+    {
+      "id": "push-fail",
+      "from": "image",
+      "to": "stop",
+      "label": "push hỏng",
+      "variant": "dashed",
+      "role": "error"
+    },
+    {
+      "id": "unhealthy",
+      "from": "health",
+      "to": "rollback",
+      "label": "không healthy",
+      "variant": "dashed",
+      "role": "error"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Số đo thật",
+      "items": [
+        "Build #2 (chưa có cache): khoảng 3,5 phút",
+        "Build #3 (có cache): 37 giây; từ push tới site mới khoảng 2 phút",
+        "Đổi container: site 502 khoảng 2 giây"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Diễn tập đã chạy (10/10/2026)",
+      "items": [
+        "A: image hỏng healthcheck → deploy.sh tự rollback",
+        "B: Harbor tắt → deploy báo lỗi, site cũ vẫn chạy",
+        "C: rollback tay không cần Harbor"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Thông báo",
+      "items": [
+        "Discord: ✅ thành công · ❌ build hỏng · ❌ deploy hỏng (đã rollback)",
+        "Webhook đang trống nên bước báo được bỏ qua"
+      ]
+    }
+  ]
+}

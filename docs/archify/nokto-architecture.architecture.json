@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "nokto.qkenn.cloud — Kiến trúc hệ thống",
+    "output": "nokto-architecture.html",
+    "quality_profile": "showcase"
+  },
+  "components": [
+    { "id": "dev", "type": "external", "label": "Lập trình viên", "sublabel": "WSL · ~/project/nokto-clone-v2", "pos": [40, 40], "size": [200, 64] },
+    { "id": "github", "type": "external", "label": "GitHub", "sublabel": "qkenn04/nokto-clone-v2 · public", "pos": [40, 200], "size": [200, 64] },
+    { "id": "jenkins", "type": "backend", "label": "Jenkins controller", "sublabel": "LTS 2.580.1 · chỉ 127.0.0.1:8080", "tag": "JCasC + Job DSL", "pos": [400, 200], "size": [230, 64] },
+    { "id": "agent", "type": "backend", "label": "jenkins-agent", "sublabel": "chạy Jenkinsfile · label docker", "pos": [400, 340], "size": [230, 64] },
+    { "id": "dind", "type": "backend", "label": "jenkins-dind", "sublabel": "Docker 29.8.2 riêng để build", "pos": [400, 480], "size": [230, 64] },
+    { "id": "harbor", "type": "database", "label": "Harbor v2.15.4", "sublabel": "nokto/web:<sha> · Trivy · giữ 10", "pos": [400, 620], "size": [230, 64] },
+    { "id": "deploysh", "type": "security", "label": "/srv/nokto/deploy.sh", "sublabel": "forced command · flock · rollback", "pos": [820, 620], "size": [230, 64] },
+    { "id": "web", "type": "frontend", "label": "nokto-web", "sublabel": "Next.js 16 · 512 MB · 1 CPU", "pos": [1240, 620], "size": [230, 64] },
+    { "id": "nginx", "type": "security", "label": "Nginx", "sublabel": ":443 · X-Robots-Tag noindex", "pos": [1240, 480], "size": [230, 64] },
+    { "id": "cf", "type": "cloud", "label": "Cloudflare", "sublabel": "proxy · DNS nokto.qkenn.cloud", "pos": [1240, 340], "size": [230, 64] },
+    { "id": "viewer", "type": "external", "label": "Người xem", "sublabel": "trình duyệt", "pos": [1240, 200], "size": [230, 64] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "Máy CI qkenn-ci · WSL2 Ubuntu", "wraps": ["jenkins", "agent", "dind", "harbor"], "pad": 26 },
+    { "kind": "security-group", "label": "compose jenkins · không mở ra ngoài", "wraps": ["jenkins", "agent", "dind"], "pad": 12 },
+    { "kind": "region", "label": "VPS qkenn-server", "wraps": ["deploysh", "web", "nginx"], "pad": 26 },
+    { "kind": "security-group", "label": "chỉ loopback", "wraps": ["web"], "pad": 12 }
+  ],
+  "connections": [
+    { "id": "push", "from": "dev", "to": "github", "label": "git push", "variant": "emphasis" },
+    { "id": "poll", "from": "github", "to": "jenkins", "label": "poll 5 phút", "variant": "emphasis" },
+    { "id": "ws", "from": "jenkins", "to": "agent", "label": "WebSocket" },
+    { "id": "build", "from": "agent", "to": "dind", "label": "build · TLS :2376", "variant": "emphasis" },
+    { "id": "pushimg", "from": "dind", "to": "harbor", "label": "push :sha", "variant": "emphasis" },
+    { "id": "ssh", "from": "agent", "to": "deploysh", "label": "SSH tailnet · deploy <sha>", "variant": "security", "fromSide": "right", "toSide": "top" },
+    { "id": "pull", "from": "harbor", "to": "deploysh", "label": "pull · tailnet", "variant": "security" },
+    { "id": "up", "from": "deploysh", "to": "web", "label": "up -d + healthcheck", "variant": "emphasis" },
+    { "id": "visit", "from": "viewer", "to": "cf", "label": "HTTPS", "variant": "emphasis" },
+    { "id": "origin", "from": "cf", "to": "nginx", "label": "HTTPS · Origin CA", "variant": "emphasis" },
+    { "id": "proxy", "from": "nginx", "to": "web", "label": "proxy :3006", "variant": "emphasis" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "Hai luồng chính", "items": [
+      "Giao hàng: push → Jenkins poll 5 phút → build trong dind → Harbor → SSH deploy → VPS pull đúng SHA",
+      "Phục vụ: Người xem → Cloudflare → Nginx → 127.0.0.1:3006 → nokto-web",
+      "Máy CI tắt: site vẫn chạy, chỉ không build và deploy được"
+    ] },
+    { "dot": "rose", "title": "Ranh giới truy cập", "items": [
+      "Jenkins chỉ nghe 127.0.0.1:8080; Harbor chỉ mở :443 trong tailnet",
+      "Key deploy: from=100.64.0.0/10 + command=deploy.sh, không PTY",
+      "Robot jenkins-push được push; robot vps-pull chỉ được pull",
+      "nokto-web chỉ nghe loopback; mọi response có X-Robots-Tag noindex"
+    ] },
+    { "dot": "emerald", "title": "Khi có sự cố", "items": [
+      "Check, build, smoke hoặc push hỏng: dừng, VPS không bị đụng",
+      "Bản mới không healthy: deploy.sh tự rollback, site 502 khoảng 2 giây",
+      "VPS giữ 3 image gần nhất: rollback tay không cần Harbor",
+      "VPS reboot: .env IMAGE_TAG giữ đúng bản đang chạy"
+    ] },
+    { "dot": "amber", "title": "Cấu hình nằm ở đâu", "items": [
+      "nokto-clone-v2: Dockerfile · Jenkinsfile · ci/smoke-test.sh",
+      "infra-qkenn/ci: Harbor + Jenkins (compose, JCasC)",
+      "infra-qkenn/stacks/nokto: compose.yml · deploy.sh",
+      "infra-qkenn/nginx/conf.d/nokto.qkenn.cloud.conf"
+    ] },
+    { "dot": "slate", "title": "Còn mở (12/10/2026)", "items": [
+      "Harbor không tự lên lại sau khi WSL khởi động lại",
+      "Chưa cài tác vụ giữ WSL chạy nền trên Windows",
+      "Trivy: 8 Critical / 80 High (node 24.14.1, next 16.3.5)",
+      "Webhook Discord còn trống, chưa có thông báo"
+    ] }
+  ]
+}

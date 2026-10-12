@@ -26,6 +26,7 @@ GitHub main ──poll 5 min──▶ Jenkins (qkenn-ci, WSL) ──push──�
 - `Jenkinsfile` — `docker build --target check` (lint + typecheck), build the `runner` image with `NEXT_PUBLIC_SITE_URL`, run `ci/smoke-test.sh`, push `nokto/web:<commit sha>` to Harbor, then SSH to the VPS with `deploy <sha>`.
 - The VPS side (forced-command `deploy.sh`, compose stack, Nginx vhost) and the Jenkins/Harbor setup live in [`qkenn04/infra-qkenn`](https://github.com/qkenn04/infra-qkenn) (`stacks/nokto/`, `ci/`).
 - `deploy.sh` waits for the container healthcheck and rolls back to the previous image if it fails; it keeps the last 3 images for manual rollback.
+- Diagrams (Archify, open the HTML in a browser): [`docs/archify/nokto-architecture.html`](docs/archify/nokto-architecture.html) for the system architecture and [`docs/archify/nokto-cicd.html`](docs/archify/nokto-cicd.html) for the pipeline and its failure paths. Edit the `*.json` beside them, then run `node ~/.claude/skills/archify/bin/archify.mjs finalize <architecture|workflow> <spec.json> <out.html> --quality showcase` from `docs/archify/`.
 - Test the image locally the way CI does:
 
   ```bash
