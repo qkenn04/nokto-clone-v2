@@ -1,0 +1,32 @@
+.intro {
+  container-type: inline-size;
+}
+
+.headline {
+  font-size: clamp(2.125rem, 14cqw, 5.5rem);
+}
+
+@media (width < 40rem) {
+  .layout {
+    gap: 1.5rem;
+  }
+
+  .copy {
+    gap: 1.25rem;
+    padding-block: 1.25rem;
+  }
+}
+
+@media (width >= 64rem) and (height < 50rem) {
+  .intro {
+    padding-block: 2rem;
+  }
+
+  .layout {
+    gap: 1.5rem;
+  }
+
+  .copy {
+    gap: 1rem;
+  }
+}

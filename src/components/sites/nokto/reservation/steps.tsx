@@ -6,7 +6,7 @@ import { reservation, type ReservationStep } from "./content";
 import { Checkbox, DateInput, Field, GuestStepper, TextArea, TextInput, TimeSlots } from "./fields";
 import {
   formatReservationDate,
-  tomorrowIsoDate,
+  minimumReservationDate,
   type FieldErrors,
   type ReservationData,
   type ReservationField,
@@ -25,17 +25,17 @@ const describedBy = (id: string, error?: string) => (error ? `${id}-error` : und
 
 // The date minimum depends on the visitor's clock, so it is only set after hydration.
 const subscribeToNothing = () => () => {};
-function useTomorrow() {
-  return useSyncExternalStore(subscribeToNothing, tomorrowIsoDate, () => undefined);
+function useMinimumDate() {
+  return useSyncExternalStore(subscribeToNothing, minimumReservationDate, () => undefined);
 }
 
 function StepHeader({ step }: { step: ReservationStep }) {
   return (
     <Stack gap={3}>
       <Text variant="label" tone="muted">
-        Step {String(step.number).padStart(2, "0")} · {step.label}
+        Bước {String(step.number).padStart(2, "0")} · {step.label}
       </Text>
-      <Heading as="h2" level="h2" weight="light">
+      <Heading as="h2" level="h2">
         {step.title}
       </Heading>
     </Stack>
@@ -47,7 +47,7 @@ export function WhenStep({ data, errors, onUpdate }: StepProps) {
   const dateId = useId();
   const timeId = useId();
   const guestsId = useId();
-  const tomorrow = useTomorrow();
+  const minimumDate = useMinimumDate();
 
   return (
     <Stack gap={10}>
@@ -57,7 +57,7 @@ export function WhenStep({ data, errors, onUpdate }: StepProps) {
           <DateInput
             id={dateId}
             name="date"
-            min={tomorrow}
+            min={minimumDate}
             value={data.date}
             invalid={Boolean(errors.date)}
             aria-describedby={describedBy(dateId, errors.date)}
@@ -190,11 +190,11 @@ type SummaryRow = { label: string; value: string };
 /** "Your reservation" table shown on the review step and the confirmation screen. */
 export function ReservationSummary({ data }: { data: ReservationData }) {
   const labels = reservation.summary.fields;
-  const name = [data.firstName, data.lastName].filter(Boolean).join(" ");
+  const name = [data.lastName, data.firstName].filter(Boolean).join(" ");
   const rows: SummaryRow[] = [
     { label: labels.date, value: formatReservationDate(data.date) },
     { label: labels.time, value: data.time || "—" },
-    { label: labels.guests, value: `${data.guests} ${data.guests === 1 ? "guest" : "guests"}` },
+    { label: labels.guests, value: `${data.guests} khách` },
     { label: labels.name, value: name || "—" },
     { label: labels.email, value: data.email || "—" },
     { label: labels.phone, value: data.phone || "—" },
@@ -246,7 +246,7 @@ export function ConfirmStep({
           <Text variant="label" tone="muted">
             {reservation.cancellation.label}
           </Text>
-          <Text variant="body" serif italic tone="faded" leading="snug">
+          <Text variant="body" tone="faded" leading="snug">
             {reservation.cancellation.policy}
           </Text>
         </Stack>

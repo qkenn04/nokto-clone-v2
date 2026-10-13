@@ -39,7 +39,7 @@ export function PageTransition({ children }: { children: ReactNode }) {
         initial={!firstRender.current && { opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: reduce ? 0.15 : 0.35, ease: EASE_CINEMA }}
-        className="w-full lg:h-full"
+        className="w-full"
       >
         {children}
       </motion.div>

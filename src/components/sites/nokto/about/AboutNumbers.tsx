@@ -29,13 +29,13 @@ function CountUp({ target, delay = 0 }: { target: number; delay?: number }) {
   return <motion.span ref={ref}>{rounded}</motion.span>;
 }
 
-/** Three figures that describe a service: seats, deliveries, substitutions. */
+/** Three details about The Hot. */
 export function AboutNumbers() {
   const reduce = !!useReducedMotion();
 
   return (
     <Section
-      aria-label="The shape of a service"
+      aria-label="The Hot qua những con số"
       relative
       padY="lg-tight"
       className="flex items-center lg:min-h-[60dvh]"
@@ -50,8 +50,8 @@ export function AboutNumbers() {
             transition={{ duration: 0.6, delay: 0.08 * index, ease: EASE_CINEMA }}
             className={cx("flex flex-col gap-3", statPlacement[index])}
           >
-            <Heading as="dt" level="stat" family="serif" weight="light">
-              <CountUp target={stat.value} delay={0.12 * index} />
+            <Heading as="dt" level="stat" family="display">
+              <CountUp target={stat.value} delay={0.12 * index} />{stat.suffix}
             </Heading>
             <Text as="dd" variant="label" tone="muted">
               {stat.label}

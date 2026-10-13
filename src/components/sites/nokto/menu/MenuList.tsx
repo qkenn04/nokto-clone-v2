@@ -7,11 +7,12 @@ import { Heading, Section, Stack, Text } from "../ui";
 import { menu } from "./data";
 import { MenuFilter, type MenuFilterOption } from "./MenuFilter";
 import { MenuItemRow } from "./MenuItemRow";
+import { MenuViewSwitcher } from "./MenuViewSwitcher";
 
 const ALL = "all";
 
 const filters: MenuFilterOption[] = [
-  { value: ALL, label: "All" },
+  { value: ALL, label: "Tất cả" },
   ...menu.categories.map((category) => ({ value: category.name, label: category.name })),
 ];
 
@@ -39,9 +40,10 @@ export function MenuList() {
             <Heading as="h1" level="h1">
               {menu.headline}
             </Heading>
-            <Text variant="editorial" serif italic tone="muted" measure="comfort">
+            <Text variant="editorial" tone="muted" measure="comfort">
               {menu.editorial}
             </Text>
+            <MenuViewSwitcher active="list" />
           </Stack>
         </motion.header>
 
@@ -69,11 +71,11 @@ export function MenuList() {
               <section key={category.name} className="border-b border-border-subtle last:border-b-0">
                 <Stack gap={8} className="py-12 lg:py-16">
                   <Stack gap={3}>
-                    <Heading as="h2" level="category" family="serif" weight="light">
+                    <Heading as="h2" level="category" family="display">
                       {category.name}
                     </Heading>
                     {category.tagline ? (
-                      <Text variant="body" serif italic tone="muted" leading="snug" measure="comfort">
+                      <Text variant="body" tone="muted" leading="snug" measure="comfort">
                         {category.tagline}
                       </Text>
                     ) : null}
@@ -85,15 +87,15 @@ export function MenuList() {
                       ))}
                     </ul>
                   ) : (
-                    <Text variant="body" serif italic tone="muted" leading="snug">
-                      No items in this category.
+                    <Text variant="body" tone="muted" leading="snug">
+                      Chưa có món trong nhóm này.
                     </Text>
                   )}
                 </Stack>
               </section>
             ))}
             <Stack className="py-12">
-              <Text variant="body" serif italic leading="snug" tone="faded">
+              <Text variant="body" leading="snug" tone="faded">
                 {menu.pairings}
               </Text>
               <Text variant="small" tone="subtle" measure="wide">

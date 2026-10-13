@@ -73,7 +73,7 @@ export function AboutBody() {
               <span aria-hidden className="type-label absolute -left-12 top-[0.4em] hidden text-accent/80 lg:block">
                 {String(index + 1).padStart(2, "0")}
               </span>
-              <Text variant="editorial" serif leading="snug" tone="soft">
+              <Text variant="editorial" leading="snug" tone="soft">
                 {paragraph}
               </Text>
             </motion.div>

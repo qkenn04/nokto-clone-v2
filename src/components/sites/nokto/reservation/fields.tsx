@@ -207,7 +207,7 @@ export function GuestStepper({
     <Stack gap={3}>
       <div
         role="group"
-        aria-label="Guest count"
+        aria-label="Số khách"
         aria-describedby={describedBy}
         onKeyDown={onKeyDown}
         className={`inline-flex items-stretch border ${invalid ? "border-error" : "border-border"}`}
@@ -216,7 +216,7 @@ export function GuestStepper({
           type="button"
           onClick={() => onChange(Math.max(min, count - 1))}
           disabled={atMin}
-          aria-label="Decrease guests"
+          aria-label="Giảm số khách"
           className={stepperButtonClass}
         >
           <Minus aria-hidden strokeWidth={1.5} className="h-4 w-4" />
@@ -231,14 +231,14 @@ export function GuestStepper({
           type="button"
           onClick={() => onChange(Math.min(max, count + 1))}
           disabled={atMax}
-          aria-label="Increase guests"
+          aria-label="Tăng số khách"
           className={stepperButtonClass}
         >
           <Plus aria-hidden strokeWidth={1.5} className="h-4 w-4" />
         </button>
       </div>
       {atMax && overflowNote ? (
-        <Text variant="small" serif italic tone="muted">
+        <Text variant="small" tone="muted">
           {overflowNote}
         </Text>
       ) : null}

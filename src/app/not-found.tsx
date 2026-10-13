@@ -9,10 +9,10 @@ export default function NotFound() {
         <BrandMark />
         <Stack gap={6}>
           <Heading as="h1" level="h1">
-            This seat is no longer available.
+            Không tìm thấy trang này.
           </Heading>
-          <Text variant="editorial" serif italic tone="muted">
-            Try the counter instead.
+          <Text variant="editorial" tone="muted">
+            Hẹn bạn ở The Hot.
           </Text>
           <div className="pt-4">
             <ButtonLink href={site.cta.href}>{site.cta.label}</ButtonLink>

@@ -1,186 +1,98 @@
-import { siteImage } from "../site";
+import { site } from "../site";
 
-export type MenuItem = {
-  name: string;
-  /** Italic detail shown after the name. */
-  subtitle?: string;
-  description: string;
-  /** Price in the site currency (PLN). */
-  price: number;
-  /** Thumbnail path; items without one keep an empty placeholder tile. */
-  image?: string;
-};
+export type MenuItem = { name: string; subtitle?: string; description?: string; price: number; image?: string };
+export type MenuCategory = { name: string; tagline?: string; items: MenuItem[] };
+export type MenuContent = { label: string; headline: string; editorial: string; categories: MenuCategory[]; pairings: string; footnote: string };
 
-export type MenuCategory = {
-  name: string;
-  tagline?: string;
-  items: MenuItem[];
-};
-
-export type MenuContent = {
-  label: string;
-  headline: string;
-  editorial: string;
-  categories: MenuCategory[];
-  pairings: string;
-  footnote: string;
-};
-
-// Autumn menu as published on the source page.
+// Prices in VND from The Hot’s supplied menu, including VAT.
 export const menu: MenuContent = {
-  label: "MENU — AUTUMN SEASON",
-  headline: "Each plate is a chapter.",
-  editorial: "The menu shifts with each season. The intention holds.",
+  label: "MENU NHẬU — THE HOT",
+  headline: "Mồi bén. Bia lạnh.",
+  editorial: "Từ món lai rai đến món ăn no, gọi theo gu của cả bàn.",
   categories: [
     {
-      name: "SASHIMI",
-      tagline: "Cut, rested, served at the temperature it asks for.",
+      name: "Món ăn chơi",
+      tagline: "Gọi vài món, lai rai trong lúc chờ đủ hội.",
       items: [
-        {
-          name: "Otoro",
-          subtitle: "Bluefin belly",
-          description: "Three slices, aged seven days, sea salt and yuzu zest",
-          price: 145,
-          image: siteImage("otoro.jpg"),
-        },
-        {
-          name: "Hirame",
-          subtitle: "Olive flounder",
-          description: "Kelp-cured, ponzu, pink peppercorn",
-          price: 95,
-          image: siteImage("hirame.jpg"),
-        },
-        {
-          name: "Hotate",
-          subtitle: "Hokkaido scallop",
-          description: "Raw, brown butter, charred leek oil",
-          price: 110,
-          image: siteImage("hotate.jpg"),
-        },
-        {
-          name: "Akami Zuke",
-          subtitle: "Marinated lean tuna",
-          description: "Soy, mirin, fresh wasabi grated to order",
-          price: 85,
-          image: siteImage("akami.jpg"),
-        },
-        {
-          name: "Kanpachi",
-          subtitle: "Amberjack",
-          description: "Smoked over cherrywood, green apple, shiso",
-          price: 105,
-          image: siteImage("kanpachi.jpg"),
-        },
+        { name: "Bánh mì bơ tỏi", price: 39000 },
+        { name: "Khoai lang kén", price: 39000 },
+        { name: "Bắp sốt bơ cay", price: 69000 },
+        { name: "Đậu hũ lướt ván", price: 59000 },
+        { name: "Khoai lang kén lắc phô mai", price: 45000 },
+        { name: "Da ếch rang muối", price: 59000 },
       ],
     },
     {
-      name: "NIGIRI",
-      tagline: "Rice warm. Fish cold. The hand decides everything in between.",
+      name: "Salad",
+      tagline: "Thêm chút rau xanh cho cả bàn.",
       items: [
-        {
-          name: "Otoro Nigiri",
-          description: "Aged bluefin belly, nikiri brushed",
-          price: 65,
-          image: siteImage("otoro-nigiri.jpg"),
-        },
-        {
-          name: "Uni",
-          subtitle: "Hokkaido sea urchin",
-          description: "Single piece, nori from Ariake Bay",
-          price: 85,
-          image: siteImage("uni.jpg"),
-        },
-        {
-          name: "Ikura",
-          subtitle: "Salmon roe",
-          description: "Cured in sake and dashi overnight",
-          price: 45,
-          image: siteImage("ikura.jpg"),
-        },
-        {
-          name: "Anago",
-          subtitle: "Saltwater eel",
-          description: "Slow-braised, sweet tsume glaze",
-          price: 55,
-          image: siteImage("anago.jpg"),
-        },
-        {
-          name: "Saba",
-          subtitle: "Mackerel",
-          description: "Pressed, vinegared, ginger",
-          price: 40,
-          image: siteImage("saba.jpg"),
-        },
-        {
-          name: "A5 Wagyu",
-          subtitle: "Miyazaki",
-          description: "Seared on binchotan, smoked soy",
-          price: 95,
-          image: siteImage("a5wagyu.jpg"),
-        },
+        { name: "Salad dầu giấm", price: 59000 },
+        { name: "Salad cải kale", price: 99000 },
+        { name: "Khổ qua chà bông", price: 49000 },
       ],
     },
     {
-      name: "OMAKASE",
-      tagline: "The chef chooses. You arrive hungry, curious, on time.",
+      name: "Gà",
+      tagline: "Sụn gà và lòng mề, chọn món hợp gu.",
       items: [
-        {
-          name: "Hana",
-          subtitle: "seven courses",
-          description: "Sashimi, two warm plates, nigiri selection, dessert",
-          price: 480,
-        },
-        {
-          name: "Tsuki",
-          subtitle: "twelve courses",
-          description: "Full seasonal progression, premium cuts, paired tea",
-          price: 680,
-        },
-        {
-          name: "Yoru",
-          subtitle: "chef's table, eight guests",
-          description: "Extended tasting at the counter, conversation with the chef",
-          price: 880,
-        },
+        { name: "Sụn gà rang muối", price: 99000 },
+        { name: "Lòng mề gà xào hành", price: 79000 },
       ],
     },
     {
-      name: "WINE & SAKE",
+      name: "Mực",
+      tagline: "Mực trứng, răng mực — bơ cay, mắm hay sate?",
       items: [
-        {
-          name: "Dassai 39 Junmai Daiginjo",
-          subtitle: "by the carafe, 180ml",
-          description: "Yamaguchi · floral, restrained",
-          price: 95,
-        },
-        {
-          name: "Tedorigawa Yamahai",
-          subtitle: "by the carafe, 180ml",
-          description: "Ishikawa · earthy, structured",
-          price: 75,
-        },
-        {
-          name: "Chablis 1er Cru, Vaillons",
-          subtitle: "glass",
-          description: "Domaine Dauvissat, 2021",
-          price: 85,
-        },
-        {
-          name: "Champagne Egly-Ouriet Brut Tradition",
-          subtitle: "glass",
-          description: "Grand Cru, Ambonnay",
-          price: 110,
-        },
-        {
-          name: "Hojicha Cold Brew",
-          subtitle: "non-alcoholic, carafe",
-          description: "Roasted, deep, served chilled",
-          price: 35,
-        },
+        { name: "Răng mực sốt bơ cay", price: 99000 },
+        { name: "Răng mực chiên mắm", price: 89000 },
+        { name: "Răng mực sate", price: 89000 },
+        { name: "Mực xào sate", price: 99000 },
+        { name: "Mực trứng chiên mắm", price: 99000 },
+        { name: "Mực trứng xào sate", price: 99000 },
+      ],
+    },
+    {
+      name: "Heo",
+      tagline: "Trộn thính, xào cải chua hay chiên mắm?",
+      items: [
+        { name: "Ba chỉ heo trộn thính", price: 99000 },
+        { name: "Bao tử heo xào cải chua", price: 99000 },
+        { name: "Bao tử heo chiên mắm", price: 99000 },
+      ],
+    },
+    {
+      name: "Bò",
+      tagline: "Gỏi bò Thái Lan hoặc cải thìa xào bò sốt nấm.",
+      items: [
+        { name: "Gỏi bò Thái Lan", price: 99000 },
+        { name: "Cải thìa xào bò sốt nấm", price: 99000 },
+      ],
+    },
+    {
+      name: "Cơm & mì",
+      tagline: "Hội đang đói? Thêm cơm, mì hoặc miến.",
+      items: [
+        { name: "Mì trộn tứ vị", price: 99000 },
+        { name: "Cơm chiên tóp mỡ", price: 89000 },
+        { name: "Miến xào sốt XO", price: 99000 },
+        { name: "Cơm chiên muối é", price: 89000 },
+      ],
+    },
+    {
+      name: "Bia & cider",
+      tagline: site.beerOffer,
+      items: [
+        { name: "Heineken", price: 23000 },
+        { name: "Heineken Silver", price: 23000 },
+        { name: "Tiger Crystal", price: 20000 },
+        { name: "Larue Smooth", price: 20000 },
+        { name: "Tiger Silver", price: 19000 },
+        { name: "Strongbow Dâu", price: 32000 },
+        { name: "Strongbow Táo", price: 32000 },
+        { name: "Strongbow Nho đen", price: 32000 },
       ],
     },
   ],
-  pairings: "Sake flight 220 · wine flight 280 · non-alcoholic 140. Pairings on request.",
-  footnote:
-    "Prices in PLN. Tell us about dietary needs when you reserve. The counter is small, the menu is the chef's — both by design.",
+  pairings: site.beerOffer,
+  footnote: "Giá VNĐ, đã gồm VAT. Nhắn The Hot để hỏi món đang có và ưu đãi hôm bạn ghé.",
 };

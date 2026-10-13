@@ -13,7 +13,7 @@ export function AboutOpening() {
   const tick = usePageTick();
 
   return (
-    <Section aria-label="Opening statement" relative padX={false} padY="none" minH="100dvh" className="isolate">
+    <Section aria-label="Giới thiệu The Hot" relative padX={false} padY="none" minH="100dvh" className="isolate">
       <Fragment key={tick}>
         <motion.div
           {...fadeUp(reduce, 12, 0.1)}
@@ -42,7 +42,7 @@ export function AboutOpening() {
           {...fadeUp(reduce, 24, 0.7)}
           className="absolute bottom-8 left-8 sm:bottom-12 sm:left-12 md:bottom-16 md:left-16 lg:bottom-20 lg:left-20 xl:bottom-24 xl:left-24"
         >
-          <Text variant="small" serif italic leading="snug" tone="dim" measure="reading">
+          <Text variant="small" leading="snug" tone="dim" measure="reading">
             {about.editorial}
           </Text>
         </motion.div>

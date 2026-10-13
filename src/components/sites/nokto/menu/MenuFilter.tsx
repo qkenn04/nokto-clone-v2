@@ -16,7 +16,7 @@ export function MenuFilter({
   onChange: (value: string) => void;
 }) {
   return (
-    <nav aria-label="Filter menu categories">
+    <nav aria-label="Lọc nhóm món">
       <ul className="flex flex-wrap items-center gap-x-6 gap-y-3 sm:gap-x-8">
         {filters.map((filter) => {
           const pressed = filter.value === active;

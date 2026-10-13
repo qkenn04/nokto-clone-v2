@@ -4,10 +4,10 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { EASE_CINEMA } from "../motion";
-import { ASSET_BASE, site } from "../site";
+import { site } from "../site";
 import { Backdrop } from "./Backdrop";
 
-const STORAGE_KEY = "nokto:preloader-shown";
+const STORAGE_KEY = "the-hot:preloader-shown";
 
 function alreadyShown() {
   try {
@@ -67,13 +67,13 @@ export function Preloader() {
             className="relative flex items-center justify-center"
           >
             <Image
-              src={`${ASSET_BASE}/logo.svg`}
-              alt={site.name}
-              width={954}
-              height={187}
+              src={site.logo.src}
+              alt={`${site.name} ${site.location}`}
+              width={site.logo.width}
+              height={site.logo.height}
               preload
               unoptimized
-              className="block h-[3.125rem] w-auto"
+              className="block h-28 w-auto"
             />
           </motion.div>
         </motion.div>
