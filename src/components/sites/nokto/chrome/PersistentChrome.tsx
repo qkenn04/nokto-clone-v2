@@ -57,8 +57,8 @@ function NavItem({ label, href, image, imageWidth, imageHeight, index, isActive,
       >
         <span className="type-label shrink-0 text-muted">{String(index).padStart(2, "0")}</span>
         <span
-          className={`flex flex-1 items-center gap-3 font-serif font-normal tracking-[-0.02em] leading-[var(--leading-none)] text-nav-item ${
-            isActive ? "italic" : ""
+          className={`flex flex-1 items-center gap-3 font-display font-bold uppercase tracking-[-0.02em] leading-[var(--leading-none)] text-nav-item ${
+            isActive ? "text-accent" : ""
           }`}
         >
           <span>{label}</span>
@@ -158,13 +158,13 @@ function SiteNavigation() {
           type="button"
           aria-expanded={open}
           aria-controls="primary-menu"
-          aria-label={open ? "Close menu" : "Open menu"}
+          aria-label={open ? "Đóng điều hướng" : "Mở điều hướng"}
           onClick={() => setOpen((value) => !value)}
           className="pointer-events-auto inline-flex items-center gap-3 text-small uppercase tracking-[var(--tracking-label)] text-foreground transition-colors duration-[var(--duration-fast)] hover:text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
         >
           {open ? (
             <>
-              <span>Close</span>
+              <span>Đóng</span>
               <X aria-hidden className="h-4 w-4" strokeWidth={1.25} />
             </>
           ) : (
@@ -182,7 +182,8 @@ function SiteNavigation() {
             id="primary-menu"
             role="dialog"
             aria-modal="true"
-            aria-label="Primary navigation"
+            aria-label="Điều hướng chính"
+            data-lenis-prevent
             tabIndex={-1}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -197,14 +198,14 @@ function SiteNavigation() {
               </div>
             </div>
             <div className="section-pad relative grid h-full grid-cols-1 items-center gap-12 py-32 sm:py-36 md:py-40 lg:grid-cols-[1fr_minmax(220px,auto)] lg:gap-20 lg:py-24">
-              <nav aria-label="Primary" className="self-center">
+              <nav aria-label="Các trang" className="self-center">
                 <ul className="flex flex-col">
                   {site.nav.map((item, index) => (
                     <NavItem
                       key={item.href}
                       {...item}
                       index={index + 1}
-                      isActive={pathname === item.href || pathname.startsWith(`${item.href}/`)}
+                      isActive={pathname === item.href || pathname.startsWith(`${item.href}/`) || (item.href === "/menu" && pathname === "/the-hot/menu")}
                       delay={0.1 + 0.08 * index}
                       reduce={reduce}
                     />
@@ -218,9 +219,9 @@ function SiteNavigation() {
                 className="hidden self-center lg:block"
               >
                 <Stack gap={8}>
-                  <InfoItem label="Counter" value={site.address.display} />
-                  <InfoItem label="Hours" value={site.hours.display} />
-                  <InfoItem label="Social" value={site.social} />
+                  <InfoItem label="Địa chỉ" value={site.address.display} />
+                  <InfoItem label="Giờ mở cửa" value={site.hours.display} />
+                  <InfoItem label="Facebook" value={site.social} href={site.socialHref} />
                 </Stack>
               </motion.aside>
             </div>
@@ -238,7 +239,7 @@ function FixedBrand() {
   const opacity = useTransform(scrollY, [0, 220], [1, 0], { clamp: true });
   return (
     <motion.div style={{ opacity }} className="section-pad section-pad-y fixed left-0 top-0 z-30">
-      <BrandMark />
+      <BrandMark size="compact" />
     </motion.div>
   );
 }

@@ -1,0 +1,382 @@
+.menuPage {
+  z-index: 1;
+  color: var(--color-foreground);
+}
+
+.layout {
+  display: grid;
+  gap: 2rem;
+  padding-block: 7rem 2.5rem;
+}
+
+.intro {
+  min-width: 0;
+  max-width: 28rem;
+}
+
+.introNote {
+  display: none;
+}
+
+.bookArea {
+  min-width: 0;
+  width: min(100%, 31rem);
+  justify-self: center;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.pageSelect {
+  position: relative;
+  min-width: 0;
+  flex: 1;
+}
+
+.pageSelect select {
+  width: 100%;
+  min-height: 2.75rem;
+  appearance: none;
+  padding: 0.65rem 2.25rem 0.65rem 0.875rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  font-size: var(--text-small);
+}
+
+.pageSelect svg {
+  position: absolute;
+  top: 50%;
+  right: 0.75rem;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--color-muted);
+}
+
+.expandButton,
+.control {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid var(--color-border);
+  background: var(--color-background);
+  color: var(--color-foreground);
+  transition: color var(--duration-fast), border-color var(--duration-fast), background var(--duration-fast);
+}
+
+.expandButton {
+  gap: 0.6rem;
+  padding: 0.65rem 0.875rem;
+  font-size: var(--text-small);
+  font-weight: 500;
+}
+
+.control {
+  width: 2.75rem;
+}
+
+.expandButton:hover:not(:disabled),
+.control:hover:not(:disabled) {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-accent-foreground);
+}
+
+.control:disabled,
+.expandButton:disabled,
+.pageSelect select:disabled {
+  opacity: 0.35;
+}
+
+.control:focus-visible,
+.expandButton:focus-visible,
+.pageSelect select:focus-visible,
+.paperStage:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 4px;
+}
+
+.bookShell {
+  position: relative;
+  margin: 0;
+}
+
+.paperStage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1414 / 2000;
+  overflow: hidden;
+  perspective: 1800px;
+  touch-action: pan-y pinch-zoom;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 1.5rem 3rem rgb(0 0 0 / 0.25);
+}
+
+.paperBase,
+.paperTurn {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+.paperTurn {
+  z-index: 2;
+}
+
+.paperTurn::after {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  content: "";
+  background: linear-gradient(90deg, rgb(0 0 0 / 0.2), transparent 16%, transparent 82%, rgb(0 0 0 / 0.12));
+}
+
+.paperImage {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.bookCaption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-top: 1rem;
+}
+
+.pageStatus {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  text-align: center;
+}
+
+.captionTitle {
+  font-size: var(--text-small);
+  font-weight: 600;
+}
+
+.progress {
+  display: flex;
+  gap: 0.3rem;
+  margin-top: 1.25rem;
+}
+
+.progress span {
+  flex: 1;
+  height: 2px;
+  background: var(--color-border);
+  transition: background var(--duration-fast);
+}
+
+.progress .progressRead {
+  background: var(--color-accent);
+}
+
+.hint {
+  margin: 0.75rem 0 0;
+  color: var(--color-muted);
+  font-size: 0.6875rem;
+  line-height: 1.7;
+  text-align: center;
+}
+
+.closing {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.5rem;
+  padding-block: 1.75rem 2.5rem;
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+.readerDialog {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: var(--color-background);
+  color: var(--color-foreground);
+}
+
+.readerDialog::backdrop {
+  background: rgb(0 0 0 / 0.9);
+}
+
+/* Native dialogs sit above the site's custom cursor. */
+.readerDialog,
+.readerDialog * {
+  cursor: auto;
+}
+
+.readerDialog button,
+.readerDialog select {
+  cursor: pointer;
+}
+
+.dialogLayout {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+}
+
+.dialogHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.dialogTitle {
+  margin: 0.15rem 0 0;
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.dialogActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.readerViewport {
+  min-height: 0;
+  flex: 1;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 1rem;
+}
+
+.readerCanvas {
+  display: flex;
+  width: 100%;
+  min-height: 100%;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.readerImage {
+  display: block;
+  width: min(100%, calc((100dvh - 12.5rem) * 1414 / 2000));
+  height: auto;
+  flex-shrink: 0;
+}
+
+.readerCanvasZoomed {
+  width: max(100%, min(160vw, 80rem));
+}
+
+.readerCanvasZoomed .readerImage {
+  width: min(100%, 80rem);
+}
+
+.dialogFooter {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  border-top: 1px solid var(--color-border);
+}
+
+@media (width < 25rem) {
+  .expandButton span {
+    display: none;
+  }
+
+  .expandButton {
+    width: 2.75rem;
+    padding-inline: 0;
+  }
+}
+
+@media (width >= 40rem) {
+  .layout {
+    padding-top: 8rem;
+  }
+
+  .closing {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+@media (width >= 48rem) {
+  .layout {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    align-items: start;
+    gap: clamp(2.5rem, 5vw, 5rem);
+    padding-block: 9rem 3rem;
+  }
+
+  .intro {
+    position: sticky;
+    top: 9rem;
+  }
+
+  .introNote {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .bookArea {
+    width: min(100%, 31rem, max(18rem, calc((100svh - 22rem) * 1414 / 2000)));
+    justify-self: center;
+  }
+
+  .dialogHeader,
+  .dialogFooter {
+    padding-inline: 2rem;
+  }
+}
+
+@media (width >= 64rem) {
+  .layout {
+    padding-top: 10rem;
+  }
+
+  .intro {
+    top: 10rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .control,
+  .expandButton,
+  .progress span {
+    transition: none;
+  }
+}

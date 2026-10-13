@@ -5,13 +5,13 @@ import { EASE_CINEMA, revealOnView } from "../motion";
 import { Heading, Section, Text } from "../ui";
 import { about } from "./content";
 
-/** The chef's quote at h1 size with its accent attribution. */
+/** The Hot's tagline at h1 size with its accent attribution. */
 export function AboutQuote() {
   const reduce = !!useReducedMotion();
 
   return (
     <Section
-      aria-label="In the chef's words"
+      aria-label="Đà Lạt Chill Zone"
       relative
       padY="lg-loose"
       className="flex items-center lg:min-h-[90dvh]"

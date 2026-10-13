@@ -22,12 +22,12 @@ function stepState(step: StepNumber, current: StepNumber): StepState {
 /** "Progress" aside: hand-drawn path with three dots and the step labels beneath. */
 export function ReservationProgress({ current }: { current: StepNumber }) {
   return (
-    <aside aria-label="Reservation context">
+    <aside aria-label="Các bước chuẩn bị">
       <Stack gap={4}>
         <Text variant="label" tone="muted">
-          Progress
+          Các bước
         </Text>
-        <div role="group" aria-label="Reservation progress" className="w-full">
+        <div role="group" aria-label="Tiến trình" className="w-full">
           <div className="w-full max-w-md">
             <div aria-hidden className="pointer-events-none relative aspect-[303/10] w-full">
               <Image

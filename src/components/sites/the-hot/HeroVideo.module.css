@@ -1,0 +1,31 @@
+.overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgb(9 9 11 / 0.4) 0%,
+    rgb(9 9 11 / 0.55) 35%,
+    rgb(9 9 11 / 0.7) 72%,
+    var(--color-background) 100%
+  );
+}
+
+@media (width >= 64rem) {
+  .overlay {
+    background:
+      linear-gradient(
+        90deg,
+        var(--color-background) 0%,
+        rgb(9 9 11 / 0.4) 12%,
+        rgb(9 9 11 / 0.08) 38%,
+        rgb(9 9 11 / 0.12) 100%
+      ),
+      linear-gradient(
+        180deg,
+        rgb(9 9 11 / 0.25) 0%,
+        transparent 40%,
+        rgb(9 9 11 / 0.45) 100%
+      );
+  }
+}

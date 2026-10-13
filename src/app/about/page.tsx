@@ -11,8 +11,8 @@ import { FixedPhoto } from "@/components/sites/nokto/chrome/FixedPhoto";
 import { SiteFooter } from "@/components/sites/nokto/chrome/SiteFooter";
 import { site } from "@/components/sites/nokto/site";
 
-const title = "About";
-const description = "Eighteen seats. One chef. The story behind NOKTO, Warsaw's omakase counter.";
+const title = "Về The Hot";
+const description = "The Hot — quán nhậu của hội bạn ở Đà Lạt. Mồi bén, bia lạnh, nhạc lên tại 28 Sương Nguyệt Ánh, P. Lâm Viên.";
 
 export const metadata: Metadata = {
   title,

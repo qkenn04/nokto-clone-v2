@@ -2,7 +2,7 @@
 export function ReservationLoading() {
   return (
     <main aria-busy="true" aria-live="polite" className="relative w-full bg-background">
-      <span className="sr-only">Loading reservation form…</span>
+      <span className="sr-only">Đang tải thông tin đặt bàn…</span>
       <div className="w-full section-pad">
         <div className="flex flex-col gap-4 pt-28 sm:pt-32 md:pt-36 lg:pt-40 pb-24 sm:pb-28 md:pb-32">
           <div className="flex flex-col gap-10 motion-safe:animate-pulse">

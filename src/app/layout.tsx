@@ -4,7 +4,6 @@ import { CustomCursor } from "@/components/sites/nokto/chrome/CustomCursor";
 import { PageTransition } from "@/components/sites/nokto/chrome/PageTransition";
 import { PersistentChrome } from "@/components/sites/nokto/chrome/PersistentChrome";
 import { Preloader } from "@/components/sites/nokto/chrome/Preloader";
-import { ScrollManager } from "@/components/sites/nokto/chrome/ScrollManager";
 import { SmoothScroll } from "@/components/sites/nokto/chrome/SmoothScroll";
 import { site } from "@/components/sites/nokto/site";
 import "./globals.css";
@@ -17,7 +16,7 @@ export const metadata: Metadata = {
   description: site.rootDescription,
   robots: { index: true, follow: true },
   alternates: { canonical: "/" },
-  openGraph: { title: site.rootTitle, description: site.rootDescription, url: "/", type: "website" },
+  openGraph: { title: site.rootTitle, description: site.rootDescription, url: "/", type: "website", locale: "vi_VN", siteName: site.name },
   twitter: { card: "summary_large_image", title: site.rootTitle, description: site.rootDescription },
 };
 
@@ -33,35 +32,31 @@ const restaurantSchema = {
   name: site.name,
   description: site.schemaDescription,
   url: siteUrl,
-  image: `${siteUrl}/opengraph-image`,
+  image: `${siteUrl}/opengraph-image.png`,
   address: {
     "@type": "PostalAddress",
     streetAddress: site.address.street,
     addressLocality: site.address.city,
+    addressRegion: site.address.region,
     addressCountry: site.address.country,
   },
   servesCuisine: site.cuisine,
-  priceRange: site.priceRange,
-  openingHoursSpecification: [
-    {
-      "@type": "OpeningHoursSpecification",
-      dayOfWeek: site.hours.days,
-      opens: site.hours.opens,
-      closes: site.hours.closes,
-    },
-  ],
+  telephone: site.phoneHref.slice(4),
+  sameAs: [site.socialHref],
+  hasMenu: `${siteUrl}/menu`,
+  currenciesAccepted: "VND",
   acceptsReservations: "True",
 };
 
-const FONT_FILES = ["inter-tight-latin", "fraunces-latin", "fraunces-italic-latin"];
+const FONT_FILES = ["barlow-condensed-700-latin", "barlow-condensed-700-vietnamese", "be-vietnam-pro-400-latin", "be-vietnam-pro-400-vietnamese"];
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   for (const file of FONT_FILES) {
-    preload(`/sites/nokto/fonts/${file}.woff2`, { as: "font", type: "font/woff2", crossOrigin: "" });
+    preload(`/sites/the-hot-beer-garden/fonts/${file}.woff2`, { as: "font", type: "font/woff2", crossOrigin: "" });
   }
 
   return (
-    <html lang="en">
+    <html lang="vi">
       <body>
         <script
           type="application/ld+json"
@@ -71,14 +66,13 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[300] focus:bg-accent focus:text-accent-foreground focus:px-4 focus:py-2 focus:text-small focus:tracking-[var(--tracking-label)] focus:uppercase focus:no-underline focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent"
         >
-          Skip to content
+          Chuyển đến nội dung
         </a>
         <CustomCursor />
         <PersistentChrome />
         <PageTransition>{children}</PageTransition>
         <Preloader />
         <SmoothScroll />
-        <ScrollManager />
       </body>
     </html>
   );

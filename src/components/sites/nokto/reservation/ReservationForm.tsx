@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, LoaderCircle } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { scaleVariants, slideVariants } from "../motion";
@@ -21,10 +21,7 @@ import {
 
 type FormStep = StepNumber | "success";
 
-// Demo only: nothing is sent anywhere. A short pause keeps the source's "Confirming…" state visible.
-const SIMULATED_SUBMIT_MS = 900;
-
-/** Three-step booking form (When → Who → Confirm) with a local, simulated confirmation. */
+/** Prepare a local booking summary before contacting The Hot. */
 export function ReservationForm() {
   const reduce = useReducedMotion() ?? false;
   const [step, setStep] = useState<FormStep>(1);
@@ -32,7 +29,6 @@ export function ReservationForm() {
   const [data, setData] = useState<ReservationData>(initialReservation);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [showErrors, setShowErrors] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
 
   const updateField = useCallback<UpdateField>((field, value) => {
@@ -76,9 +72,8 @@ export function ReservationForm() {
   }, [goTo, step]);
 
   const submit = useCallback(
-    async (event: FormEvent<HTMLFormElement>) => {
+    (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
-      if (submitting) return;
       if (step !== 3) {
         goForward();
         return;
@@ -88,12 +83,9 @@ export function ReservationForm() {
         reportErrors(found);
         return;
       }
-      setSubmitting(true);
-      await new Promise((resolve) => setTimeout(resolve, SIMULATED_SUBMIT_MS));
-      setSubmitting(false);
       goTo("success", 1);
     },
-    [data, goForward, goTo, reportErrors, step, submitting],
+    [data, goForward, goTo, reportErrors, step],
   );
 
   const reset = useCallback(() => {
@@ -116,7 +108,7 @@ export function ReservationForm() {
   const visibleErrors = showErrors ? errors : {};
 
   return (
-    <Section as="section" id="reservation-form" aria-label="Reservation form" relative tone="background" padY="lg">
+    <Section as="section" id="reservation-form" aria-label="Thông tin đặt bàn" relative tone="background" padY="lg">
       <div className="border-t border-border-subtle">
         <Stack gap={12} className="pt-12 lg:gap-16">
           <ReservationProgress current={isSuccess ? 3 : step} />
@@ -124,7 +116,6 @@ export function ReservationForm() {
             ref={formRef}
             noValidate
             onSubmit={submit}
-            aria-busy={submitting || undefined}
             className="flex w-full flex-col"
           >
             <div className="relative">
@@ -176,16 +167,10 @@ export function ReservationForm() {
                   ) : (
                     <button
                       type="submit"
-                      disabled={submitting}
-                      aria-busy={submitting || undefined}
                       className={buttonClass("primary")}
                     >
-                      <span>{submitting ? reservation.actions.submitting : reservation.actions.submit}</span>
-                      {submitting ? (
-                        <LoaderCircle aria-hidden strokeWidth={1.5} className="h-4 w-4 motion-safe:animate-spin" />
-                      ) : (
-                        <ArrowRight aria-hidden className="h-4 w-4" strokeWidth={1.5} />
-                      )}
+                      <span>{reservation.actions.submit}</span>
+                      <ArrowRight aria-hidden className="h-4 w-4" strokeWidth={1.5} />
                     </button>
                   )}
                 </div>

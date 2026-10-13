@@ -176,22 +176,22 @@ export function Section({
 }
 
 const headingLevels = {
-  display: "text-display leading-[var(--leading-display)] tracking-[-0.035em]",
-  h1: "text-h1 leading-[var(--leading-tight)] tracking-[-0.03em]",
-  h2: "text-h2 leading-[var(--leading-tight)] tracking-[-0.025em]",
+  display: "text-display leading-[var(--leading-display)] tracking-[-0.01em]",
+  h1: "text-h1 leading-[var(--leading-tight)] tracking-[-0.01em]",
+  h2: "text-h2 leading-[var(--leading-tight)] tracking-[-0.01em]",
   h3: "text-h3 leading-[var(--leading-tight)] tracking-[-0.02em]",
   category: "text-category-name leading-[var(--leading-tight)] tracking-[-0.015em]",
   closing: "text-closing leading-[var(--leading-none)]",
   stat: "text-stat leading-[var(--leading-tight)] tracking-[var(--tracking-display)]",
 } as const;
 
-/** Serif heading. `as` sets the element, `level` sets the visual size. */
+/** Bold display heading. `as` sets the element, `level` sets the visual size. */
 export function Heading({
   as: Tag = "h2",
   level = "h2",
-  family = "serif",
+  family = level === "h3" ? "sans" : "display",
   italic = false,
-  weight = "normal",
+  weight = family === "display" ? "bold" : "semibold",
   tone = "default",
   balance = true,
   className,
@@ -200,9 +200,9 @@ export function Heading({
 }: {
   as?: ElementType;
   level?: keyof typeof headingLevels;
-  family?: "sans" | "serif";
+  family?: "sans" | "display";
   italic?: boolean;
-  weight?: "light" | "normal" | "medium";
+  weight?: "normal" | "medium" | "semibold" | "bold";
   tone?: "default" | "muted" | "accent";
   balance?: boolean;
   className?: string;
@@ -212,9 +212,9 @@ export function Heading({
     <Tag
       className={cx(
         headingLevels[level],
-        family === "serif" ? "font-serif" : "font-sans",
+        family === "display" ? "font-display uppercase" : "font-sans",
         tone === "default" ? "text-foreground" : tone === "muted" ? "text-muted" : "text-accent",
-        weight === "light" ? "font-light" : weight === "medium" ? "font-medium" : "font-normal",
+        weight === "bold" ? "font-bold" : weight === "semibold" ? "font-semibold" : weight === "medium" ? "font-medium" : "font-normal",
         italic && "italic",
         balance && "text-balance",
         className,
@@ -271,11 +271,10 @@ const textMeasure = {
   none: "",
 } as const;
 
-/** Body/label/editorial text. Serif text defaults to the light weight, as in the source. */
+/** Readable body, supporting and label text. */
 export function Text({
   as: Tag = "p",
   variant = "body",
-  serif = false,
   italic = false,
   weight,
   tone = "default",
@@ -292,7 +291,6 @@ export function Text({
 }: {
   as?: ElementType;
   variant?: keyof typeof textVariant;
-  serif?: boolean;
   italic?: boolean;
   weight?: keyof typeof textWeight;
   tone?: keyof typeof textTone;
@@ -306,7 +304,6 @@ export function Text({
   className?: string;
   children?: ReactNode;
 } & Omit<ComponentPropsWithoutRef<"p">, "className" | "children">) {
-  const resolvedWeight = weight ?? (serif ? "light" : undefined);
   return (
     <Tag
       className={cx(
@@ -314,9 +311,8 @@ export function Text({
         leading ? textLeading[leading] : textVariantLeading[variant],
         tracking ? textTracking[tracking] : textVariantTracking[variant],
         textTone[tone],
-        serif && "font-serif",
         italic && "italic",
-        resolvedWeight && textWeight[resolvedWeight],
+        weight && textWeight[weight],
         uppercase && variant !== "label" && "uppercase tracking-[var(--tracking-label)]",
         balance && "text-balance",
         pretty && "text-pretty",
@@ -332,7 +328,7 @@ export function Text({
 }
 
 const buttonBase =
-  "inline-flex items-center uppercase text-small tracking-[var(--tracking-label)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent transition-colors duration-[var(--duration-fast)] disabled:opacity-50 disabled:pointer-events-none";
+  "inline-flex items-center uppercase text-small font-semibold tracking-[var(--tracking-label)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent transition-colors duration-[var(--duration-fast)] disabled:opacity-50 disabled:pointer-events-none";
 
 const buttonVariants = {
   primary:

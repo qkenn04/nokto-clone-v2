@@ -10,17 +10,17 @@ export default function Error({ retry }: { error: Error & { digest?: string }; r
         <BrandMark />
         <Stack gap={6}>
           <Heading as="h1" level="h1">
-            Something went wrong.
+            Trang chưa tải được.
           </Heading>
-          <Text variant="editorial" serif italic leading="snug" tone="muted" measure="comfort">
-            The page didn&apos;t load as expected. Try again, or return to the counter.
+          <Text variant="editorial" leading="snug" tone="muted" measure="comfort">
+            Vui lòng thử lại hoặc quay về trang chủ The Hot.
           </Text>
           <div className="flex flex-col gap-4 pt-4 sm:flex-row sm:items-center sm:gap-6">
             <button type="button" onClick={() => retry()} className={buttonClass("primary")}>
-              Try again
+              Thử lại
             </button>
             <ButtonLink href="/" variant="ghost">
-              Return home
+              Về trang chủ
             </ButtonLink>
           </div>
         </Stack>

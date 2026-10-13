@@ -1,6 +1,5 @@
 import { FixedPhoto } from "../chrome/FixedPhoto";
 import { SiteFooter } from "../chrome/SiteFooter";
-import { siteImage } from "../site";
 import { ButtonLink, Heading, Section, Stack, Text } from "../ui";
 import type { LegalDocument, LegalSection } from "./content";
 
@@ -12,14 +11,14 @@ function LegalHeader({ content }: { content: LegalDocument }) {
           <Text variant="label" tone="muted">
             {content.eyebrow}
           </Text>
-          <Text as="span" variant="small" tone="subtle" serif italic>
-            Last updated: {content.updated}
+          <Text as="span" variant="small" tone="subtle">
+            Cập nhật: {content.updated}
           </Text>
         </div>
-        <Heading as="h1" level="h1" weight="light">
+        <Heading as="h1" level="h1">
           {content.title}
         </Heading>
-        <Text variant="editorial" leading="snug" tone="faded" serif italic>
+        <Text variant="editorial" leading="snug" tone="faded">
           {content.intro}
         </Text>
       </Stack>
@@ -36,7 +35,7 @@ function LegalSectionItem({ number, section }: { number: string; section: LegalS
             {number}
           </Text>
           <Stack gap={3}>
-            <Heading as="h2" level="h3" weight="light">
+            <Heading as="h2" level="h3">
               {section.title}
             </Heading>
             <Text tone="soft">{section.body}</Text>
@@ -51,7 +50,7 @@ function LegalSectionItem({ number, section }: { number: string; section: LegalS
 export function LegalPage({ content }: { content: LegalDocument }) {
   return (
     <main id="main-content" className="relative w-full">
-      <FixedPhoto src={siteImage(content.image.file)} alt={content.image.alt} />
+      <FixedPhoto src={content.image.src} alt={content.image.alt} />
       <div className="relative z-10 lg:w-1/2">
         <Section as="div" padY="none">
           <Stack gap={4} className="pt-28 pb-24 sm:pt-32 sm:pb-28 md:pt-36 md:pb-32 lg:pt-40">
@@ -69,7 +68,7 @@ export function LegalPage({ content }: { content: LegalDocument }) {
                 </ol>
                 <div className="pt-6">
                   <ButtonLink href="/" variant="ghost">
-                    ← Return home
+                    ← Về trang chủ
                   </ButtonLink>
                 </div>
               </Stack>

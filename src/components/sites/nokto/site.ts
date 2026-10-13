@@ -1,48 +1,58 @@
-// Site-wide content observed on https://nokto-template.vercel.app/.
+// Business details from The Hot's supplied menu and event poster.
 export const ASSET_BASE = "/sites/nokto";
+export const THE_HOT_ASSET_BASE = "/sites/the-hot-beer-garden";
+
+const sloganLines = ["Đà Lạt lên đèn,", "The Hot lên mood."] as const;
+const slogan = sloganLines.join(" ");
 
 export const site = {
-  name: "NOKTO",
-  location: "Warsaw",
-  rootTitle: "NOKTO — Next.js Restaurant Website Template",
+  name: "The Hot Beer Garden",
+  location: "Đà Lạt",
+  slogan,
+  sloganLines,
+  rootTitle: `The Hot Beer Garden Đà Lạt — ${slogan}`,
   rootDescription:
-    "An eighteen-seat omakase counter in Warsaw. One chef. One seasonal menu. Two seatings a night, Tuesday through Saturday.",
-  rootOgDescription: "Dine in the half-light. Eighteen seats. Two seatings a night.",
-  schemaDescription: "An eighteen-seat omakase counter in Warsaw. Two seatings a night, Tuesday through Saturday.",
-  label: "RESTAURANT — WARSAW",
-  tagline: "Warsaw Omakase Counter",
+    `${slogan} Quán nhậu cho hội bạn ở Đà Lạt: mồi bén, bia lạnh, nhạc lên. Ghé 28 Sương Nguyệt Ánh, P. Lâm Viên từ 17:30. Đặt bàn: 0967 539 939.`,
+  rootOgDescription: `${slogan} Mồi bén, bia lạnh và những đêm nhạc giữa Đà Lạt.`,
+  schemaDescription: "The Hot Beer Garden tại 28 Sương Nguyệt Ánh, P. Lâm Viên, Đà Lạt. Nhà hàng nhậu cho giới trẻ, phục vụ món ăn, bia và âm nhạc từ 17:30 đến khuya.",
+  label: "BEER GARDEN — ĐÀ LẠT",
+  tagline: "Đà Lạt Chill Zone",
+  logo: { src: `${THE_HOT_ASSET_BASE}/images/logo.png`, width: 640, height: 479 },
   nav: [
-    { label: "Menu", href: "/menu", image: `${ASSET_BASE}/images/menu.svg`, imageWidth: 228, imageHeight: 231 },
-    { label: "About", href: "/about", image: `${ASSET_BASE}/images/about.svg`, imageWidth: 228, imageHeight: 226 },
+    { label: "Thực đơn", href: "/menu", image: `${ASSET_BASE}/images/menu.svg`, imageWidth: 228, imageHeight: 231 },
+    { label: "Về The Hot", href: "/about", image: `${ASSET_BASE}/images/about.svg`, imageWidth: 228, imageHeight: 226 },
     {
-      label: "Reservations",
+      label: "Đặt bàn",
       href: "/reservation",
       image: `${ASSET_BASE}/images/reservations.svg`,
       imageWidth: 194,
       imageHeight: 226,
     },
   ],
-  cta: { label: "Reserve a table", href: "/reservation" },
+  cta: { label: "Đặt bàn", href: "/reservation" },
   hours: {
-    days: ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-    opens: "18:00",
-    closes: "23:30",
-    display: "Tue – Sat · Seatings at 18:00 & 21:00",
+    opens: "17:30",
+    display: "17:30 – Late",
   },
-  address: { street: "Próżna 12", city: "Warsaw", country: "PL", display: "Próżna 12 · Warsaw" },
-  phone: "+48 22 555 0123",
-  email: "privacy@nokto.example",
-  social: "Instagram @nokto.warsaw",
-  footer: "NOKTO · Warsaw · Est. 2021",
-  cuisine: "Japanese",
-  priceRange: "$$$$",
-  currency: { symbol: "PLN", position: "after" },
+  address: { street: "28 Sương Nguyệt Ánh, P. Lâm Viên", city: "Đà Lạt", region: "Lâm Đồng", country: "VN", display: "28 Sương Nguyệt Ánh, P. Lâm Viên, Đà Lạt" },
+  phone: "0967 539 939",
+  phoneHref: "tel:+84967539939",
+  social: "The Hot Beer Garden Đà Lạt",
+  socialHref: "https://www.facebook.com/thehotbeergardendalat/",
+  footer: "The Hot · Đà Lạt Chill Zone",
+  cuisine: "Vietnamese",
+  currency: { symbol: "₫", position: "after" },
+  beerOffer: "Giá bia trong menu áp dụng từ Chủ nhật đến thứ Năm hằng tuần.",
   legal: [
-    { label: "Terms & Conditions", href: "/terms" },
-    { label: "Privacy Policy", href: "/privacy" },
+    { label: "Thông tin đặt bàn", href: "/terms" },
+    { label: "Bảo mật thông tin", href: "/privacy" },
   ],
 } as const;
 
 export function siteImage(file: string) {
   return `${ASSET_BASE}/images/${file}`;
+}
+
+export function hotImage(file: string) {
+  return `${THE_HOT_ASSET_BASE}/images/${file}`;
 }

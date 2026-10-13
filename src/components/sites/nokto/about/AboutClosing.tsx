@@ -10,7 +10,7 @@ export function AboutClosing() {
   const reduce = !!useReducedMotion();
 
   return (
-    <Section aria-label="Closing" relative padY="lg" className="flex items-center lg:min-h-[80dvh]">
+    <Section aria-label="Hẹn ở The Hot" relative padY="lg" className="flex items-center lg:min-h-[80dvh]">
       <div className="grid w-full grid-cols-1 lg:grid-cols-12 lg:gap-x-6">
         <div className="flex flex-col lg:col-start-2 lg:col-end-9">
           <motion.div {...revealOnView(reduce, 0)}>

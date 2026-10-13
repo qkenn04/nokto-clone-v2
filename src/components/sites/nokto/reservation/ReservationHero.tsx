@@ -36,7 +36,7 @@ export function ReservationHero() {
   }, [reduce]);
 
   return (
-    <Section as="section" aria-label="Reservations" relative padX={false} padY="none" minH="100dvh" className="isolate">
+    <Section as="section" aria-label="Đặt bàn The Hot" relative padX={false} padY="none" minH="100dvh" className="isolate">
       <Fragment key={tick}>
         <motion.div
           {...fadeUp(reduce, 12, 0.1)}
@@ -63,7 +63,7 @@ export function ReservationHero() {
               ))}
             </Heading>
             <motion.div {...fadeUp(reduce, 24, 0.55)}>
-              <Text variant="editorial" serif italic weight="light" leading="snug" tone="low" measure="comfort">
+              <Text variant="editorial" leading="snug" tone="low" measure="comfort">
                 {hero.intro}
               </Text>
             </motion.div>
