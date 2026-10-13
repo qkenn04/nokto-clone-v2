@@ -16,7 +16,7 @@ npm run check      # lint + typecheck + production build
 
 ## CI/CD
 
-Every push to `main` is built and deployed to https://nokto.qkenn.cloud:
+Every push to `main` is built and deployed to https://thehot.k2-tech.dev (the old https://nokto.qkenn.cloud redirects there):
 
 ```
 GitHub main ──poll 5 min──▶ Jenkins (qkenn-ci, WSL) ──push──▶ Harbor (qkenn-ci) ◀──pull── VPS
@@ -31,7 +31,7 @@ GitHub main ──poll 5 min──▶ Jenkins (qkenn-ci, WSL) ──push──�
 
   ```bash
   docker build --target check .
-  docker build --target runner --build-arg NEXT_PUBLIC_SITE_URL=https://nokto.qkenn.cloud -t nokto:local .
+  docker build --target runner --build-arg NEXT_PUBLIC_SITE_URL=https://thehot.k2-tech.dev -t nokto:local .
   ci/smoke-test.sh nokto:local
   ```
 
@@ -61,4 +61,4 @@ The form reproduces the source's three steps, validation, and confirmation scree
 
 - Inspection notes and the build brief: `docs/research/nokto/brief.md`. Comparison screenshots: `docs/design-references/nokto/`.
 - The legal pages reproduce the source template's sample text; they do not describe this app.
-- Images, logo, fonts, and copy belong to the source template's owner. This repository and the deployment at nokto.qkenn.cloud are public as a learning project; the deployment sends `X-Robots-Tag: noindex, nofollow` so search engines do not index it. Check the template's licence before any other public use.
+- Images, logo, fonts, and copy belong to the source template's owner. This repository and the deployment at thehot.k2-tech.dev are public as a learning project; the deployment sends `X-Robots-Tag: noindex, nofollow` so search engines do not index it. Check the template's licence before any other public use.

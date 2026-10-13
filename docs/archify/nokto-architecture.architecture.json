@@ -2,7 +2,7 @@
   "schema_version": 1,
   "diagram_type": "architecture",
   "meta": {
-    "title": "nokto.qkenn.cloud — Kiến trúc hệ thống",
+    "title": "thehot.k2-tech.dev (NOKTO clone) — Kiến trúc hệ thống",
     "output": "nokto-architecture.html",
     "quality_profile": "showcase"
   },
@@ -16,7 +16,7 @@
     { "id": "deploysh", "type": "security", "label": "/srv/nokto/deploy.sh", "sublabel": "forced command · flock · rollback", "pos": [820, 620], "size": [230, 64] },
     { "id": "web", "type": "frontend", "label": "nokto-web", "sublabel": "Next.js 16 · 512 MB · 1 CPU", "pos": [1240, 620], "size": [230, 64] },
     { "id": "nginx", "type": "security", "label": "Nginx", "sublabel": ":443 · X-Robots-Tag noindex", "pos": [1240, 480], "size": [230, 64] },
-    { "id": "cf", "type": "cloud", "label": "Cloudflare", "sublabel": "proxy · DNS nokto.qkenn.cloud", "pos": [1240, 340], "size": [230, 64] },
+    { "id": "cf", "type": "cloud", "label": "Cloudflare", "sublabel": "proxy · DNS thehot.k2-tech.dev", "pos": [1240, 340], "size": [230, 64] },
     { "id": "viewer", "type": "external", "label": "Người xem", "sublabel": "trình duyệt", "pos": [1240, 200], "size": [230, 64] }
   ],
   "boundaries": [
@@ -60,7 +60,7 @@
       "nokto-clone-v2: Dockerfile · Jenkinsfile · ci/smoke-test.sh",
       "infra-qkenn/ci: Harbor + Jenkins (compose, JCasC)",
       "infra-qkenn/stacks/nokto: compose.yml · deploy.sh",
-      "infra-qkenn/nginx/conf.d/nokto.qkenn.cloud.conf"
+      "infra-qkenn/nginx/conf.d/thehot.k2-tech.dev.conf"
     ] },
     { "dot": "slate", "title": "Còn mở (12/10/2026)", "items": [
       "Harbor không tự lên lại sau khi WSL khởi động lại",

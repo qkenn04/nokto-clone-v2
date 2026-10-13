@@ -1,4 +1,4 @@
-// Build, test and deploy https://nokto.qkenn.cloud.
+// Build, test and deploy https://thehot.k2-tech.dev (nokto.qkenn.cloud redirects there).
 //
 // Runs on the qkenn-ci Jenkins (infra-qkenn/ci/jenkins). The `docker` agent talks to its own
 // Docker daemon, images go to the Harbor registry on the same machine, and the deploy is one SSH
@@ -19,7 +19,7 @@ def notifyDiscord(String title, int color) {
              fields: [{name: "Repo", value: "qkenn04/nokto-clone-v2", inline: true},
                       {name: "Commit", value: $sha, inline: true},
                       {name: "Build", value: $build, inline: true}],
-             footer: {text: "nokto.qkenn.cloud · Jenkins qkenn-ci · Harbor"},
+             footer: {text: "thehot.k2-tech.dev · Jenkins qkenn-ci · Harbor"},
              timestamp: (now | todate)}]}' > discord.json
         curl -sS --fail-with-body -H 'Content-Type: application/json' -d @discord.json "$WEBHOOK" >/dev/null
       '''
@@ -42,7 +42,7 @@ pipeline {
   environment {
     REGISTRY = 'qkenn-ci.tailb41a82.ts.net'
     IMAGE = "${REGISTRY}/nokto/web"
-    SITE_URL = 'https://nokto.qkenn.cloud'
+    SITE_URL = 'https://thehot.k2-tech.dev'
     VPS = '100.93.222.27' // qkenn-server on the tailnet; the deploy key only works from 100.64.0.0/10
   }
 
@@ -105,7 +105,7 @@ pipeline {
 
   post {
     success {
-      notifyDiscord('✅ Deploy thành công — nokto.qkenn.cloud', 3066993)
+      notifyDiscord('✅ Deploy thành công — thehot.k2-tech.dev', 3066993)
     }
     failure {
       script {
