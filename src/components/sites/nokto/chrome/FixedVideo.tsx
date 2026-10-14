@@ -8,11 +8,11 @@ import styles from "./FixedVideo.module.css";
 export type VideoSource = { src: string; type: string };
 
 // Matches Tailwind's `lg` breakpoint, where the panel becomes visible.
-const DESKTOP_QUERY = "(min-width: 64rem)";
+export const DESKTOP_QUERY = "(min-width: 64rem)";
 const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 
 /** Live `matchMedia` result; `false` during SSR and hydration so the server markup never carries video sources. */
-function useMediaQuery(query: string) {
+export function useMediaQuery(query: string) {
   const subscribe = useCallback(
     (onChange: () => void) => {
       const list = window.matchMedia(query);

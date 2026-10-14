@@ -4,7 +4,7 @@
 
 Tốc độ trên điện thoại ảnh hưởng tới xếp hạng và tới dữ liệu di động của khách. Spec này đặt mục tiêu đo được cho https://thehot.vn, ghi mốc đo ban đầu và liệt kê các thay đổi theo thứ tự lợi ích. Số đo chính thức (kèm cách đo) nằm ở [Hiệu năng: số đo](../../dev/perf.md); ở đây chỉ trích để giải thích.
 
-Hiện thực: phần A (ưu tiên ảnh LCP, logo đúng kích thước) chạy trên production từ Jenkins build #16 (PR #4). Phần C (cache) xong 2026-10-15: Cloudflare (chủ quán), header 7 ngày ở reverse proxy (repo hạ tầng), `images.minimumCacheTTL` 7 ngày (PR #9, Jenkins build #19); lần gọi thứ hai trúng cache Cloudflare. Chưa đo lại PageSpeed sau PR #4 và sau cache. Phần B chờ chủ quán chọn cách xử lý âm thanh video (chủ quán muốn giữ âm thanh); phần D còn AVIF và `sizes`; E–H chưa làm, nhiều phần cần chủ quán duyệt. Trạng thái chi tiết ở [tasks.md](tasks.md).
+Hiện thực: phần A (ưu tiên ảnh LCP, logo đúng kích thước) chạy trên production từ Jenkins build #16 (PR #4). Phần C (cache) xong 2026-10-15: Cloudflare (chủ quán), header 7 ngày ở reverse proxy (repo hạ tầng), `images.minimumCacheTTL` 7 ngày (PR #9, Jenkins build #19); lần gọi thứ hai trúng cache Cloudflare. Chưa đo lại PageSpeed sau PR #4 và sau cache. Phần B (video hero) ở PR #16, chờ merge: chủ quán chốt 2026-10-15 (giữ âm thanh, cách B1, AV1 + 720p, điện thoại vẫn phát nhưng hoãn tải); phần D còn AVIF và `sizes`; E–H chưa làm, nhiều phần cần chủ quán duyệt. Trạng thái chi tiết ở [tasks.md](tasks.md).
 
 ## 1. Mục tiêu
 
@@ -25,8 +25,8 @@ Mọi thay đổi phải đo trước và sau; không sửa theo cảm tính.
 
 | Điểm | Thực tế |
 |---|---|
-| Video đầu trang chủ `public/videos/main.mp4` | 83,7 MB, 103 s, 1080×1920, H.264 kèm track âm thanh AAC (khoảng 129 kbps, 1,7 MB, khoảng 2% file; đo 2026-10-15; video luôn tắt tiếng khi phát), khoảng 6,5 Mbps, không faststart (`moov` ở cuối file nên trình duyệt phải đọc cuối file mới phát được). PageSpeed không bắt lỗi vì `preload="metadata"`, nhưng khách vẫn tốn dữ liệu thật |
-| `HeroVideo` | Một nguồn, không có bản AV1; tự phát cả trên điện thoại; cả khối mờ dần từ opacity 0 trong 1,2 s; nhánh dự phòng khi video lỗi dùng poster `next/image` lazy (Googlebot thấy nhánh này) |
+| Video đầu trang chủ `public/videos/main.mp4` (trước PR #16) | 83,7 MB, 103 s, 1080×1920, H.264 kèm track âm thanh AAC (khoảng 129 kbps, 1,7 MB, khoảng 2% file; đo 2026-10-15; video luôn tắt tiếng khi phát), khoảng 6,5 Mbps, không faststart (`moov` ở cuối file nên trình duyệt phải đọc cuối file mới phát được). PageSpeed không bắt lỗi vì `preload="metadata"`, nhưng khách vẫn tốn dữ liệu thật |
+| `HeroVideo` (trước PR #16) | Một nguồn, không có bản AV1; tự phát cả trên điện thoại; cả khối mờ dần từ opacity 0 trong 1,2 s; nhánh dự phòng khi video lỗi dùng poster `next/image` lazy (Googlebot thấy nhánh này) |
 | `FixedVideo` (About, Bếp) | Đã tốt: chỉ gắn nguồn trên màn hình lớn và khi không giảm chuyển động, `preload="none"`, có bản AV1 |
 | Cache tệp trong `public/` | Next.js gửi `max-age=0`; Cloudflare hỏi lại origin mỗi lần; trình duyệt nhận TTL mặc định 4 giờ của Cloudflare. Đã sửa 2026-10-15 (phần C) |
 | Cache `/_next/image` | Cloudflare `DYNAMIC` (URL không có đuôi file) nên mọi ảnh chạy về origin; bộ nhớ ảnh đã nén của Next.js mất sau mỗi deploy. Đã sửa 2026-10-15 (phần C, D): Cloudflare cache 7 ngày |
@@ -52,24 +52,23 @@ Mọi thay đổi phải đo trước và sau; không sửa theo cảm tính.
 - Logo: bỏ `unoptimized`, `sizes` theo chiều cao hiển thị, `loading="eager"` + `fetchPriority="low"` (không preload, không tranh băng thông với ảnh LCP). Điện thoại tải WebP `w=256` khoảng 31 KB thay cho PNG 88,8 KB.
 - Logo trong menu điều hướng dùng lại cùng `sizes`, trúng file đã nén thay vì tải PNG gốc khi mở menu.
 
-### Phần B: video hero (chưa làm; cần chủ quán chọn cách xử lý âm thanh và duyệt chất lượng)
+### Phần B: video hero (PR #16; chủ quán chốt 2026-10-15)
 
 - Giữ đủ 103 s: chủ quán chưa chọn được đoạn cắt (quyết định 2026-10-14). Mọi cách giảm dung lượng không đổi nội dung hay độ dài.
-- **Giữ âm thanh** (chủ quán, 2026-10-15). Track âm thanh chỉ 1,7 MB trên 83,7 MB (khoảng 2%), nên bỏ đi gần như không giảm dung lượng. Mọi bản (đóng gói lại hay encode lại) đều giữ track âm thanh.
-- Bước nhanh: đưa `moov` lên đầu file (faststart), copy nguyên mọi track (`-map 0 -c copy`): hình và tiếng giữ nguyên từng byte, phát được khi mới tải phần đầu. Cần cài `ffmpeg`.
-- Hiện khách không nghe được tiếng: trình duyệt chỉ cho tự phát video đang tắt tiếng (`muted`), và chưa có nút bật tiếng. Cách xử lý, chờ chủ quán chọn ([ADR 0008](../../adr/0008-compress-hero-video-without-trimming.md)):
+- **Giữ âm thanh** (chủ quán, 2026-10-15). Track âm thanh chỉ 1,7 MB trên 83,7 MB (khoảng 2%), nên bỏ đi gần như không giảm dung lượng. Mọi bản encode copy nguyên track âm thanh (giống bản gốc từng byte).
+- Khách nghe tiếng thế nào ([ADR 0008](../../adr/0008-compress-hero-video-without-trimming.md)): chủ quán chọn **B1** (2026-10-15): âm thanh nằm sẵn trong file, video vẫn tắt tiếng (trình duyệt chỉ cho tự phát video tắt tiếng), giao diện không đổi.
 
-  | Cách | Làm gì | Khách nghe được tiếng | Thêm việc |
+  | Cách | Làm gì | Khách nghe được tiếng | Trạng thái |
   |---|---|---|---|
-  | B1 | Chỉ faststart; âm thanh nằm sẵn trong file | Không | Không đổi giao diện |
-  | B2 | Nút bật/tắt tiếng trên video hero | Có, sau khi bấm | Nút mới trên hero, cần duyệt thiết kế |
-  | B3 | Nút "Xem video có tiếng" mở trình phát riêng (có điều khiển, phát có tiếng) | Có, trong trình phát | Trình phát mới, cần duyệt thiết kế |
+  | B1 | Âm thanh nằm sẵn trong file; video tắt tiếng | Không | **Chọn**, PR #16 |
+  | B2 | Nút bật/tắt tiếng trên video hero | Có, sau khi bấm | Không làm lúc này; cần duyệt thiết kế |
+  | B3 | Nút "Xem video có tiếng" mở trình phát riêng (có điều khiển, phát có tiếng) | Có, trong trình phát | Không làm lúc này; cần duyệt thiết kế |
 
-  B2 và B3 vẫn làm bước faststart như B1.
-- Encode lại: AV1 1080×1920 cho trình duyệt có AV1; H.264 720×1280 dự phòng (iPhone, Mac không có AV1); cả hai giữ track âm thanh. Tên file có phiên bản (`main.v2.*`) để bật cache dài.
-- `HeroVideo` theo mẫu `FixedVideo`: nhiều `<source>` kèm `type` có codec; `preload="none"`; chỉ gắn nguồn và phát sau khi trang tải xong và sau màn hình chờ; poster hiện ngay, tải ưu tiên cao; chỉ lớp video mờ dần, poster không mờ.
-- Không tải video khi bật giảm chuyển động, bật tiết kiệm dữ liệu (`saveData`) hoặc mạng `2g`/`slow-2g`: chỉ hiện poster.
-- Điện thoại: [CẦN XÁC NHẬN: phát video hero (hoãn tải như trên) hay chỉ hiện poster như `FixedVideo` — chưa xác định, cần chủ quán xác nhận; đề xuất: có phát]
+- Encode lại (chủ quán chọn mức 2026-10-15): AV1 1080×1920 CRF 48 (`main.v2.av1.mp4`, 26,8 MB) và H.264 720×1280 CRF 27 (`main.v2.720.mp4`, 31,5 MB), cả hai faststart, giữ track âm thanh. Bước "chỉ faststart" (đóng gói lại `main.mp4`) không làm riêng vì bản encode đã faststart. Tên file có phiên bản (`main.v2.*`): URL mới, không cần purge cache.
+- `HeroVideo`: HTML từ server có poster `next/image` (`loading="eager"`, không `fetchPriority="high"`) và `<video>` chưa có nguồn, `preload="none"`. Phía trình duyệt gắn nguồn sau sự kiện `load` (tối đa 8 s), sau khi màn hình chờ rời đi (`data-splash` là `exit` hoặc `done`) và một lúc rảnh (`requestIdleCallback`, tối đa 1 s). Chọn AV1 khi `navigator.mediaCapabilities` báo giải mã được và mượt, và trên màn hình hẹp hơn `lg` còn phải tiết kiệm điện (thực tế: giải mã phần cứng); máy tính (từ `lg`, `(min-width: 64rem)`, đọc một lần khi chọn) giải mã AV1 bằng CPU không vấn đề. Còn lại dùng H.264 720p. Lần phát đầu bắt đầu ở 2,25 s (bỏ đoạn mở đầu tối, vì poster sáng); các vòng sau phát đủ. Poster hiện ngay với opacity 1; chỉ lớp video mờ dần (1 s) khi bắt đầu phát.
+- Không tải video khi bật giảm chuyển động (bật giữa chừng thì dừng và huỷ tải), bật tiết kiệm dữ liệu (`saveData`) hoặc mạng `2g`/`slow-2g`: chỉ hiện poster.
+- Điện thoại: vẫn tự phát, hoãn tải như trên (chủ quán, 2026-10-15).
+- Số đo lab trước và sau: [Hiệu năng, mục 5](../../dev/perf.md#5-thử-nghiệm-tối-ưu). MB trong 10 s đầu chỉ giảm khoảng 11% vì khi đã phát, Chrome tải trước nhanh hết đường truyền; 003-AC-03 chưa đạt.
 
 ### Phần C: cache (xong 2026-10-15)
 
@@ -124,9 +123,11 @@ Không có API.
 
 | Tình huống | Người dùng thấy |
 |---|---|
-| Trình duyệt không có AV1 | Bản H.264 720p |
+| Trang đang tải, màn hình chờ chưa rời đi | Poster, chưa tải video |
+| Điện thoại hoặc màn hình nhỏ không giải mã AV1 mượt và tiết kiệm điện (thường là không có giải mã phần cứng), kể cả iPhone không có chip AV1; máy tính không giải mã AV1 mượt | Bản H.264 720p |
+| Máy tính giải mã được AV1 mượt, kể cả bằng CPU | Bản AV1 1080p |
 | Giảm chuyển động, tiết kiệm dữ liệu, mạng 2g | Poster, không video |
-| Video lỗi | Poster (tải ưu tiên, không lazy) |
+| Video lỗi, hoặc trình duyệt chặn tự phát (ví dụ chế độ nguồn điện thấp trên iPhone) | Poster (luôn nằm dưới video, `loading="eager"`) |
 | JS tắt | Màn hình chờ chạy theo đồng hồ CSS rồi mờ; trang đọc được |
 
 ## 8. Tiêu chí nghiệm thu
@@ -140,7 +141,7 @@ Loại kiểm: xem [mục lục spec, mục 4](../README.md#4-quy-ước).
 | 003-AC-03 | Production, đã có mốc "MB trong 10 s đầu" | DevTools Network, Fast 4G, tắt cache, tải `/` | Dữ liệu 10 s đầu giảm ít nhất 70% so với mốc | M |
 | 003-AC-04 | Đã deploy phần B | Tải `/` | Request video chỉ xuất hiện sau sự kiện `load` và sau màn hình chờ; không có request `Range` tới cuối file | M |
 | 003-AC-05 | Đã deploy phần B; bật *Emulate prefers-reduced-motion* hoặc `saveData` | Tải `/` | Không có request video; poster hiện | M |
-| 003-AC-06 | Đã deploy phần B | Mở `/` trên Chrome và trên iPhone không có chip AV1 | Chrome tải bản AV1; iPhone tải bản H.264 720p | M |
+| 003-AC-06 | Đã deploy phần B | Mở `/` trên Chrome máy tính, và trên iPhone không có chip AV1 | Chrome tải bản AV1; iPhone tải bản H.264 720p | M |
 | 003-AC-07 | Đã deploy phần C, D | Gọi cùng một URL `/_next/image?…` hai lần | Lần hai `cf-cache-status: HIT` | E |
 | 003-AC-08 | Đã deploy phần E | Search Console → Test live URL `/` | Ảnh chụp thấy chữ hero và nút Đặt bàn | E |
 | 003-AC-09 | Production (phần A) | Xem HTML trang bất kỳ | Preload ảnh nền có `fetchPriority="high"`; logo qua `/_next/image` với `sizes`, không preload | E |
@@ -154,7 +155,7 @@ Loại kiểm: xem [mục lục spec, mục 4](../README.md#4-quy-ước).
 
 ## 10. Phụ thuộc
 
-- Cần: `ffmpeg` có encoder AV1 (máy dev chưa có; hoặc chạy trong Docker); quyết định của chủ quán về âm thanh video (B1/B2/B3). Phần C đã xong (Cloudflare, repo hạ tầng).
+- Phần B: `ffmpeg` có encoder AV1 (máy dev có `ffmpeg` 8.0.1 với `libsvtav1` từ 2026-10-15) và quyết định của chủ quán (đã chốt 2026-10-15). Phần C đã xong (Cloudflare, repo hạ tầng).
 - Phần H cần [004](../004-analytics/spec.md).
 - Phần E ảnh hưởng thời điểm hiện banner xin đồng ý của [004](../004-analytics/spec.md) (banner hiện sau màn hình chờ).
 
@@ -164,11 +165,8 @@ Phần A: M1. Phần B–H: M3 ([lộ trình](../../plan/roadmap.md#m3-tốc-đ�
 
 ## 12. Câu hỏi mở
 
-- [CẦN XÁC NHẬN: trên điện thoại phát video hero (hoãn tải) hay chỉ hiện poster — chưa xác định, cần chủ quán xác nhận]
-- [CẦN XÁC NHẬN: chủ quán duyệt chất lượng video sau khi encode (xem bản gốc và bản mới cạnh nhau trên điện thoại và máy tính)]
 - [CẦN XÁC NHẬN: chủ quán và `kennle04` duyệt màn hình chờ ngắn hơn và chữ hero hiện ngay (phần E)]
 - [CẦN XÁC NHẬN: duyệt đổi subset font (phần F, lệch kerning nhẹ)]
-- [CẦN XÁC NHẬN: âm thanh video hero (chủ quán muốn giữ): B1 chỉ faststart, B2 nút bật tiếng, hay B3 trình phát "Xem video có tiếng" — chưa xác định, cần chủ quán chọn]
 
 ## Lịch sử thay đổi
 
@@ -176,3 +174,5 @@ Phần A: M1. Phần B–H: M3 ([lộ trình](../../plan/roadmap.md#m3-tốc-đ�
 |---|---|
 | 2026-10-14 | Tạo từ ghi chú kế hoạch tốc độ, cập nhật theo PR #4 đã merge; trạng thái Đang áp dụng |
 | 2026-10-15 | Phần C xong (Cloudflare, header 7 ngày ở reverse proxy); phần D: `minimumCacheTTL` 7 ngày thay 30 ngày (PR #9); phần B: giữ âm thanh theo ý chủ quán, thêm các cách B1/B2/B3; bỏ câu hỏi ai làm Cloudflare (chủ quán đã làm) |
+| 2026-10-15 | Phần B theo quyết định của chủ quán (B1, CRF 48 / 27, điện thoại vẫn phát, hoãn tải, lần phát đầu từ 2,25 s) và PR #16; poster eager, không ưu tiên cao; bỏ ba câu hỏi đã trả lời |
+| 2026-10-15 | Quy tắc chọn AV1: máy tính chỉ cần giải mã được và mượt, điện thoại còn phải tiết kiệm điện; mục 7 và AC-06 theo quy tắc này |

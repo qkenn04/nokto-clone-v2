@@ -21,7 +21,7 @@ Người làm: **Chủ quán** (chủ quán hoặc người quản lý) · **Dev
 - [ ] TK15 TripAdvisor: nhận (claim) trang của quán rồi sửa danh mục (đang là Events/Attraction, cần nhà hàng hoặc quán bar), giờ mở cửa (đang 16:30, đúng là 17:30), ghim bản đồ (lệch khoảng 40 m), thêm website `https://thehot.vn` · M5 · [002-T62](../specs/002-onpage-seo/tasks.md) · gấp: AI Overview đọc giờ từ đây; trang này đứng thứ 2 khi tìm tên quán
 - [ ] TK16 Thêm `https://thehot.vn` vào tiểu sử Instagram, TikTok và mục Website của trang Facebook `thehot.dalat` (UTM theo [004 mục 4.2](../specs/004-analytics/spec.md#42-quy-ước-utm) nếu muốn đo) · M5 · [002-T61](../specs/002-onpage-seo/tasks.md) · vì: ba trang này đang đứng trên site khi tìm tên quán; link chính chủ từ đó trỏ về site giúp Google nhận site là website chính thức
 - [ ] TK17 Sau khi PR #10 lên production: Rich Results Test cho `https://thehot.vn/`, rồi Search Console → URL Inspection → `https://thehot.vn/` → Request indexing · M2 · [002-T26, 002-T27](../specs/002-onpage-seo/tasks.md)
-- [ ] TK18 Chọn cách xử lý âm thanh video hero: B1 chỉ faststart (giữ âm thanh trong file, khách vẫn chưa nghe được), B2 nút bật tiếng trên video, B3 nút "Xem video có tiếng" mở trình phát riêng · M3 · [Q15](#câu-hỏi-chờ-chủ-quán), [003-T35](../specs/003-performance/tasks.md)
+- [x] TK18 Chọn cách xử lý âm thanh video hero: B1 chỉ faststart (giữ âm thanh trong file, khách vẫn chưa nghe được), B2 nút bật tiếng trên video, B3 nút "Xem video có tiếng" mở trình phát riêng · M3 · [Q15](#câu-hỏi-chờ-chủ-quán), [003-T35](../specs/003-performance/tasks.md) · chọn B1, 2026-10-15
 
 ### Tiếp theo
 
@@ -41,7 +41,7 @@ Người làm: **Chủ quán** (chủ quán hoặc người quản lý) · **Dev
 - [ ] TK22 Facebook Sharing Debugger: Scrape Again cho 7 URL · M1 · [002-T14](../specs/002-onpage-seo/tasks.md)
 - [ ] TK23 JSON-LD đợt 1 chỉ với thông tin đã xác nhận (`geo`, `sameAs`, `hasMap`, `WebSite`, `Event` cho sự kiện thật) và `/favicon.ico` · M2 · [002-T21, 002-T22, 002-T26](../specs/002-onpage-seo/tasks.md) · **PR #10 chờ duyệt** (validator.schema.org 0 lỗi, 0 cảnh báo) · xong khi: PR #10 merge, deploy, `/favicon.ico` trả 200
 - [x] TK24 Header cache cho tệp `public/` ở reverse proxy · M3 · [003-T22](../specs/003-performance/tasks.md) · xong 2026-10-15: PR #7 của repo `qkenn04/infra-qkenn` (7 ngày); kèm PR #9 (`images.minimumCacheTTL` 7 ngày, build #19)
-- [ ] TK25 Video hero bước nhanh: faststart, **giữ âm thanh** (`-map 0 -c copy`, mọi track giữ nguyên từng byte; cần `ffmpeg`); nếu chủ quán chọn B2 hoặc B3 thì thêm phần giao diện · M3 · [003-T30, 003-T31, 003-T36](../specs/003-performance/tasks.md) · chặn bởi TK18
+- [ ] TK25 Video hero bước nhanh: faststart, **giữ âm thanh** (`-map 0 -c copy`, mọi track giữ nguyên từng byte; cần `ffmpeg`); nếu chủ quán chọn B2 hoặc B3 thì thêm phần giao diện · M3 · [003-T30, 003-T31, 003-T36](../specs/003-performance/tasks.md) · gộp vào PR #16 (AV1 + 720p faststart, hoãn tải; chủ quán chọn B1), xong khi PR #16 merge
 - [x] TK26 Sửa mục "Tùy chọn hiển thị" đang sai ở `/privacy` (nói về `sessionStorage` đã bỏ từ `d0a8e34`): gộp vào 003 phần E hoặc 004 PR A, tuỳ cái nào làm trước · [003-T51](../specs/003-performance/tasks.md), [004-T15](../specs/004-analytics/tasks.md) · PR #13 merge 2026-10-15
 - [x] TK27 Hạ tầng Umami (repo hạ tầng riêng, private), lấy Website ID (2026-10-15) · M4 · [004-T03](../specs/004-analytics/tasks.md)
 - [ ] TK28 Dọn tệp template NOKTO không còn dùng trong `public/sites/nokto/` · M2 · [002-T32](../specs/002-onpage-seo/tasks.md)
@@ -68,13 +68,13 @@ Mỗi câu chặn việc ghi ở cột "Chặn"; chưa có câu trả lời thì
 | Q6 | Gửi ảnh ngang độ phân giải cao (từ 1600 px; 16:9, 4:3, 1:1) | Đổi tên ảnh, `Restaurant.image`, ảnh chia sẻ riêng | 001-T40, 002-T25, 002-T31 | 2026-10-14 |
 | Q7 | Có logo SVG gốc không? | Logo nét và nhẹ nhất; `logo` trong JSON-LD | — | 2026-10-14 |
 | Q8 | Xác nhận SSL/TLS Full (strict) trong Cloudflare | Đóng M1 | TK02 | 2026-10-14 |
-| Q9 | Điện thoại: phát video hero (hoãn tải) hay chỉ hiện poster? Đề xuất: phát | 003 phần B | 003-T33 | 2026-10-14 |
-| Q10 | Duyệt chất lượng video sau encode | 003 phần B | 003-T32 | khi có bản encode |
+| Q9 | Điện thoại: phát video hero (hoãn tải) hay chỉ hiện poster? Đề xuất: phát. **Trả lời 2026-10-15: phát, hoãn tải** | 003 phần B | — (PR #16) | 2026-10-14 |
+| Q10 | Duyệt chất lượng video sau encode. **Trả lời 2026-10-15: AV1 CRF 48, H.264 720p CRF 27** | 003 phần B | — (PR #16) | khi có bản encode |
 | Q11 | Duyệt màn hình chờ ngắn hơn và chữ hero hiện ngay (cùng `kennle04`) | 003 phần E | 003-T50 | khi có bản thử |
 | Q12 | Duyệt đổi subset font (lệch kerning nhẹ) | 003 phần F | 003-T52 | 2026-10-14 |
 | Q13 | Thông tin cho hỏi đáp: chỗ để xe, nhóm đông tối đa bao nhiêu người | 002 phần F | 002-T40 | 2026-10-14 |
 | Q14 | Các câu hỏi về analytics (tài khoản GA4, thời gian lưu, ai xem số liệu, chữ banner, `/privacy`, Cloudflare Web Analytics) | 004 | 004-T02 | 2026-10-14 |
-| Q15 | Âm thanh video hero (chủ quán muốn giữ): B1 chỉ faststart, B2 nút bật tiếng, hay B3 trình phát "Xem video có tiếng"? | 003 phần B, [ADR 0008](../adr/0008-compress-hero-video-without-trimming.md) | TK18, 003-T31, 003-T36 | 2026-10-15 |
+| Q15 | Âm thanh video hero (chủ quán muốn giữ): B1 chỉ faststart, B2 nút bật tiếng, hay B3 trình phát "Xem video có tiếng"? **Trả lời 2026-10-15: B1** | 003 phần B, [ADR 0008](../adr/0008-compress-hero-video-without-trimming.md) | — (PR #16) | 2026-10-15 |
 | Q16 | Giá bia trong menu vẫn chỉ áp dụng Chủ nhật đến thứ Năm? (PDF menu không ghi điều kiện này; website đang ghi theo `site.beerOffer`) | `/menu`, `/menu/list`, mô tả trang `/menu` | Giữ nguyên `site.beerOffer` tới khi có trả lời; 002-T16 | 2026-10-15 |
 | Q17 | Giá rượu, vang và tháp trong menu Premium tính theo chai hay ly? Rượu mơ / táo mèo 55 là ly hay chai? Theo bố cục trang, website hiểu 670 là giá vang Rivage, 759 là giá Chateau du Pin, 55 là giá chung của rượu mơ và rượu táo mèo: đúng không? | `/menu/list` phần đồ uống | Ghi đơn vị giá đồ uống | 2026-10-15 |
 | Q18 | Trang menu "Răng mực sốt bơ cay" (trang Món ăn chơi về mực) dùng nhầm ảnh món bắp sốt bơ cay; chủ quán có sửa ảnh trên Canva và đăng lại không? | Ảnh trang menu lật sách | Thay ảnh trang đó | 2026-10-15 |

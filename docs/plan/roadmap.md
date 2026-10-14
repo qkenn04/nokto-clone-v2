@@ -126,7 +126,7 @@ Vì sao thứ tự này:
 
 ### M3 Tốc độ vòng 2
 
-**Trạng thái:** đang làm từ 2026-10-15: cache xong (Cloudflare, repo hạ tầng, PR #9); chưa đo lại sau PR #4 và sau cache; video chờ chủ quán chọn cách xử lý âm thanh (giữ âm thanh, B1/B2/B3) ([tiến độ](progress.md#theo-mốc)).
+**Trạng thái:** đang làm từ 2026-10-15: cache xong (Cloudflare, repo hạ tầng, PR #9); chưa đo lại sau PR #4 và sau cache; video hero ở PR #16 (AV1 + 720p, hoãn tải; chủ quán chọn B1); lab cho thấy dữ liệu 10 s đầu chỉ giảm khoảng 11%, chưa đạt 003-AC-03 ([tiến độ](progress.md#theo-mốc)).
 
 **Mục tiêu.** Đạt mục tiêu ở [003](../specs/003-performance/spec.md) mục 1 và giảm mạnh dữ liệu khách phải tải.
 
@@ -144,7 +144,7 @@ Vì sao thứ tự này:
 
 **Ước lượng.** 1,5–2 ngày công (khoảng 11–16 giờ), chưa tính font và thời gian chờ duyệt.
 
-**Phụ thuộc.** M1; `ffmpeg` có AV1; quyền Cloudflare; PR ở repo hạ tầng cho header cache. Phần H (Core Web Vitals về Umami) cần M4 và không chặn việc đóng M3.
+**Phụ thuộc.** M1; `ffmpeg` có AV1 (có từ 2026-10-15); quyền Cloudflare; PR ở repo hạ tầng cho header cache. Phần H (Core Web Vitals về Umami) cần M4 và không chặn việc đóng M3.
 
 **Spec và ADR.** 003; ADR 0006, ADR 0008.
 
