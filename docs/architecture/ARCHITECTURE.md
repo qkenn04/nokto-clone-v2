@@ -83,7 +83,7 @@ flowchart LR
 | Jenkins | Jenkins Pipeline, agent nhãn `docker` | Chạy `Jenkinsfile`: tính ngày sitemap, kiểm, build, smoke test, push, deploy; báo kết quả lên Discord | Máy CI (nguồn ở `qkenn04/infra-qkenn`) | Lịch sử build | — |
 | Harbor | Harbor | Lưu image `nokto/web:<commit sha>` | Máy CI | Image | — |
 | GitHub | Dịch vụ ngoài | Nguồn code, PR, review | GitHub | Lịch sử git (cũng là nguồn ngày `lastmod`) | [0004](../adr/0004-automate-sitemap-from-page-config-and-git.md) |
-| Umami | Umami tự cài (hạ tầng ở repo riêng) | Nhận lượt xem và sự kiện từ trình duyệt khách, không cookie. Site chỉ tải tracker khi build có Website ID (chưa bật tính tới 2026-10-15) | Tên miền con của `thehot.vn` | Số liệu truy cập | [0007](../adr/0007-use-umami-and-consent-gated-ga4.md) |
+| Umami | Umami tự cài (hạ tầng ở repo riêng) | Nhận lượt xem và sự kiện từ trình duyệt khách, không cookie. Site chỉ tải tracker khi build có Website ID (Website ID đặt trong `Jenkinsfile` từ 2026-10-15) | Tên miền con của `thehot.vn` | Số liệu truy cập | [0007](../adr/0007-use-umami-and-consent-gated-ga4.md) |
 
 ### 3.1 Ranh giới giữa các phần
 

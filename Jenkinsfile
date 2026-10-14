@@ -45,7 +45,7 @@ pipeline {
     SITE_URL = 'https://thehot.vn'
     // Umami analytics (docs/specs/004-analytics). Public values that end up in every page's HTML, not secrets;
     // changing one needs a new build. Empty ID = no tracker and no Umami section on /privacy.
-    UMAMI_WEBSITE_ID = '' // set after Umami website is created
+    UMAMI_WEBSITE_ID = '8834d3ef-90e0-40e5-b6ca-2932a0fea7d8'
     UMAMI_SRC = 'https://stats.thehot.vn/ht.js'
     VPS = '100.93.222.27' // qkenn-server on the tailnet; the deploy key only works from 100.64.0.0/10
   }
