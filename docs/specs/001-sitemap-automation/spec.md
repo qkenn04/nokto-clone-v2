@@ -1,0 +1,114 @@
+# 001: Sitemap tự động
+
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-14 · Liên quan: [Mục lục spec](../README.md), [plan.md](plan.md), [tasks.md](tasks.md), [Mục lục ADR](../../adr/README.md) (ADR 0004), [Lộ trình M1](../../plan/roadmap.md#m1-nền-tảng-seo)
+
+`/sitemap.xml` của https://thehot.vn cho Google và Bing biết site có những trang nào, trang nào vừa đổi và mỗi trang có ảnh nào của quán. Trước spec này, sitemap là một mảng 5 URL gõ tay trong `src/app/sitemap.ts`, `lastmod` gõ cứng là `2026-10-12` và thiếu trang `/terms`. Spec này thay bằng sitemap sinh từ một file cấu hình duy nhất, ngày lấy từ lịch sử git, và có bước kiểm làm build thất bại khi cấu hình lệch với trang thật.
+
+Hiện thực: xong, PR #3 (merge `b8e2665`), chạy trên production từ Jenkins build #11; bản đang chạy là build #16 (`90f1882`). Trạng thái chi tiết ở [tasks.md](tasks.md) và [tiến độ](../../plan/progress.md).
+
+## 1. Mục tiêu
+
+1. Sitemap liệt kê đúng 6 trang muốn index: `/`, `/menu`, `/menu/list`, `/about`, `/reservation`, `/terms`. `/privacy` cố ý để ngoài.
+2. `lastmod` của mỗi trang là ngày thay đổi nội dung của trang đó vào nhánh `main`, không phải ngày build và không gõ tay.
+3. Thêm hoặc xoá trang mà quên khai báo thì build báo lỗi rõ ràng, không lặng lẽ sinh sitemap thiếu.
+4. Mỗi trang khai ảnh thật của quán mà trang đó hiển thị (sitemap ảnh), lấy từ chính dữ liệu trang.
+
+**Hiện trạng trước spec (kiểm ngày 2026-10-14):**
+
+| Điểm | Trước | Sau |
+|---|---|---|
+| Danh sách trang | 5 URL gõ tay, thiếu `/terms` | 6 URL từ `seo/sitemap-pages.json` |
+| `lastmod` | Gõ cứng `2026-10-12`, dù commit `d0a8e34` (14/10) đã sửa mọi trang | Ngày commit theo từng trang |
+| `changefreq`, `priority` | Có (Google bỏ qua) | Bỏ |
+| Ảnh | Không khai | 25 mục ảnh, 19 file khác nhau |
+
+## 2. Câu chuyện người dùng
+
+| # | Là | Tôi muốn | Để |
+|---|---|---|---|
+| U1 | Googlebot / Bingbot | đọc một sitemap đúng và có ngày tin được | ưu tiên crawl lại đúng trang vừa đổi |
+| U2 | Chủ quán | thấy trong Search Console mọi trang chính đã được khám phá | biết site có mặt đầy đủ trên Google |
+| U3 | Dev | thêm trang mới mà không phải nhớ sửa sitemap bằng tay | không có trang bị bỏ sót |
+
+## 3. Giao diện
+
+Không có giao diện. Đầu ra công khai:
+
+- `GET /sitemap.xml`: XML sitemap, mỗi `<url>` có `<loc>`, `<lastmod>` và các `<image:image>`.
+- `GET /robots.txt`: cho phép tất cả, có dòng `Sitemap: https://thehot.vn/sitemap.xml` (không đổi trong spec này).
+
+## 4. Dữ liệu
+
+Site không có cơ sở dữ liệu. Nguồn dữ liệu của sitemap:
+
+- `seo/sitemap-pages.json`: nguồn duy nhất về trang. Trường `pages[]` (`path`, `sources[]`), `shared[]` (file hiện trên mọi trang), `exclude[]` (trang cố ý để ngoài), `dynamic[]` (mẫu route động, hiện chưa dùng).
+- `src/generated/sitemap-lastmod.json`: sinh lúc CI, không commit (`.gitignore`). Dạng `{ "<path>": "<ISO 8601 có múi giờ>" }`.
+- Ảnh: đọc từ các module dữ liệu mà trang đang render (`galleryPhotos`, `homeEvents`, `menuPages`, `about`, `terms`, `heroVideo`, `aboutVideo`, `kitchenVideo`).
+
+## 5. API
+
+Không có API. Chỉ có hai route tĩnh ở mục 3.
+
+## 6. Quy tắc và kiểm tra
+
+1. Sitemap chỉ chứa các trang trong `pages`. Mọi route có thể truy cập trong `src/app` phải nằm trong đúng một nhóm: `pages`, `exclude` hoặc `dynamic`.
+2. Mỗi trang trong `pages` phải có file `page.*` tương ứng, `sources` không rỗng, mọi đường dẫn nguồn tồn tại, và `sources` phải bao gồm chính file `page.*` của trang.
+3. `lastmod` của một trang = ngày commit (committer date, ISO 8601 có múi giờ) của commit cuối cùng trên lịch sử first-parent của nhánh đang build chạm vào `sources` của trang hoặc file `shared`. Trang đổi qua PR mang ngày merge PR vào `main`.
+4. Commit chỉ sửa tài liệu, CI hay file không nằm trong `sources`/`shared` không làm đổi `lastmod` của trang nào. Thay đổi chưa commit không được tính.
+5. Clone nông (shallow) thì dừng build, không ghi ngày sai. Đường dẫn nguồn chưa từng có commit nào chạm tới thì cũng dừng.
+6. Không có file ngày (build ở máy dev chưa chạy script) thì bỏ trống `<lastmod>`, không bịa ngày.
+7. Ảnh: chỉ ảnh thật của quán mà trang hiển thị; mỗi ảnh một lần trong một trang; cùng một ảnh được phép xuất hiện ở nhiều trang. Không bao giờ khai ảnh nền template `hero-backdrop.jpg`, SVG trang trí, icon, logo, ảnh OG. URL là file tĩnh gốc, không phải `/_next/image?...`.
+8. Mọi URL là URL tuyệt đối trên `NEXT_PUBLIC_SITE_URL` (bỏ dấu `/` cuối nếu có); trang chủ là origin trần `https://thehot.vn`.
+
+## 7. Trạng thái trống, lỗi, đang tải
+
+| Tình huống | Kết quả | Ghi lại |
+|---|---|---|
+| Thêm `src/app/<x>/page.tsx` mà không khai | Stage `check` của Docker build thất bại, thông báo nêu route thiếu | Log Jenkins |
+| Clone nông, thiếu `git` hoặc `jq` trên agent | Stage `Sitemap dates` thất bại trước khi build, chưa deploy gì | Log Jenkins |
+| `src/seo/sitemap-images.ts` khai ảnh cho path không có trong cấu hình | Build thất bại (`sitemap.ts` ném lỗi) | Log build |
+| Image build thiếu file ngày | Smoke test thất bại ở kiểm "mỗi `<url>` có `<lastmod>`" | Log Jenkins |
+| Build local không chạy script | Sitemap không có `<lastmod>`, có cảnh báo trên console | Console build |
+
+## 8. Tiêu chí nghiệm thu
+
+Loại kiểm: xem [mục lục spec, mục 4](../README.md#4-quy-ước).
+
+| Mã | Cho (Given) | Khi (When) | Thì (Then) | Loại |
+|---|---|---|---|---|
+| 001-AC-01 | Image production đã build | `GET /sitemap.xml` | Có đúng 6 `<url>`: `/`, `/menu`, `/menu/list`, `/about`, `/reservation`, `/terms`; không có `/privacy` | I, E |
+| 001-AC-02 | CI đã chạy `ci/sitemap-lastmod.sh` | `GET /sitemap.xml` | Mỗi `<url>` có `<lastmod>`; build lại cùng commit cho ra cùng ngày | I, M |
+| 001-AC-03 | Một commit chỉ sửa README, `docs/` hoặc CI | Chạy lại script | Không trang nào đổi `lastmod` | M |
+| 001-AC-04 | Một commit chỉ sửa nguồn của `/about` | Chạy lại script | Chỉ `/about` đổi ngày; sửa `site.ts` hoặc `SiteFooter.tsx` thì mọi trang đổi | M |
+| 001-AC-05 | Thêm `src/app/thu-nghiem/page.tsx` không khai báo | `npm run check:sitemap` hoặc stage `check` | Thoát mã 1, thông báo nêu route thiếu | S |
+| 001-AC-06 | Workspace là clone nông | `bash ci/sitemap-lastmod.sh` | Thoát mã 1, không ghi file | M |
+| 001-AC-07 | Image production đã build | Smoke test đọc mọi `<loc>` và `<image:loc>` | Mọi URL nằm trên origin của site, trả 200, ảnh có `content-type` `image/*`, không chuyển hướng | I |
+| 001-AC-08 | Production | `GET /sitemap.xml` | Không có `hero-backdrop.jpg`, `.svg`, logo hay ảnh OG trong `<image:loc>` | E |
+| 001-AC-09 | Sitemap đã gửi trong Search Console | Google đọc lại sitemap | Mục Sitemaps báo *Success*, 6 trang được khám phá | E |
+
+## 9. Ngoài phạm vi
+
+- Đổi tên file ảnh và thay ảnh độ phân giải cao: việc tiếp theo, xem [tasks.md](tasks.md#việc-tiếp-theo-pr-2-đổi-tên-ảnh-và-ảnh-độ-phân-giải-cao).
+- Danh sách ảnh trong JSON-LD (`Restaurant.image`): thuộc [002](../002-onpage-seo/spec.md).
+- Sitemap video, `changefreq`, `priority` (Google bỏ qua hai trường sau).
+- Trang động: chưa có; khi có thì khai trong `dynamic` và mở rộng spec.
+- Sửa `robots.txt`.
+
+## 10. Phụ thuộc
+
+- Cần: tên miền `thehot.vn` và cho phép index (ADR 0002, ADR 0003; xem [mục lục ADR](../../adr/README.md)); Jenkins checkout đủ lịch sử git.
+- Chặn: [002](../002-onpage-seo/spec.md) dùng lại quy ước ảnh thật cho `Restaurant.image`; trang mới ở M5 (sự kiện, bài viết) tự vào sitemap khi được khai trong cấu hình.
+
+## 11. Mốc
+
+M1 ([lộ trình](../../plan/roadmap.md#m1-nền-tảng-seo)).
+
+## 12. Câu hỏi mở
+
+Không có câu hỏi chặn spec này. Việc tiếp theo cần ảnh gốc từ chủ quán (xem [tasks.md](tasks.md)).
+
+## Lịch sử thay đổi
+
+| Ngày | Thay đổi |
+|---|---|
+| 2026-10-14 | Tạo từ ghi chú kế hoạch sitemap, cập nhật theo bản đã merge (PR #3); trạng thái Đang áp dụng |
