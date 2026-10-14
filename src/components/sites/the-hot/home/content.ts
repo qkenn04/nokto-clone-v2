@@ -29,7 +29,8 @@ export const galleryPhotos: GalleryPhoto[] = [
 
 // Preview programmes requested by the owner, using real restaurant photos.
 // The 10/10/2026 poster date is confirmed; its calendar-day window does not
-// imply exact performance hours. Other programmes and schedules are illustrative.
+// imply exact performance hours. Friday on Fire (16/10) and Hot Saturday (17/10)
+// were confirmed by the owner on 2026-10-15; the other programmes are illustrative.
 export const homeEvents: HomeEvent[] = [
   {
     id: "hot-saturday",
@@ -40,7 +41,6 @@ export const homeEvents: HomeEvent[] = [
     posterAlt: "Không khí sân khấu The Hot, ảnh minh hoạ chương trình Hot Saturday",
     tags: ["Saturday night", "DJ set", "Hội bạn"],
     timing: { kind: "scheduled", startsAt: "2026-10-17T19:30:00+07:00", endsAt: "2026-10-18T00:30:00+07:00" },
-    illustrative: true,
   },
   {
     id: "friday-on-fire",
@@ -51,7 +51,6 @@ export const homeEvents: HomeEvent[] = [
     posterAlt: "Biểu diễn tại The Hot, ảnh minh hoạ chương trình Friday on Fire",
     tags: ["Friday night", "Live performance"],
     timing: { kind: "scheduled", startsAt: "2026-10-16T19:00:00+07:00", endsAt: "2026-10-17T00:30:00+07:00" },
-    illustrative: true,
   },
   {
     id: "after-hours",
