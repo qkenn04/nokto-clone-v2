@@ -5,6 +5,7 @@ import { PageTransition } from "@/components/sites/nokto/chrome/PageTransition";
 import { PersistentChrome } from "@/components/sites/nokto/chrome/PersistentChrome";
 import { Preloader } from "@/components/sites/nokto/chrome/Preloader";
 import { SmoothScroll } from "@/components/sites/nokto/chrome/SmoothScroll";
+import { FloatingContact } from "@/components/sites/the-hot/FloatingContact";
 import { site } from "@/components/sites/nokto/site";
 import "./globals.css";
 
@@ -48,7 +49,14 @@ const restaurantSchema = {
   acceptsReservations: "True",
 };
 
-const FONT_FILES = ["barlow-condensed-700-latin", "barlow-condensed-700-vietnamese", "be-vietnam-pro-400-latin", "be-vietnam-pro-400-vietnamese"];
+// The beer-fill splash plays on every full page load and is the first thing painted: it is the first content in the
+// body and shows by default, so nothing has to run before it appears. This script runs just before it is parsed and
+// holds its intro ("wait") until the splash has been through a frame, since that first frame lays out the whole page
+// underneath and can be slow; then it plays it. The Preloader starts the exit once the page is ready; the 6s cap
+// here still lets the page through if the app's scripts never arrive. Without scripts the splash runs on its own clock.
+const SPLASH_SCRIPT = `(function(){var script=document.currentScript,root=script.parentElement;root.setAttribute("data-splash","wait");function painted(){if(!script.nextElementSibling)return requestAnimationFrame(painted);requestAnimationFrame(play)}function play(){if(root.getAttribute("data-splash")!=="wait")return;root.setAttribute("data-splash","play");setTimeout(function(){if(root.getAttribute("data-splash")==="play")root.setAttribute("data-splash","exit")},6000)}requestAnimationFrame(painted)})()`;
+
+const FONT_FILES = ["barlow-condensed-700-latin", "barlow-condensed-700-latin-ext", "barlow-condensed-700-vietnamese", "be-vietnam-pro-400-latin", "be-vietnam-pro-400-vietnamese"];
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   for (const file of FONT_FILES) {
@@ -62,17 +70,22 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(restaurantSchema) }}
         />
-        <a
-          href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[300] focus:bg-accent focus:text-accent-foreground focus:px-4 focus:py-2 focus:text-small focus:tracking-[var(--tracking-label)] focus:uppercase focus:no-underline focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent"
-        >
-          Chuyển đến nội dung
-        </a>
-        <CustomCursor />
-        <PersistentChrome />
-        <PageTransition>{children}</PageTransition>
-        <Preloader />
-        <SmoothScroll />
+        {/* Marked by the script below before first paint; not <html>, whose attributes React resets in dev. */}
+        <div className="contents" data-splash-root="" suppressHydrationWarning>
+          <script dangerouslySetInnerHTML={{ __html: SPLASH_SCRIPT }} />
+          <Preloader />
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[300] focus:bg-accent focus:text-accent-foreground focus:px-4 focus:py-2 focus:text-small focus:tracking-[var(--tracking-label)] focus:uppercase focus:no-underline focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent"
+          >
+            Chuyển đến nội dung
+          </a>
+          <CustomCursor />
+          <PersistentChrome />
+          <PageTransition>{children}</PageTransition>
+          <FloatingContact />
+          <SmoothScroll />
+        </div>
       </body>
     </html>
   );

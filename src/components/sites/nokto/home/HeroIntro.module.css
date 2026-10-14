@@ -2,8 +2,199 @@
   container-type: inline-size;
 }
 
+/* Fade the marble backdrop beneath the copy into the gallery's background. */
+.intro::after {
+  position: absolute;
+  z-index: -1;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: clamp(6rem, 24vh, 16rem);
+  background: linear-gradient(180deg, transparent, var(--color-background));
+  content: "";
+  pointer-events: none;
+}
+
+.layout {
+  gap: 2rem;
+}
+
+.copy {
+  gap: 1.25rem;
+  padding-block: 0.75rem;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.5rem 0.875rem;
+  border: 1px solid color-mix(in srgb, var(--color-accent) 35%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-background) 60%, transparent);
+}
+
 .headline {
-  font-size: clamp(2.125rem, 14cqw, 5.5rem);
+  font-size: clamp(3.5rem, 24cqw, 7.5rem);
+  font-style: italic;
+  letter-spacing: -0.035em;
+  line-height: 0.95;
+}
+
+.lettering {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1em;
+}
+
+.opening {
+  display: block;
+  font-size: 0.48em;
+  font-style: normal;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+.brandLine {
+  display: block;
+  padding-right: 0.08em;
+  white-space: nowrap;
+}
+
+.letter {
+  display: inline-block;
+  transform-origin: 50% 85%;
+}
+
+.wordSpace {
+  display: inline-block;
+  width: 0.17em;
+}
+
+.moodSticker {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  margin-block: 0.025em 0.12em;
+  padding: 0.045em 0.17em 0.13em;
+  border-radius: 0.04em;
+  background: var(--color-accent);
+  color: var(--color-accent-foreground);
+  font-size: 0.8em;
+  box-shadow: 0.055em 0.055em 0 color-mix(in srgb, var(--color-accent) 24%, transparent);
+  transform-origin: 35% 60%;
+  white-space: nowrap;
+}
+
+.stickerText {
+  display: block;
+}
+
+/*
+ * The whole hero enters on CSS from first paint, so hydration landing late changes nothing. On a full page load the
+ * splash covers the server-rendered column (`data-load`), so its entrance (the beer pour inside it too) is paused
+ * until the splash starts to leave; without scripts the splash leaves at a fixed 2.6s and the entrance is delayed to
+ * match (--hero-offset). The logo replay and client navigations render without `data-load` and start at once.
+ */
+:global([data-splash="wait"]) .intro[data-load] *,
+:global([data-splash="play"]) .intro[data-load] * {
+  animation-play-state: paused;
+}
+
+:global([data-splash-root]:not([data-splash])) .intro[data-load] {
+  --hero-offset: 2.6s;
+}
+
+.enter {
+  animation: hero-enter var(--enter-duration) cubic-bezier(0.22, 1, 0.36, 1) calc(var(--hero-offset, 0s) + var(--enter-delay)) backwards;
+}
+
+.backdrop {
+  opacity: 0.35;
+  animation: hero-fade 1.6s cubic-bezier(0.22, 1, 0.36, 1) var(--hero-offset, 0s) backwards;
+}
+
+@keyframes hero-enter {
+  from {
+    opacity: 0;
+    translate: 0 var(--enter-y);
+  }
+}
+
+@keyframes hero-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/*
+ * Slogan entrance. linear() samples the springs the letters used before (stiffness/damping 220/16, 240/17,
+ * 300/14); browsers without linear() keep the overshooting cubic-bezier. Letters pass their stagger as --delay.
+ */
+.opening {
+  animation: slogan-rise 0.45s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--hero-offset, 0s) + 0.1s) backwards;
+}
+
+.brandLetter {
+  animation: slogan-letter 0.75s calc(var(--hero-offset, 0s) + var(--delay)) backwards;
+  animation-timing-function: cubic-bezier(0.34, 1.45, 0.64, 1);
+  animation-timing-function: linear(0, 0.053, 0.184, 0.355, 0.537, 0.709, 0.856, 0.971, 1.053, 1.104, 1.129, 1.133, 1.123, 1.103, 1.08, 1.055, 1.033, 1.015, 1.001, 0.991, 0.985, 0.982, 0.982, 0.984, 0.987, 0.99, 0.993, 0.996, 0.999, 1, 1.002, 1.002, 1);
+}
+
+.moodSticker {
+  animation: slogan-sticker 0.7s calc(var(--hero-offset, 0s) + 0.48s) backwards;
+  animation-timing-function: cubic-bezier(0.34, 1.45, 0.64, 1);
+  animation-timing-function: linear(0, 0.05, 0.175, 0.34, 0.516, 0.683, 0.829, 0.945, 1.031, 1.087, 1.117, 1.127, 1.122, 1.107, 1.086, 1.064, 1.042, 1.023, 1.008, 0.997, 0.989, 0.985, 0.984, 0.984, 0.986, 0.989, 0.992, 0.994, 0.997, 0.999, 1, 1.001, 1);
+}
+
+.moodLetter {
+  animation: slogan-sticker-letter 0.8s calc(var(--hero-offset, 0s) + var(--delay)) backwards;
+  animation-timing-function: cubic-bezier(0.34, 1.6, 0.64, 1);
+  animation-timing-function: linear(0, 0.082, 0.283, 0.537, 0.787, 0.997, 1.145, 1.227, 1.249, 1.226, 1.175, 1.111, 1.049, 0.998, 0.962, 0.942, 0.938, 0.944, 0.957, 0.973, 0.989, 1.001, 1.01, 1.015, 1.015, 1.014, 1.01, 1.006, 1.003, 0.999, 0.997, 0.996, 1);
+}
+
+@keyframes slogan-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+@keyframes slogan-letter {
+  from {
+    opacity: 0;
+    transform: translateY(45px) rotate(-8deg) scale(0.85);
+  }
+}
+
+/* Ends on the sticker's resting tilt, which motion also holds as its base rotation for the hover. */
+@keyframes slogan-sticker {
+  from {
+    opacity: 0;
+    transform: translateY(16px) rotate(6deg) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(-3deg) scale(1);
+  }
+}
+
+@keyframes slogan-sticker-letter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+.editorial {
+  font-size: clamp(0.9375rem, 3.5cqw, 1.0625rem);
+}
+
+.body {
+  font-size: clamp(0.9375rem, 3.4cqw, 1rem);
 }
 
 @media (width < 40rem) {
@@ -13,7 +204,7 @@
 
   .copy {
     gap: 1.25rem;
-    padding-block: 1.25rem;
+    padding-block: 0.75rem;
   }
 }
 
@@ -28,5 +219,24 @@
 
   .copy {
     gap: 1rem;
+  }
+
+  .headline {
+    font-size: clamp(3.5rem, min(24cqw, 13vh), 7.5rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .moodSticker {
+    transform: rotate(-3deg) !important;
+  }
+
+  .enter,
+  .backdrop,
+  .opening,
+  .brandLetter,
+  .moodSticker,
+  .moodLetter {
+    animation: none;
   }
 }

@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { FixedPhoto } from "@/components/sites/nokto/chrome/FixedPhoto";
+import { FixedVideo } from "@/components/sites/nokto/chrome/FixedVideo";
 import { SiteFooter } from "@/components/sites/nokto/chrome/SiteFooter";
 import { reservation } from "@/components/sites/nokto/reservation/content";
 import { ReservationForm } from "@/components/sites/nokto/reservation/ReservationForm";
 import { ReservationHero } from "@/components/sites/nokto/reservation/ReservationHero";
 import { ReservationLoading } from "@/components/sites/nokto/reservation/ReservationLoading";
 import { site } from "@/components/sites/nokto/site";
+import { aboutVideo } from "@/components/sites/the-hot/videos";
 
 const { title, description } = reservation.metadata;
 
@@ -22,7 +23,7 @@ export default function ReservationPage() {
   return (
     <Suspense fallback={<ReservationLoading />}>
       <main id="main-content" className="relative w-full">
-        <FixedPhoto src={reservation.image.src} alt={reservation.image.alt} />
+        <FixedVideo {...aboutVideo} />
         <div className="relative z-10 lg:w-1/2">
           <ReservationHero />
           <ReservationForm />

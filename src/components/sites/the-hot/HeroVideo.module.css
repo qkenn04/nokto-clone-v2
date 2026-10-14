@@ -24,8 +24,10 @@
       linear-gradient(
         180deg,
         rgb(9 9 11 / 0.25) 0%,
-        transparent 40%,
-        rgb(9 9 11 / 0.45) 100%
+        transparent 50%,
+        rgb(9 9 11 / 0.2) 68%,
+        rgb(9 9 11 / 0.65) 86%,
+        var(--color-background) 100%
       );
   }
 }

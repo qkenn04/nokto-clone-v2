@@ -53,7 +53,7 @@ export function LegalPage({ content }: { content: LegalDocument }) {
       <FixedPhoto src={content.image.src} alt={content.image.alt} />
       <div className="relative z-10 lg:w-1/2">
         <Section as="div" padY="none">
-          <Stack gap={4} className="pt-28 pb-24 sm:pt-32 sm:pb-28 md:pt-36 md:pb-32 lg:pt-40">
+          <Stack gap={4} className="pt-32 pb-24 sm:pt-40 sm:pb-28 md:pt-44 md:pb-32 lg:pt-48 xl:pt-52">
             <article className="flex max-w-[68ch] flex-col">
               <Stack gap={10}>
                 <LegalHeader content={content} />

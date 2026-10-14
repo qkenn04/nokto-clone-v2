@@ -15,7 +15,7 @@ export default function HomePage() {
         </section>
         <aside className="absolute inset-0 z-0 overflow-hidden lg:relative lg:inset-auto lg:min-h-0 lg:w-[55%] lg:flex-none">
           <HeroVideo
-            src="/sites/the-hot-beer-garden/videos/hero.mp4"
+            src="/videos/main.mp4"
             poster="/sites/the-hot-beer-garden/images/hero-video-poster.jpg"
           />
         </aside>

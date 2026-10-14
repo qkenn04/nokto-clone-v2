@@ -19,15 +19,9 @@ export const site = {
   tagline: "Đà Lạt Chill Zone",
   logo: { src: `${THE_HOT_ASSET_BASE}/images/logo.png`, width: 640, height: 479 },
   nav: [
-    { label: "Thực đơn", href: "/menu", image: `${ASSET_BASE}/images/menu.svg`, imageWidth: 228, imageHeight: 231 },
-    { label: "Về The Hot", href: "/about", image: `${ASSET_BASE}/images/about.svg`, imageWidth: 228, imageHeight: 226 },
-    {
-      label: "Đặt bàn",
-      href: "/reservation",
-      image: `${ASSET_BASE}/images/reservations.svg`,
-      imageWidth: 194,
-      imageHeight: 226,
-    },
+    { label: "Thực đơn", href: "/menu" },
+    { label: "Về The Hot", href: "/about" },
+    { label: "Đặt bàn", href: "/reservation" },
   ],
   cta: { label: "Đặt bàn", href: "/reservation" },
   hours: {
@@ -39,6 +33,8 @@ export const site = {
   phoneHref: "tel:+84967539939",
   social: "The Hot Beer Garden Đà Lạt",
   socialHref: "https://www.facebook.com/thehotbeergardendalat/",
+  messengerHref: "https://m.me/thehotbeergardendalat",
+  zaloHref: "https://zalo.me/0967539939",
   footer: "The Hot · Đà Lạt Chill Zone",
   cuisine: "Vietnamese",
   currency: { symbol: "₫", position: "after" },

@@ -1,0 +1,271 @@
+/* Fills its positioned parent and clips to its shape. Lengths are in cqh so one design scales from a button to a headline sticker. */
+.pour {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  container-type: size;
+  pointer-events: none;
+}
+
+.stream {
+  position: absolute;
+  top: 0;
+  left: var(--stream-at);
+  width: 10cqh;
+  height: 100%;
+  margin-left: -5cqh;
+  border-radius: 0 0 5cqh 5cqh;
+  background: linear-gradient(90deg, rgb(196 104 14 / 0.85), #f2a22c 28%, #ffe9b0 46%, #f7b53c 62%, rgb(196 104 14 / 0.85));
+  transform-origin: 50% 0;
+  clip-path: inset(0% 0% 100% 0%);
+}
+
+/* Taller than the parent so the slosh never uncovers a corner; parked fully below it when empty. */
+.liquid {
+  position: absolute;
+  inset: 0 0 -20cqh;
+  transform-origin: 50% 0;
+}
+
+.head {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 36cqh;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 30'%3E%3Cg fill='none' stroke='%23d6b97c' stroke-opacity='.5' stroke-width='.6'%3E%3Ccircle cx='6' cy='5' r='1.4'/%3E%3Ccircle cx='17' cy='9' r='.9'/%3E%3Ccircle cx='29' cy='4' r='1.8'/%3E%3Ccircle cx='35' cy='14' r='1.1'/%3E%3Ccircle cx='9' cy='18' r='1.9'/%3E%3Ccircle cx='22' cy='21' r='1.2'/%3E%3Ccircle cx='31' cy='25' r='1.5'/%3E%3Ccircle cx='3' cy='27' r='.9'/%3E%3Ccircle cx='15' cy='28' r='1.3'/%3E%3Ccircle cx='26' cy='13' r='.8'/%3E%3C/g%3E%3C/svg%3E") 0 0 / 40cqh 30cqh,
+    linear-gradient(#fffaf0, #fff6e4 40%, #f6e8c6 78%, #ead097);
+}
+
+/* Lumpy head: two rows of shaded foam bubbles drifting apart; each loop moves exactly one tile. */
+.head::before,
+.head::after {
+  position: absolute;
+  left: -40cqh;
+  width: calc(100% + 80cqh);
+  background-position: 0 100%;
+  background-repeat: repeat-x;
+  content: "";
+}
+
+.head::before {
+  bottom: calc(100% + 1.5cqh);
+  height: 10cqh;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 26 10' preserveAspectRatio='none'%3E%3Cdefs%3E%3CradialGradient id='g' cx='.38' cy='.32' r='.75'%3E%3Cstop offset='0' stop-color='%23fbf1da'/%3E%3Cstop offset='.65' stop-color='%23f0e0bb'/%3E%3Cstop offset='1' stop-color='%23dcc28a'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect y='6.5' width='26' height='3.5' fill='%23f0e0bb'/%3E%3Cg fill='url(%23g)'%3E%3Ccircle cx='0' cy='6.5' r='3.6'/%3E%3Ccircle cx='26' cy='6.5' r='3.6'/%3E%3Ccircle cx='6' cy='5' r='3.8'/%3E%3Ccircle cx='12.5' cy='6.5' r='2.8'/%3E%3Ccircle cx='18.5' cy='4.6' r='4.2'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 26cqh 10cqh;
+  animation: drift-right 5s linear infinite;
+}
+
+.head::after {
+  bottom: calc(100% - 1px);
+  height: 12cqh;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 12' preserveAspectRatio='none'%3E%3Cdefs%3E%3CradialGradient id='g' cx='.38' cy='.32' r='.75'%3E%3Cstop offset='0' stop-color='%23ffffff'/%3E%3Cstop offset='.65' stop-color='%23fffaf0'/%3E%3Cstop offset='1' stop-color='%23efdfbc'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect y='8' width='36' height='4' fill='%23fffaf0'/%3E%3Cg fill='url(%23g)'%3E%3Ccircle cx='0' cy='8' r='4.4'/%3E%3Ccircle cx='36' cy='8' r='4.4'/%3E%3Ccircle cx='6.5' cy='6.2' r='4.2'/%3E%3Ccircle cx='13' cy='8' r='3'/%3E%3Ccircle cx='19.5' cy='5' r='5'/%3E%3Ccircle cx='26.5' cy='7.4' r='3.6'/%3E%3Ccircle cx='31.5' cy='6' r='4'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 36cqh 12cqh;
+  animation: drift-left 7s linear infinite;
+}
+
+/* Beer under the foam: shadow line, glow, glass sheen, darker walls, then copper to honey. Every stop keeps dark text above 4.5:1. */
+.body {
+  position: absolute;
+  inset: 16cqh 0 0;
+  overflow: hidden;
+  background:
+    linear-gradient(rgb(150 72 8 / 0.4), rgb(150 72 8 / 0) 5cqh),
+    radial-gradient(ellipse 55% 38% at 58% 4cqh, rgb(255 226 150 / 0.55), transparent 70%),
+    linear-gradient(90deg, transparent 8%, rgb(255 240 200 / 0.42) 11%, rgb(255 240 200 / 0.12) 15%, transparent 18%),
+    linear-gradient(90deg, transparent 21%, rgb(255 240 200 / 0.16) 22.5%, transparent 24.5%),
+    linear-gradient(90deg, rgb(110 40 0 / 0.15), transparent 10%, transparent 90%, rgb(110 40 0 / 0.15)),
+    linear-gradient(#fbc044, #f6ad2c 14cqh, #ee981c 34cqh, #e2850f 54cqh, #d4740d 74cqh, #cc6c0e);
+}
+
+/* Foam fringe hanging into the beer, so the head does not end on a ruled line. */
+.body::before {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 5cqh;
+  background:
+    radial-gradient(circle at 50% 0, #f1dfb1 0 2.4cqh, transparent 2.9cqh) 0 0 / 7cqh 5cqh repeat-x,
+    radial-gradient(circle at 50% 0, #f6e8c6 0 1.7cqh, transparent 2.2cqh) 3.5cqh 0 / 9cqh 5cqh repeat-x;
+  content: "";
+}
+
+.bubble {
+  position: absolute;
+  border: max(1px, 0.7cqh) solid rgb(255 248 228 / 0.85);
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 30%, rgb(255 255 255 / 0.95) 0 18%, rgb(255 255 255 / 0.22) 42%, transparent 70%);
+  box-shadow: 0 0 1.5cqh rgb(255 236 190 / 0.45);
+  opacity: 0;
+  animation-name: rise;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.9, 0.7);
+  animation-iteration-count: infinite;
+}
+
+.churn {
+  position: absolute;
+  top: -14cqh;
+  left: var(--stream-at);
+  width: 46cqh;
+  height: 24cqh;
+  margin-left: -23cqh;
+  background:
+    radial-gradient(circle at 30% 58%, #fffdf6 0 24%, transparent 25%),
+    radial-gradient(circle at 55% 42%, #ffffff 0 30%, transparent 31%),
+    radial-gradient(circle at 76% 60%, #fffaf0 0 22%, transparent 23%),
+    radial-gradient(ellipse at 50% 70%, rgb(255 250 236 / 0.85) 0 42%, transparent 70%);
+  opacity: 0;
+}
+
+/*
+ * Auto mode: the same pour on CSS keyframes, from first paint. Base styles are the full glass, so reduced motion
+ * (animation: none) shows it statically; `backwards` holds the empty state through the delay.
+ */
+.auto {
+  --pour-start: calc(var(--hero-offset, 0s) + var(--pour-delay));
+}
+
+.auto .liquid {
+  translate: 0 9%;
+  animation:
+    pour-fill var(--pour-duration) cubic-bezier(0.3, 0.62, 0.35, 1) var(--pour-start) backwards,
+    pour-slosh calc(var(--pour-duration) * 0.85) ease-in-out var(--pour-start) backwards;
+}
+
+.auto .body {
+  animation: pour-head calc(var(--pour-duration) * 1.25) ease-out var(--pour-start) backwards;
+}
+
+.auto .stream {
+  animation: pour-stream calc(var(--pour-duration) * 0.95) ease-out var(--pour-start) backwards;
+}
+
+.auto .churn {
+  animation: pour-bloom calc(var(--pour-duration) * 0.95) ease-out var(--pour-start) backwards;
+}
+
+@keyframes pour-fill {
+  from {
+    translate: 0 100%;
+  }
+}
+
+@keyframes pour-slosh {
+  0% {
+    transform: skewY(0deg);
+  }
+  25% {
+    transform: skewY(-3deg);
+  }
+  50% {
+    transform: skewY(2.2deg);
+  }
+  75% {
+    transform: skewY(-1deg);
+  }
+  100% {
+    transform: skewY(0deg);
+  }
+}
+
+@keyframes pour-head {
+  0% {
+    translate: 0 -8%;
+  }
+  50% {
+    translate: 0 8%;
+  }
+  100% {
+    translate: 0 0;
+  }
+}
+
+@keyframes pour-stream {
+  0% {
+    clip-path: inset(0% 0% 100% 0%);
+    scale: 0.6 1;
+  }
+  12% {
+    clip-path: inset(0% 0% 0% 0%);
+    scale: 1 1;
+  }
+  72% {
+    clip-path: inset(0% 0% 0% 0%);
+    scale: 0.85 1;
+  }
+  100% {
+    clip-path: inset(100% 0% 0% 0%);
+    scale: 0.3 1;
+  }
+}
+
+@keyframes pour-bloom {
+  0% {
+    opacity: 0;
+    scale: 0.4;
+  }
+  15% {
+    opacity: 1;
+    scale: 1.15;
+  }
+  70% {
+    opacity: 1;
+    scale: 0.95;
+  }
+  100% {
+    opacity: 0;
+    scale: 0.5;
+  }
+}
+
+@keyframes drift-left {
+  to {
+    transform: translateX(-36cqh);
+  }
+}
+
+@keyframes drift-right {
+  from {
+    transform: translateX(-26cqh);
+  }
+}
+
+@keyframes rise {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  12% {
+    opacity: 1;
+  }
+  78% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(1.5cqh, -60cqh, 0) scale(0.55);
+  }
+}
+
+/* Reduced motion: no pour. Follow mode shows a full glass while the parent is hovered or focused; auto mode is full. */
+@media (prefers-reduced-motion: reduce) {
+  .follow {
+    opacity: 0;
+  }
+
+  :hover > .follow,
+  :focus-visible > .follow {
+    opacity: 1;
+  }
+
+  .bubble {
+    display: none;
+  }
+
+  .auto .liquid,
+  .auto .body,
+  .auto .stream,
+  .auto .churn {
+    animation: none;
+  }
+}
