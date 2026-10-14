@@ -1,17 +1,17 @@
 # Runbook 001: Build Jenkins hỏng ngay ở bước checkout với lỗi "object file … is empty"
 
-> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-14 · Liên quan: [Mục lục runbook](README.md), [Triển khai](../deployment.md), [Jenkins + Harbor](../providers/jenkins-registry.md), [Postmortem](../postmortems/README.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-15 · Liên quan: [Mục lục runbook](README.md), [Triển khai](../deployment.md), [Jenkins + Harbor](../providers/jenkins-registry.md), [Postmortem 001](../postmortems/001-wsl-restart-corrupted-jenkins-git-cache.md)
 
 **Mức:** P2 (không deploy được; site đang chạy không bị ảnh hưởng, vì mọi lỗi trước stage Deploy không chạm VPS).
 
-**Dấu hiệu:** sau khi máy CI tắt hoặc khởi động lại không sạch (mất điện, WSL bị tắt khi đang chạy, Windows khởi động lại), mọi build của job này hỏng trước stage đầu tiên. Log build có dòng như:
+**Dấu hiệu:** sau khi máy CI tắt hoặc khởi động lại không sạch (mất điện, WSL tự tắt hoặc bị tắt khi đang chạy, Windows khởi động lại), mọi build của job này hỏng trước stage đầu tiên. Log build có dòng như:
 
 ```text
 error: object file .git/objects/af/ce6d14… is empty
 fatal: cannot read existing object info
 ```
 
-Thông báo Discord: "Build THẤT BẠI — VPS không bị đụng". Build sau vẫn hỏng y như vậy, dù commit mới không liên quan.
+Build sau vẫn hỏng y như vậy, dù commit mới không liên quan. Nếu Jenkins đã có webhook Discord, thông báo là "Build THẤT BẠI — VPS không bị đụng"; lúc sự cố 2026-10-14 webhook chưa được cấu hình nên không có thông báo nào ([postmortem 001](../postmortems/001-wsl-restart-corrupted-jenkins-git-cache.md)).
 
 **Nguyên nhân:** khi máy tắt đột ngột giữa lúc git đang ghi, các file object vừa tạo trong `.git/objects/` còn rỗng (0 byte). Jenkins giữ hai bản sao repo của job: **cache git của controller** (dùng để đọc `Jenkinsfile`, kiểu lightweight checkout) và **workspace của job trên agent**. Một trong hai, hoặc cả hai, chứa object rỗng thì mọi lần checkout sau đều hỏng; Jenkins không tự dọn.
 
@@ -53,7 +53,7 @@ Xoá hai bản sao hỏng để Jenkins clone lại từ GitHub. Không mất d�
    ```
 
 3. Xoá workspace của job trên agent (Jenkins → job → "Wipe Out Current Workspace", hoặc `rm -rf -- "$JOB_WORKSPACE"` sau khi kiểm biến trỏ đúng thư mục của job này).
-4. Bấm **Build Now** cho job → mong đợi: checkout thành công, chạy hết các stage, Discord báo thành công.
+4. Bấm **Build Now** cho job → mong đợi: checkout thành công, chạy hết các stage (Discord báo thành công nếu đã có webhook).
 
 Nếu job khác trên cùng Jenkins cũng hỏng cùng kiểu, lặp lại cho từng job; mỗi repo có thư mục cache riêng.
 
@@ -65,7 +65,7 @@ Nếu job khác trên cùng Jenkins cũng hỏng cùng kiểu, lặp lại cho t
 
 ## Sau đó
 
-- Tránh tắt máy CI hoặc WSL khi Jenkins đang build.
+- Tránh tắt máy CI hoặc WSL khi Jenkins đang build. WSL cũng có thể tự tắt (sự cố 2026-10-14); việc tìm nguyên nhân và phòng ngừa theo dõi ở [postmortem 001, mục 6](../postmortems/001-wsl-restart-corrupted-jenkins-git-cache.md#6-việc-cần-làm).
 - Ghi lại sự cố ở [mục lục postmortem](../postmortems/README.md); sự cố mức P2 cần postmortem theo quy ước.
 - Đề xuất phòng ngừa (chưa làm, chưa chốt): bật `core.fsync` cho git trên máy CI để object được ghi xuống đĩa trước khi git báo xong; hoặc thêm bước tự kiểm object rỗng và xoá cache khi checkout lỗi. Thuộc repo infra.
 
@@ -73,21 +73,23 @@ Nếu job khác trên cùng Jenkins cũng hỏng cùng kiểu, lặp lại cho t
 
 | Ngày | Môi trường | Người | Kết quả | Thời gian |
 |---|---|---|---|---|
-| 2026-10-14 | Máy CI thật, sự cố thật (không phải diễn tập) | Người vận hành | Đạt: build #16 deploy `90f1882` | `[CẦN XÁC NHẬN: thời gian từ lúc phát hiện tới khi build #16 xanh]` |
+| 2026-10-14 | Máy CI thật, sự cố thật (không phải diễn tập) | Người vận hành | Đạt: build #16 deploy `90f1882` | Khoảng 4 phút từ lúc chẩn đoán (khoảng 18:43) tới build #16 xanh (18:47); giờ phát hiện `[CẦN XÁC NHẬN]` |
 
 ## Lịch sử sự cố
 
 **2026-10-14 (giờ Việt Nam, UTC+7):**
 
 - 18:18: PR #4 và PR #5 merge vào `main`.
-- 18:21: WSL của máy CI khởi động lại không sạch; build #12 bị giết giữa chừng.
+- 18:21: WSL của máy CI tự tắt (không do người vận hành) rồi khởi động lại; build #12 bị giết giữa chừng.
 - 18:33: PR #6 merge (`90f1882`).
 - Sau đó: build #13, #14, #15 hỏng ở checkout với `error: object file .git/objects/af/ce6d14… is empty` / `fatal: cannot read existing object info`. Cache lightweight checkout của controller và workspace của job trên agent mỗi nơi có 60 file object rỗng.
 - Xử lý: xoá thư mục cache của job (tìm theo `remote.origin.url`) và workspace của job, rồi chạy build. Build #16 thành công và deploy `90f1882` (gồm PR #4, #5, #6).
 - Ảnh hưởng: deploy của PR #4, #5, #6 bị trễ; site đang chạy không bị ảnh hưởng.
+- Dòng thời gian đầy đủ, nguyên nhân và việc cần làm: [postmortem 001](../postmortems/001-wsl-restart-corrupted-jenkins-git-cache.md).
 
 ## Lịch sử thay đổi
 
 | Ngày | Thay đổi |
 |---|---|
 | 2026-10-14 | Tạo sau sự cố cùng ngày |
+| 2026-10-15 | Link tới postmortem 001; WSL tự tắt (chủ repo xác nhận); thông báo Discord chỉ có khi đã cấu hình webhook |
