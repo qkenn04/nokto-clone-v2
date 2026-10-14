@@ -20,6 +20,9 @@ const SIZES = {
   compact: { className: "h-12", sizes: `${widthAt(48)}px` },
 } as const;
 
+/** `sizes` of the default logo; other logos reuse it so the browser picks the same, already cached file. */
+export const LOGO_SIZES = SIZES.default.sizes;
+
 /** Logo link. On the home page it replays the entrance instead of navigating. */
 export function BrandMark({
   size = "default",
