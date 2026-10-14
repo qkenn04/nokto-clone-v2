@@ -1,6 +1,6 @@
 # Thuật ngữ
 
-> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-14 · Liên quan: [Đặc tả sản phẩm](spec.md), [Yêu cầu phi chức năng](nfr.md), [Kiến trúc](../architecture/ARCHITECTURE.md), [Tài liệu](../README.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-15 · Liên quan: [Đặc tả sản phẩm](spec.md), [Yêu cầu phi chức năng](nfr.md), [Kiến trúc](../architecture/ARCHITECTURE.md), [Tài liệu](../README.md)
 
 Chỉ gồm thuật ngữ dùng trong repo và tài liệu này. Dùng thuật ngữ nhất quán trong tài liệu và code; đổi tên thì đổi ở đây trước.
 
@@ -14,7 +14,8 @@ Mục lục: [Miền nghiệp vụ](#miền-nghiệp-vụ) · [Tìm kiếm và c
 | **GBP** | Hồ sơ Google của quán | Google Business Profile: hồ sơ quán trên Google Search và Google Maps (giờ, ảnh, đánh giá) | Do chủ quán quản lý, ngoài repo; link website trên GBP dùng UTM |
 | **Đặt bàn** | Chốt bàn, chốt kèo | Trên site: khách điền form để chuẩn bị thông tin, rồi gọi hoặc nhắn quán. Bàn chỉ được xác nhận khi quán trả lời | `/reservation`; form không gửi dữ liệu ([Đặc tả, NG2](spec.md#5-không-làm)) |
 | **Liên hệ nhanh** | Nút nổi | Cụm nút Messenger, Facebook, Zalo, Gọi và nút Đặt bàn cố định ở góc màn hình trên mọi trang | `src/components/sites/the-hot/FloatingContact.tsx` |
-| **Menu sách lật** / **bảng giá** | Menu | Hai cách xem menu: lật 10 trang ảnh menu (`/menu`) hoặc danh sách món kèm giá (`/menu/list`) | `menuPages.ts`, `MenuBook.tsx`; `menu/data.ts` |
+| **Menu sách lật** / **bảng giá** | Menu | Hai cách xem menu: lật trang ảnh menu (`/menu`) hoặc danh sách món kèm giá (`/menu/list`) | `menuPages.ts`, `MenuBook.tsx`; `menu/data.ts` |
+| **Món ăn chơi** / **Premium** | Hai tab menu | Hai phần của menu, mỗi phần một tab ở cả sách lật và bảng giá. "Món ăn chơi": mồi 39K–99K, salad, bia (bản PDF gọi là "Menu Luxury"). "Premium": combo, khai vị, mồi, mẹt, món heo, bò, gà, tôm, ếch, lẩu, canh, cơm, rau, rượu, vang, tháp | `MenuGroupId` `an_choi`, `premium` trong `menu/data.ts`; `menuBooks` trong `menuPages.ts`; `MenuTabs.tsx` |
 | **Chương trình minh hoạ** | Sự kiện mẫu | Sự kiện hiện ở trang chủ để minh hoạ không khí, chưa có lịch thật từ quán; trên UI có nhãn "Chương trình minh hoạ" | Cờ `illustrative: true` trong `homeEvents` |
 | **Màn hình chờ** | Splash, preloader | Hiệu ứng rót bia phủ cả màn hình mỗi lần tải trang, giữ tối đa 6 s | `SPLASH_SCRIPT` trong `src/app/layout.tsx`, `chrome/Preloader.tsx` |
 | **Ảnh nền template** | Backdrop | Ảnh `hero-backdrop.jpg` của template NOKTO, mờ dần sang phải phía sau nội dung; là phần tử LCP trên điện thoại | `chrome/Backdrop.tsx`; [ADR 0003](../adr/0003-allow-search-indexing.md) |

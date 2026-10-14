@@ -17,6 +17,7 @@
 - [x] 002-T12 Kiểm trước merge: lint, typecheck, `check:sitemap`, build, `docker build --target check`; so chuỗi chính xác title/description/OG/Twitter trên 7 trang; `<body>` giống `main` · 2026-10-14
 - [x] 002-T13 Deploy (Jenkins build #16) và kiểm trên production: `/menu` có `<title>Menu — The Hot Beer Garden Đà Lạt</title>` và `og:image` · 2026-10-14
 - [ ] 002-T14 Facebook Sharing Debugger: Scrape Again cho 7 URL để làm mới ảnh xem trước · AC: 002-AC-08
+- [ ] 002-T16 Chủ quán duyệt mô tả mới cho `/menu`, `/menu/list` có combo, lẩu, mẹt, rượu ([spec.md phần A](spec.md#phần-a-tiêu-đề-và-mô-tả-xong)); duyệt xong thì sửa `src/seo/page-meta.ts` trong PR nhỏ · chặn bởi Q16 (câu ưu đãi bia)
 - [ ] 002-T15 Sau khi Google crawl lại: Search Console → Performance kiểm tiêu đề mới hiện trong kết quả (theo dõi hằng tuần ở M6)
 
 ## Phần C: JSON-LD
@@ -68,3 +69,4 @@ Tình trạng 2026-10-15 (ảnh chụp của chủ quán): tìm "the hot beer ga
 | 2026-10-15 | Bỏ nhãn minh hoạ sự kiện 16/10, 17/10; link Facebook, Messenger `thehot.dalat`; deploy | PR #8, `46025ad`, merge `ed262e4`, Jenkins build #17 |
 | 2026-10-15 | Mở PR #10: JSON-LD đợt 1 + `/favicon.ico`; validator.schema.org 0 lỗi, 0 cảnh báo; chờ duyệt | PR #10, `8d9ec01`, `6680248` |
 | 2026-10-15 | Ghi tình trạng tìm tên quán (`/about` #4) và việc cho chủ quán (TripAdvisor, tiểu sử mạng xã hội, giờ trên Google) | Ảnh chụp của chủ quán; mục Xếp hạng khi tìm tên quán |
+| 2026-10-15 | Menu Premium lên `/menu` (tab thứ hai, 12 trang ảnh có alt, sitemap ảnh thêm 12 mục) và `/menu/list` (104 món dạng chữ); đề xuất mô tả mới cho hai trang menu, chờ duyệt | Nhánh `feat/menu-premium` |

@@ -24,13 +24,17 @@ PR A (Umami) là PR #13, merge 2026-10-15. Website ID có từ 2026-10-15; track
 - [ ] 004-T17 Deploy, kiểm Umami Realtime, sự kiện, UTM, không cookie · AC: 004-AC-09, 004-AC-10
 - [ ] 004-T18 Chủ quán cùng dev xem dashboard sau 1 tuần
 
+## Sự kiện thêm sau PR A
+
+- [x] 004-T50 Sự kiện `menu_tab_select` (`tab`, `mode`) khi đổi tab menu "Món ăn chơi" / "Premium" ở sách lật và danh sách; thêm `tab` vào danh sách thuộc tính cho phép · AC: 004-AC-06 (trước deploy: trình duyệt headless với tracker giả) · PR menu Premium (nhánh `feat/menu-premium`, chờ duyệt)
+
 ## GA4: chủ quán làm trên giao diện
 
 - [ ] 004-T20 Tạo account "The Hot Beer Garden", property `thehot.vn` (múi giờ Việt Nam, VND), web stream `https://thehot.vn`; gửi Measurement ID cho dev. **Không** dán đoạn mã Google đưa vào web.
 - [ ] 004-T21 Enhanced measurement: bật page views (gồm "page changes based on browser history events"), scrolls, outbound clicks; tắt site search, form interactions
 - [ ] 004-T22 Data retention 14 tháng; Google Signals tắt
 - [ ] 004-T23 Cấp quyền Editor cho dev trong lúc cài, xong hạ xuống Viewer hoặc Analyst
-- [ ] 004-T24 Ngày deploy PR B: custom dimension (Event) `method`, `location`, `mode`, `event_id`, `network`
+- [ ] 004-T24 Ngày deploy PR B: custom dimension (Event) `method`, `location`, `mode`, `tab`, `event_id`, `network`
 - [ ] 004-T25 24–48 giờ sau deploy: đánh dấu key event `contact_click`, `reservation_complete`; liên kết Search Console; publish collection Search Console
 - [ ] 004-T26 Internal traffic: khai IP wifi quán, bộ lọc ở Testing khoảng 1 tuần rồi Active
 

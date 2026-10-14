@@ -45,6 +45,7 @@ Người làm: **Chủ quán** (chủ quán hoặc người quản lý) · **Dev
 - [x] TK26 Sửa mục "Tùy chọn hiển thị" đang sai ở `/privacy` (nói về `sessionStorage` đã bỏ từ `d0a8e34`): gộp vào 003 phần E hoặc 004 PR A, tuỳ cái nào làm trước · [003-T51](../specs/003-performance/tasks.md), [004-T15](../specs/004-analytics/tasks.md) · PR #13 merge 2026-10-15
 - [x] TK27 Hạ tầng Umami (repo hạ tầng riêng, private), lấy Website ID (2026-10-15) · M4 · [004-T03](../specs/004-analytics/tasks.md)
 - [ ] TK28 Dọn tệp template NOKTO không còn dùng trong `public/sites/nokto/` · M2 · [002-T32](../specs/002-onpage-seo/tasks.md)
+- [ ] TK30 Menu Premium: tab thứ hai ở `/menu` (12 trang ảnh) và `/menu/list` (104 món kèm giá, tên tiếng Anh) · M2 · **PR chờ duyệt** (nhánh `feat/menu-premium`) · xong khi: merge, deploy; sau đó chủ quán trả lời Q16–Q24 và duyệt mô tả mới ([002-T16](../specs/002-onpage-seo/tasks.md))
 - [ ] TK29 Theo dõi kết quả tìm tên quán "the hot beer garden đà lạt": vị trí của `thehot.vn`, tiêu đề mới, biểu tượng The Hot thay quả địa cầu (dịch vụ favicon của Google đã trả logo từ 2026-10-15) · M2, M6 · [002-T60, 002-T63](../specs/002-onpage-seo/tasks.md)
 
 ### Để sau
@@ -74,6 +75,15 @@ Mỗi câu chặn việc ghi ở cột "Chặn"; chưa có câu trả lời thì
 | Q13 | Thông tin cho hỏi đáp: chỗ để xe, nhóm đông tối đa bao nhiêu người | 002 phần F | 002-T40 | 2026-10-14 |
 | Q14 | Các câu hỏi về analytics (tài khoản GA4, thời gian lưu, ai xem số liệu, chữ banner, `/privacy`, Cloudflare Web Analytics) | 004 | 004-T02 | 2026-10-14 |
 | Q15 | Âm thanh video hero (chủ quán muốn giữ): B1 chỉ faststart, B2 nút bật tiếng, hay B3 trình phát "Xem video có tiếng"? | 003 phần B, [ADR 0008](../adr/0008-compress-hero-video-without-trimming.md) | TK18, 003-T31, 003-T36 | 2026-10-15 |
+| Q16 | Giá bia trong menu vẫn chỉ áp dụng Chủ nhật đến thứ Năm? (PDF menu không ghi điều kiện này; website đang ghi theo `site.beerOffer`) | `/menu`, `/menu/list`, mô tả trang `/menu` | Giữ nguyên `site.beerOffer` tới khi có trả lời; 002-T16 | 2026-10-15 |
+| Q17 | Giá rượu, vang và tháp trong menu Premium tính theo chai hay ly? Rượu mơ / táo mèo 55 là ly hay chai? Theo bố cục trang, website hiểu 670 là giá vang Rivage, 759 là giá Chateau du Pin, 55 là giá chung của rượu mơ và rượu táo mèo: đúng không? | `/menu/list` phần đồ uống | Ghi đơn vị giá đồ uống | 2026-10-15 |
+| Q18 | Trang menu "Răng mực sốt bơ cay" (trang Món ăn chơi về mực) dùng nhầm ảnh món bắp sốt bơ cay; chủ quán có sửa ảnh trên Canva và đăng lại không? | Ảnh trang menu lật sách | Thay ảnh trang đó | 2026-10-15 |
+| Q19 | Link menu PDF trên Google Drive đang dùng ở đâu (QR trên bàn, Google Business, bio Instagram)? Đề xuất đổi sang `https://thehot.vn/menu` khi website có đủ menu | QR, Google Business, mạng xã hội | Đổi link menu | 2026-10-15 |
+| Q20 | Menu Premium in trùng hai dòng: "Mực một nắng cháy tỏi 213" (trang Mồi bén lai rai) và "Tôm sú cháy kim chi 278" (trang Chuyện nhà tôm), mỗi dòng hai lần; website ghi mỗi món một lần. Dòng thứ hai có phải là món khác bị in nhầm tên không? ("Mực 1 nắng cháy tiêu xanh 213" trong hình ở trang mồi được ghi là một món riêng) | `/menu/list`, file Canva | Sửa bản chữ nếu là món khác | 2026-10-15 |
+| Q21 | Tên tiếng Anh có thể sai, website đang giữ chữ in: "Mực cơm chiên mắm" = Fried Rice Field Squid With Fish Sauce; "Mực khô lắc mắm khoai lang" = Grilled Dried Squid With Sweet Potato Fish Sauce; "Ba chỉ một nắng cuốn lá mơ" = … With Hog Plum Leaves; "Cơm chiên dưa bò" = Beef & Pickled Cucumber Fried Rice. Sửa thành gì? | Tên tiếng Anh ở `/menu/list`, file Canva | — | 2026-10-15 |
+| Q22 | Tên món trong combo khác tên ở trang món lẻ, có phải cùng món không: "Bò xào luklak" / "Bò lúc lắc"; "Gỏi tai heo bóp rau răm" / "Tai heo bóp gỏi rau răm"; "Mực khô lắc khoai lang" / "Mực khô lắc mắm khoai lang"; "Nem chả trộn chua cay" / "… kiểu Huế"? Bia trong combo (6 hoặc 8 Tiger) là loại nào (ảnh là Tiger Crystal)? | Mô tả combo ở `/menu/list` | — | 2026-10-15 |
+| Q23 | "Thố tiềm tam sung sung" (508): tên đúng chưa, thuộc nhóm lẩu ("Sục sôi") hay canh ("Hồi sức")? Website đang xếp vào "Hồi sức" | `/menu/list` | — | 2026-10-15 |
+| Q24 | Mỗi mẹt (gà rực lửa, núi rừng Tây Bắc, The Hot) cho mấy người, có tên tiếng Anh không? "Jager Bomb Tower" in thành phần không có Jagermeister: đúng không? | `/menu/list` | — | 2026-10-15 |
 
 Danh sách đầy đủ cho analytics: [004 spec mục 12](../specs/004-analytics/spec.md#12-câu-hỏi-mở).
 

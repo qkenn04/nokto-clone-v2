@@ -56,6 +56,13 @@ Trang con có tiêu đề dạng `<tiêu đề> — The Hot Beer Garden Đà L�
 
 H1 và slogan trên giao diện không đổi.
 
+**Đề xuất mới cho `/menu` và `/menu/list` (2026-10-15, chờ chủ quán duyệt; `page-meta.ts` chưa đổi).** Từ khi có menu Premium (combo, lẩu, mẹt, rượu), mô tả cũ chỉ nói món ăn chơi. Bản đề xuất bỏ câu "Bia ưu đãi Chủ nhật đến thứ Năm" vì menu PDF không ghi điều kiện này ([Q16](../../plan/tasks.md#câu-hỏi-chờ-chủ-quán)); nếu chủ quán xác nhận ưu đãi còn áp dụng thì thêm lại "Bia từ 19K, Chủ nhật đến thứ Năm":
+
+| Trang | Mô tả đề xuất | Độ dài |
+|---|---|---|
+| `/menu` | Menu The Hot Beer Garden Đà Lạt: mồi từ 39K, combo cho 4 và 6 người kèm bia, lẩu, mẹt, rượu và tháp bia. Giá đã gồm VAT. Lật menu, chốt món rồi đặt bàn. | 152 ký tự |
+| `/menu/list` | Bảng giá The Hot Đà Lạt: mồi từ 39.000₫, combo cho 4 và 6 người kèm bia Tiger, lẩu, mẹt, món heo, bò, gà, tôm, rượu và vang. Giá đã gồm VAT. | 140 ký tự |
+
 ### Phần B: ảnh chia sẻ (xong)
 
 Mọi trang có `og:image` là thẻ chia sẻ chung `/opengraph-image.png` (1200×630). Trang con có alt của ảnh là tiêu đề slogan. Ảnh riêng cho từng trang thuộc phần E.
@@ -84,7 +91,7 @@ Không dùng `FAQPage`: từ 2023 Google chỉ hiện kết quả hỏi đáp ch
 
 ### Phần D: alt của ảnh (chưa làm)
 
-Ảnh có nội dung (món ăn, không gian, menu, sự kiện) có alt mô tả, chứa từ khoá tự nhiên. Ảnh trang trí giữ `alt=""`. Chỉ dùng "nhạc sống" khi chủ quán xác nhận.
+Ảnh có nội dung (món ăn, không gian, menu, sự kiện) có alt mô tả, chứa từ khoá tự nhiên. 12 trang ảnh menu Premium đã có alt liệt kê món chính (`menuPages.ts`, 2026-10-15). Ảnh trang trí giữ `alt=""`. Chỉ dùng "nhạc sống" khi chủ quán xác nhận.
 
 ### Phần E: ảnh chia sẻ riêng từng trang (chưa làm)
 
@@ -164,3 +171,4 @@ Phần A, B: M1. Phần C–F: M2 ([lộ trình](../../plan/roadmap.md#m2-on-pag
 |---|---|
 | 2026-10-14 | Tạo từ ghi chú kế hoạch SEO; phần A, B theo bản đã merge (PR #5, #6); trạng thái Đang áp dụng |
 | 2026-10-15 | Phần C: nhãn sự kiện 16/10, 17/10 đã gỡ (PR #8); link Facebook mới `thehot.dalat`; thêm TripAdvisor vào `sameAs`; cột trạng thái theo PR #10 (chờ duyệt) |
+| 2026-10-15 | Phần A: đề xuất mô tả mới cho `/menu`, `/menu/list` sau khi thêm menu Premium (chờ duyệt); phần D: alt cho 12 trang menu Premium |
