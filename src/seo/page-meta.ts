@@ -43,6 +43,13 @@ export const pageMeta = {
 export type PagePath = keyof typeof pageMeta;
 
 /**
+ * Share card for inner pages: the home card (`src/app/opengraph-image.png`, 1200×630). Next.js only applies that file
+ * to pages without their own `openGraph`, and every inner page sets one, so it is listed here explicitly; without it
+ * Facebook, Messenger and Zalo show links to /menu etc. with no image.
+ */
+const shareImage = { url: "/opengraph-image.png", width: 1200, height: 630, alt: site.rootTitle } as const;
+
+/**
  * Title, description, canonical and Open Graph for an inner page. The layout's title template does not reach Open
  * Graph, so the full title is spelled out there; Twitter copies both from Open Graph (see the root layout).
  */
@@ -52,6 +59,6 @@ export function pageMetadata(path: PagePath): Metadata {
     title,
     description,
     alternates: { canonical: path },
-    openGraph: { title: `${title} — ${brandName}`, description, url: path, type: "website" },
+    openGraph: { title: `${title} — ${brandName}`, description, url: path, type: "website", images: [shareImage] },
   };
 }
