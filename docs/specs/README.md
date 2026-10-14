@@ -1,6 +1,6 @@
 # Đặc tả tính năng
 
-> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-14 · Liên quan: [Bản đồ tài liệu](../README.md), [Lộ trình](../plan/roadmap.md), [Việc sắp làm](../plan/tasks.md), [Tiến độ](../plan/progress.md), [Mục lục ADR](../adr/README.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-15 · Liên quan: [Bản đồ tài liệu](../README.md), [Lộ trình](../plan/roadmap.md), [Việc sắp làm](../plan/tasks.md), [Tiến độ](../plan/progress.md), [Mục lục ADR](../adr/README.md)
 
 Mỗi tính năng (hoặc thay đổi đáng kể) của https://thehot.vn là một thư mục `NNN-<name>/` gồm:
 
@@ -17,8 +17,8 @@ Cột Tài liệu là trạng thái của spec; trạng thái hiện thực ch�
 | # | Tính năng | Tóm tắt | Mốc | Tài liệu | ADR |
 |---|---|---|---|---|---|
 | [001](001-sitemap-automation/spec.md) | Sitemap tự động | Một file cấu hình trang, kiểm lệch trong CI, `lastmod` từ git, sitemap ảnh | M1 | Đang áp dụng | 0004 |
-| [002](002-onpage-seo/spec.md) | SEO trên trang | Tiêu đề, mô tả, ảnh chia sẻ (xong); JSON-LD, alt, ảnh chia sẻ riêng, chữ giới thiệu và hỏi đáp | M1, M2 | Đang áp dụng | 0005 |
-| [003](003-performance/spec.md) | Tốc độ trang | Mục tiêu Core Web Vitals; ưu tiên LCP và logo (xong); video hero, cache, ảnh, màn hình chờ, font | M1, M3 | Đang áp dụng | 0006, 0008 |
+| [002](002-onpage-seo/spec.md) | SEO trên trang | Tiêu đề, mô tả, ảnh chia sẻ (xong); JSON-LD (PR #10 chờ duyệt), alt, ảnh chia sẻ riêng, chữ giới thiệu và hỏi đáp | M1, M2 | Đang áp dụng | 0005 |
+| [003](003-performance/spec.md) | Tốc độ trang | Mục tiêu Core Web Vitals; ưu tiên LCP và logo (xong); cache (xong); video hero, ảnh, màn hình chờ, font | M1, M3 | Đang áp dụng | 0006, 0008 |
 | [004](004-analytics/spec.md) | Đo lường truy cập | Umami luôn chạy, GA4 sau đồng ý, banner, sự kiện, UTM | M4 | Đề xuất | 0007 |
 
 Số ADR tra ở [mục lục ADR](../adr/README.md).

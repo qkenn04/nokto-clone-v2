@@ -1,6 +1,6 @@
 # Runbook
 
-> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-14 · Liên quan: [Mẫu runbook](000-template.md), [Triển khai](../deployment.md), [Cấu hình](../../dev/configuration.md), [Postmortem](../postmortems/README.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-15 · Liên quan: [Mẫu runbook](000-template.md), [Triển khai](../deployment.md), [Cấu hình](../../dev/configuration.md), [Postmortem](../postmortems/README.md)
 
 Mỗi runbook là một tình huống, viết để làm theo từng bước khi đang căng thẳng: dấu hiệu, kiểm nhanh, xử lý, khi nào coi là xong. Runbook ở repo công khai này chỉ ghi phần thuộc về site và pipeline; thao tác trên máy chủ (đường dẫn, tên dịch vụ, lệnh quản trị) nằm ở runbook của `qkenn04/infra-qkenn`.
 
@@ -10,6 +10,7 @@ Mỗi runbook là một tình huống, viết để làm theo từng bước khi
 |---|---|
 | Mọi build Jenkins hỏng ngay ở checkout với `object file … is empty` sau khi máy CI tắt đột ngột | [001](001-jenkins-git-cache-corrupted.md) |
 | Bản mới lên production chạy được nhưng sai (giao diện, nội dung, SEO) | [Triển khai, mục 7: Revert PR](../deployment.md#7-rollback) |
+| Đã thay ảnh hoặc video (giữ nguyên tên tệp) và deploy, nhưng site vẫn hiện bản cũ | [Triển khai, mục 6.4: purge URL trên Cloudflare](../deployment.md#64-thay-ảnh-hoặc-video-giữ-nguyên-tên) |
 | Deploy báo thất bại, VPS đã tự quay về bản cũ | Xem log build Jenkins và log container (repo infra); sửa bằng PR mới |
 | Site không vào được (lỗi 5xx từ Cloudflare) | Runbook của stack trên VPS ở `qkenn04/infra-qkenn` |
 | Build hỏng ở stage Sitemap dates vì shallow clone hoặc đường dẫn chưa có commit | Thông báo lỗi của `ci/sitemap-lastmod.sh` ghi cách sửa; [ADR 0004](../../adr/0004-automate-sitemap-from-page-config-and-git.md) |

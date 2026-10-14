@@ -1,6 +1,6 @@
 # Triển khai
 
-> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-14 · Liên quan: [Kiến trúc](../architecture/ARCHITECTURE.md), [Cấu hình](../dev/configuration.md), [Kiểm thử](../dev/testing.md), [Runbook](runbooks/README.md), [Postmortem](postmortems/README.md), [CI/CD core](ci-cd-core.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-15 · Liên quan: [Kiến trúc](../architecture/ARCHITECTURE.md), [Cấu hình](../dev/configuration.md), [Kiểm thử](../dev/testing.md), [Runbook](runbooks/README.md), [Postmortem](postmortems/README.md), [CI/CD core](ci-cd-core.md)
 
 Code đi từ một PR tới https://thehot.vn thế nào, kiểm sau deploy ra sao, và lùi lại bằng cách nào. Repo công khai: file này mô tả ở mức `Jenkinsfile` đã thể hiện. Script deploy trên VPS, compose stack, cấu hình nginx, cài đặt Jenkins và Harbor, quy trình quản trị nằm ở repo riêng `qkenn04/infra-qkenn`. Tính tới 2026-10-14.
 
@@ -107,6 +107,25 @@ curl -sI https://thehot.k2-tech.dev/menu | grep -i '^location'
 - Nếu PR đổi trang hoặc nội dung: Search Console → URL Inspection → Request indexing cho trang đó; Search Console → Sitemaps xem "Last read".
 - Nếu PR nhằm vào hiệu năng: PageSpeed Mobile 3 lần, ghi vào [dev/perf.md](../dev/perf.md).
 - Nếu PR đổi tiêu đề, mô tả, ảnh chia sẻ: Facebook Sharing Debugger → Scrape Again.
+- Nếu PR thay nội dung một ảnh hoặc video mà giữ nguyên tên tệp: purge URL trên Cloudflare (mục 6.4).
+
+### 6.4 Thay ảnh hoặc video giữ nguyên tên
+
+Từ 2026-10-15, tệp trong `public/` (`/videos`, `/images`, `/sites`) được Cloudflare và trình duyệt giữ 7 ngày (`Cache-Control: public, max-age=604800, stale-while-revalidate=86400`, đặt ở reverse proxy theo `qkenn04/infra-qkenn`); ảnh đã tối ưu `/_next/image` cũng 7 ngày (`images.minimumCacheTTL` và Cache Rule "Cache Next images" trên Cloudflare). Vì vậy thay nội dung một tệp mà **giữ nguyên tên** thì sau khi deploy, Cloudflare vẫn có thể trả bản cũ tới 7 ngày.
+
+Cách nên làm: đổi tên tệp khi đổi nội dung (ví dụ `main.v2.mp4`) và sửa chỗ dùng; URL mới không dính bản cũ trong cache.
+
+Lỡ giữ tên, làm sau khi Jenkins deploy xong (máy cá nhân, tài khoản có quyền vào zone):
+
+1. Cloudflare dashboard → zone `thehot.vn` → **Caching → Purge Cache → Custom Purge** → chọn URL.
+2. Dán URL đầy đủ của từng tệp đã thay, ví dụ `https://thehot.vn/sites/the-hot-beer-garden/images/logo.png`, rồi Purge.
+3. Ảnh hiển thị qua `next/image`: purge thêm các URL `https://thehot.vn/_next/image?url=…&w=…&q=…` của ảnh đó (lấy từ DevTools → Network khi mở trang trên điện thoại và máy tính). Nhiều URL quá thì dùng Purge Everything: chỉ làm Cloudflare lấy lại từ máy chủ, không mất dữ liệu (HTML vốn không được cache).
+4. Kiểm: `curl -sI <URL>` hai lần; lần hai `cf-cache-status: HIT`, và mở URL trong cửa sổ ẩn danh thấy bản mới.
+
+Giới hạn:
+
+- Purge không xoá được bản đã nằm trong trình duyệt của khách: ai đã tải có thể thấy bản cũ tới 7 ngày. Cần mọi người thấy ngay thì phải đổi tên tệp.
+- Bộ nhớ ảnh đã tối ưu của Next.js nằm trong container và hiện mất sau mỗi deploy, nên không cần xoá. Nếu sau này giữ `.next/cache` qua các lần deploy ([003 phần D](../specs/003-performance/spec.md#phần-d-ảnh-một-phần-xong)) thì phải xoá cả bộ nhớ đó.
 
 ## 7. Rollback
 

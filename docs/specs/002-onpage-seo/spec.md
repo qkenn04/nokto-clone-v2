@@ -1,10 +1,10 @@
 # 002: SEO trên trang
 
-> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-14 · Liên quan: [Mục lục spec](../README.md), [plan.md](plan.md), [tasks.md](tasks.md), [Mục lục ADR](../../adr/README.md) (ADR 0005), [Lộ trình M1, M2](../../plan/roadmap.md#m2-on-page-và-dữ-liệu-có-cấu-trúc)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-15 · Liên quan: [Mục lục spec](../README.md), [plan.md](plan.md), [tasks.md](tasks.md), [Mục lục ADR](../../adr/README.md) (ADR 0005), [Lộ trình M1, M2](../../plan/roadmap.md#m2-on-page-và-dữ-liệu-có-cấu-trúc)
 
 Những gì Google, Facebook và Zalo đọc được từ chính các trang của https://thehot.vn: tiêu đề và mô tả trong kết quả tìm kiếm, ảnh khi chia sẻ link, dữ liệu có cấu trúc (JSON-LD) về quán, chữ alt của ảnh và phần chữ giới thiệu trên trang. Mục tiêu là để người tìm "quán nhậu chill Đà Lạt", "beer garden Đà Lạt" hay tên quán thấy đúng trang, với thông tin khớp Google Business Profile.
 
-Hiện thực: phần A (tiêu đề, mô tả) và phần B (ảnh chia sẻ) chạy trên production từ Jenkins build #16 (PR #5, PR #6). Phần C–F chưa làm, chờ chủ quán trả lời các câu hỏi ở mục 12 và gửi ảnh. Trạng thái chi tiết ở [tasks.md](tasks.md).
+Hiện thực: phần A (tiêu đề, mô tả) và phần B (ảnh chia sẻ) chạy trên production từ Jenkins build #16 (PR #5, PR #6). Phần C: sự kiện 16/10, 17/10 đã bỏ nhãn minh hoạ (PR #8, Jenkins build #17, 2026-10-15); JSON-LD đợt 1 và `/favicon.ico` ở PR #10, chờ duyệt (2026-10-15); giờ đóng cửa, khoảng giá, thanh toán, nhạc sống chờ chủ quán trả lời (mục 12). Phần D–F chưa làm. Trạng thái chi tiết ở [tasks.md](tasks.md).
 
 ## 1. Mục tiêu
 
@@ -60,24 +60,25 @@ H1 và slogan trên giao diện không đổi.
 
 Mọi trang có `og:image` là thẻ chia sẻ chung `/opengraph-image.png` (1200×630). Trang con có alt của ảnh là tiêu đề slogan. Ảnh riêng cho từng trang thuộc phần E.
 
-### Phần C: dữ liệu có cấu trúc (chưa làm)
+### Phần C: dữ liệu có cấu trúc (PR #10, chờ duyệt)
 
-Đích (đề xuất; mọi trường đánh dấu `[CẦN XÁC NHẬN]` chỉ thêm khi chủ quán đã trả lời):
+Đích (mọi trường đánh dấu `[CẦN XÁC NHẬN]` chỉ thêm khi chủ quán đã trả lời). Cột "PR #10" ghi trường nào đã có trong PR #10 (mở 2026-10-15; validator.schema.org 0 lỗi, 0 cảnh báo):
 
-| Trường | Giá trị | Nguồn |
-|---|---|---|
-| `@type` | `["Restaurant", "BarOrPub"]` | Đề xuất |
-| `geo` | `GeoCoordinates` 11.950599, 108.456165 | Toạ độ Google Maps của quán |
-| `sameAs` | Facebook `https://www.facebook.com/thehotbeergardendalat/`; Instagram `https://www.instagram.com/thehot.dalat/`; TikTok `https://www.tiktok.com/@thehot.dalat`; Google `https://www.google.com/search?kgmid=/g/11yff9m3ws` | Trang mạng xã hội của quán; Knowledge Graph ID của hồ sơ Google |
-| `hasMap` | Link hồ sơ Google của quán (`https://share.google/GzxQd0SE6t7QogToT`) | Hồ sơ Google |
-| `logo` | Logo của quán (`/sites/the-hot-beer-garden/images/logo.png`; bản SVG nếu có) | `site.ts` |
-| `image` | 3–5 ảnh thật, ưu tiên ảnh ngang chất lượng cao | Chờ ảnh (001-T40) |
-| `openingHoursSpecification` | Mở 17:30 (chủ quán xác nhận 2026-10-14). Giờ đóng cửa và các ngày mở: [CẦN XÁC NHẬN: giờ đóng cửa (00:00 hay 00:30?) và quán mở mọi ngày trong tuần không — chưa xác định, cần chủ quán xác nhận] | Chủ quán |
-| `priceRange` | [CẦN XÁC NHẬN: khoảng giá — chưa xác định, cần chủ quán xác nhận] | Chủ quán |
-| `paymentAccepted` | [CẦN XÁC NHẬN: hình thức thanh toán — chưa xác định, cần chủ quán xác nhận] | Chủ quán |
-| `amenityFeature` | Chỗ ngồi ngoài trời. Nhạc sống: [CẦN XÁC NHẬN: có nhạc sống không, tối nào — chưa xác định, cần chủ quán xác nhận] | Hồ sơ Google ghi cả hai; chỉ dùng "nhạc sống" khi chủ quán xác nhận |
-| Nút `WebSite` | `name`, `url`, `inLanguage: vi`; không có `SearchAction` (site không có ô tìm kiếm) | Đề xuất |
-| Nút `Event` | Chỉ cho sự kiện thật có ngày giờ cụ thể. Chủ quán xác nhận 2026-10-14 hai sự kiện 16/10 (Friday on Fire) và 17/10 (Hot Saturday) là thật; trong code chúng vẫn mang nhãn minh hoạ (`illustrative: true`) | Dữ liệu sự kiện trên trang chủ |
+| Trường | Giá trị | Nguồn | PR #10 |
+|---|---|---|---|
+| `@type` | `["Restaurant", "BarOrPub"]` | Đề xuất | Có |
+| `geo` | `GeoCoordinates` 11.950599, 108.456165 | Toạ độ Google Maps của quán | Có |
+| `sameAs` | Instagram `https://www.instagram.com/thehot.dalat/`; TikTok `https://www.tiktok.com/@thehot.dalat`; Facebook `https://www.facebook.com/thehot.dalat/` (cùng trang cũ `thehotbeergardendalat`, đổi tên; PR #8 sửa link trên site); Google `https://www.google.com/search?kgmid=/g/11yff9m3ws`; TripAdvisor `https://www.tripadvisor.com.vn/Attraction_Review-g293922-d33307586-Reviews-The_Hot_Beer_Garden-Da_Lat_Lam_Dong_Province.html` | Trang mạng xã hội của quán; Knowledge Graph ID của hồ sơ Google; trang TripAdvisor đã đối chiếu cùng địa chỉ, điện thoại, trang Facebook | Có |
+| `hasMap` | Link hồ sơ Google của quán (`https://share.google/GzxQd0SE6t7QogToT`) | Hồ sơ Google | Có |
+| `logo` | Logo của quán (`/sites/the-hot-beer-garden/images/logo.png`; bản SVG nếu có) | `site.ts` | Có (PNG) |
+| `image` | 3–5 ảnh thật, ưu tiên ảnh ngang chất lượng cao | Chờ ảnh (001-T40) | Tạm: 5 ảnh gallery + ảnh chia sẻ |
+| `openingHoursSpecification` | Mở 17:30 (chủ quán xác nhận 2026-10-14). Giờ đóng cửa và các ngày mở: [CẦN XÁC NHẬN: giờ đóng cửa (00:00 hay 00:30?) và quán mở mọi ngày trong tuần không — chưa xác định, cần chủ quán xác nhận] | Chủ quán | Chưa (`pendingFacts`, để trống) |
+| `priceRange` | [CẦN XÁC NHẬN: khoảng giá — chưa xác định, cần chủ quán xác nhận] | Chủ quán | Chưa (`pendingFacts`) |
+| `paymentAccepted` | [CẦN XÁC NHẬN: hình thức thanh toán — chưa xác định, cần chủ quán xác nhận] | Chủ quán | Chưa (`pendingFacts`) |
+| `amenityFeature` | Chỗ ngồi ngoài trời. Nhạc sống: [CẦN XÁC NHẬN: có nhạc sống không, tối nào — chưa xác định, cần chủ quán xác nhận] | Hồ sơ Google ghi cả hai; chỉ dùng "nhạc sống" khi chủ quán xác nhận | Chỗ ngồi ngoài trời: có. Nhạc sống: chưa (`pendingFacts`) |
+| Khác | `acceptsReservations` (URL `/reservation`), `hasMenu` (`/menu`), `servesCuisine`, `currenciesAccepted` | `site.ts` | Có |
+| Nút `WebSite` | `name` "The Hot Beer Garden" (tên site Google hiện trong kết quả), `alternateName`, `url`, `inLanguage: vi-VN`, `publisher` trỏ về quán; không có `SearchAction` (site không có ô tìm kiếm) | Đề xuất | Có |
+| Nút `Event` | Chỉ cho sự kiện thật (không có `illustrative`). Chủ quán xác nhận hai sự kiện 16/10 (Friday on Fire, 19:00–00:30) và 17/10 (Hot Saturday, 19:30–00:30) là thật; PR #8 (2026-10-15) đã bỏ `illustrative` và nhãn "Chương trình minh hoạ" của hai sự kiện này. Chỉ xuất trên `/`, trang hiện dòng sự kiện | Dữ liệu sự kiện trên trang chủ | Có: 16/10, 17/10 và "Sạc pin đêm" 10/10 (chỉ có ngày); không có `offers` |
 
 Không dùng `FAQPage`: từ 2023 Google chỉ hiện kết quả hỏi đáp cho trang chính phủ và y tế.
 
@@ -162,3 +163,4 @@ Phần A, B: M1. Phần C–F: M2 ([lộ trình](../../plan/roadmap.md#m2-on-pag
 | Ngày | Thay đổi |
 |---|---|
 | 2026-10-14 | Tạo từ ghi chú kế hoạch SEO; phần A, B theo bản đã merge (PR #5, #6); trạng thái Đang áp dụng |
+| 2026-10-15 | Phần C: nhãn sự kiện 16/10, 17/10 đã gỡ (PR #8); link Facebook mới `thehot.dalat`; thêm TripAdvisor vào `sameAs`; cột trạng thái theo PR #10 (chờ duyệt) |
