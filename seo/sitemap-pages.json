@@ -31,7 +31,10 @@
         "src/components/sites/the-hot/MenuBook.module.css",
         "src/components/sites/the-hot/menuBookFold.ts",
         "src/components/sites/nokto/menu/MenuViewSwitcher.tsx",
+        "src/components/sites/nokto/menu/MenuTabs.tsx",
+        "src/components/sites/nokto/menu/data.ts",
         "public/sites/the-hot-beer-garden/images/facebook-post-menu-2026-09",
+        "public/sites/the-hot-beer-garden/images/menu-premium-2026-09",
         "src/components/sites/the-hot/menuPages.ts"
       ]
     },

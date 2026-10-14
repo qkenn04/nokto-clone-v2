@@ -3,7 +3,7 @@ import { site } from "../site";
 import { Heading, Text } from "../ui";
 import type { MenuItem } from "./data";
 
-/** Dish row: thumbnail (zooms on hover), name with detail, description, price. */
+/** Dish row: thumbnail (zooms on hover), name with its English name, description, price. */
 export function MenuItemRow({ item }: { item: MenuItem }) {
   return (
     <li className={`group relative grid ${item.image ? "grid-cols-[auto_1fr_auto]" : "grid-cols-[1fr_auto]"} items-center gap-4 py-4 sm:gap-6 sm:py-5 lg:py-6`}>
@@ -18,7 +18,7 @@ export function MenuItemRow({ item }: { item: MenuItem }) {
         <Heading as="h3" level="h3" family="sans">
           {item.name}
           {item.subtitle ? (
-            <span className="ml-2">
+            <span className="ml-2" lang="en">
               <Text as="span" variant="body" tone="muted">
                 {item.subtitle}
               </Text>

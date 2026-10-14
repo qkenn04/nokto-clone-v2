@@ -20,9 +20,11 @@ src/
 │   │   ├── ui.tsx, motion.ts     primitive (Section, Heading, Text, Stack, ButtonLink, cx) và giá trị hiệu ứng dùng chung
 │   │   ├── chrome/               khung mọi trang: menu điều hướng, Backdrop, BrandMark, Preloader, PageTransition,
 │   │   │                         SmoothScroll (Lenis), CustomCursor, SiteFooter, FixedPhoto, FixedVideo
-│   │   └── home/, menu/, about/, reservation/, legal/   component và module dữ liệu của từng trang
-│   ├── sites/the-hot/            phần làm riêng cho The Hot: HeroVideo, BeerPour, FloatingContact, MenuBook (sách lật),
-│   │                             menuPages.ts, videos.ts, home/ (gallery, dòng sự kiện, lightbox, dữ liệu trang chủ)
+│   │   └── home/, menu/, about/, reservation/, legal/   component và module dữ liệu của từng trang; menu/ có
+│   │                             MenuTabs (tab "Món ăn chơi" / "Premium", dùng chung cho bảng giá và sách lật)
+│   ├── sites/the-hot/            phần làm riêng cho The Hot: HeroVideo, BeerPour, FloatingContact, MenuBook (sách lật
+│   │                             hai tab; mỗi tab một FlipBook mới), menuPages.ts (menuBooks), videos.ts,
+│   │                             home/ (gallery, dòng sự kiện, lightbox, dữ liệu trang chủ)
 │   └── ui/                       primitive shadcn/ui (button)
 ├── lib/utils.ts                  cn() của shadcn
 ├── lib/analytics.ts              track(), trackAttrs(), danh sách thuộc tính cho phép, UMAMI_WEBSITE_ID (spec 004)
@@ -54,7 +56,7 @@ Chưa có lint rule nào chặn các luật trên; giữ bằng review. Quy tắ
 6. **Thời gian hiện tại** không đọc lúc render phía server: dùng `useSyncExternalStore` với snapshot server là `null` (như `EventTimeline.tsx`), tránh lệch hydrate.
 7. **File trong `public/`:** đổi nội dung thì đổi tên file, để cache trình duyệt và Cloudflare không giữ bản cũ.
 8. **Không gửi dữ liệu khách đi đâu:** form đặt bàn chỉ dùng state React ([Đặc tả, NG2](../product/spec.md#5-không-làm)); thêm bất kỳ request mạng nào chứa dữ liệu khách cần ADR mới.
-9. **Sự kiện analytics** ([spec 004](../specs/004-analytics/spec.md)): link và nút gắn `{...trackAttrs("tên", { … })}` (dùng được trong Server Component, `ClickTracker` gửi khi bấm); sự kiện trạng thái (form xong, mở poster) gọi `track()` trong Client Component. Không dùng `data-umami-event` (tracker Umami chặn click rồi tự chuyển trang, làm trang tải lại và màn hình chờ chạy lại). Khoá thuộc tính ngoài danh sách cho phép bị bỏ trước khi gửi; thêm khoá hay sự kiện thì sửa spec 004 và `src/lib/analytics.ts` cùng PR.
+9. **Sự kiện analytics** ([spec 004](../specs/004-analytics/spec.md)): link và nút gắn `{...trackAttrs("tên", { … })}` (dùng được trong Server Component, `ClickTracker` gửi khi bấm); sự kiện trạng thái (form xong, mở poster, đổi tab menu) gọi `track()` trong Client Component. Không dùng `data-umami-event` (tracker Umami chặn click rồi tự chuyển trang, làm trang tải lại và màn hình chờ chạy lại). Khoá thuộc tính ngoài danh sách cho phép bị bỏ trước khi gửi; thêm khoá hay sự kiện thì sửa spec 004 và `src/lib/analytics.ts` cùng PR.
 
 ## 4. Quy ước code
 

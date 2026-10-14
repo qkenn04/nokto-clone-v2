@@ -67,9 +67,9 @@ Sửa: src/app/layout.tsx; SiteFooter.tsx (link Bảo mật + Cài đặt cookie
 ```ts
 export type AnalyticsEvent =
   | "contact_click" | "booking_cta_click" | "reservation_complete"
-  | "menu_view_mode" | "event_view" | "social_click";
+  | "menu_view_mode" | "menu_tab_select" | "event_view" | "social_click";
 
-export type AnalyticsPropKey = "method" | "location" | "mode" | "event_id" | "network" | "party_size";
+export type AnalyticsPropKey = "method" | "location" | "mode" | "tab" | "event_id" | "network" | "party_size";
 export type AnalyticsProps = Partial<Record<AnalyticsPropKey, string | number>>;
 
 /** Website ID của Umami lúc build; rỗng thì không tracker, `/privacy` không có mục Umami. */

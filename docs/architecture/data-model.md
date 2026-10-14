@@ -1,6 +1,6 @@
 # Mô hình dữ liệu nội dung
 
-> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-14 · Liên quan: [Kiến trúc](ARCHITECTURE.md), [Đặc tả sản phẩm](../product/spec.md), [Front-end](../dev/frontend.md), [Kiểm thử](../dev/testing.md), [Mục lục ADR](../adr/README.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-15 · Liên quan: [Kiến trúc](ARCHITECTURE.md), [Đặc tả sản phẩm](../product/spec.md), [Front-end](../dev/frontend.md), [Kiểm thử](../dev/testing.md), [Mục lục ADR](../adr/README.md)
 
 Site không có cơ sở dữ liệu. "Dữ liệu" là các module TypeScript, file JSON và file trong `public/` mà trang, metadata, JSON-LD và sitemap cùng đọc. Nguồn sự thật là chính các file đó (kiểu TypeScript là schema); file này giải thích điều code không nói: ai đọc gì, bất biến nào không được phá, và đổi dữ liệu thế nào. Tính tới 2026-10-14.
 
@@ -31,7 +31,7 @@ flowchart LR
   site["site.ts<br/>tên, địa chỉ, hotline, giờ, link"]
   meta["src/seo/page-meta.ts<br/>tiêu đề, mô tả"]
   home["the-hot/home/content.ts<br/>galleryPhotos, homeEvents"]
-  menuPages["the-hot/menuPages.ts<br/>10 trang ảnh menu"]
+  menuPages["the-hot/menuPages.ts<br/>2 tab, 22 trang ảnh menu"]
   menuData["nokto/menu/data.ts<br/>bảng giá"]
   videos["the-hot/videos.ts<br/>hero, about, kitchen"]
   aboutC["nokto/about/content.ts"]
@@ -56,6 +56,7 @@ flowchart LR
   home --> ui
   menuPages --> ui
   menuData --> ui
+  menuData --> menuPages
   videos --> ui
   aboutC --> ui
   legalC --> ui
@@ -102,10 +103,10 @@ flowchart LR
 
 | Module | Nội dung | Trang |
 |---|---|---|
-| `src/components/sites/the-hot/menuPages.ts` | `menuPages`: 10 trang ảnh menu (`file`, `label`, `alt`) đăng trên Facebook tháng 9/2026; `MENU_IMAGE_BASE` | `/menu` (sách lật), sitemap ảnh |
-| `src/components/sites/nokto/menu/data.ts` | `menu: MenuContent`: 8 nhóm, 34 món (26 món ăn, 8 bia và cider), `price` là số VND đã gồm VAT | `/menu/list` |
+| `src/components/sites/nokto/menu/data.ts` | `menu: MenuContent` gồm 2 nhóm (`groups`, `MenuGroup`: `id` `an_choi` \| `premium`, `label`, `summary`, `categories`). "Món ăn chơi": 8 nhóm món, 34 món (26 món ăn, 8 bia và cider). "Premium": 15 nhóm món, 104 món (5 combo, 3 mẹt, 83 món lẻ, 13 đồ uống). `MenuItem`: `name`, `subtitle` (tên tiếng Anh cho khách nước ngoài), `description` (thành phần combo, mẹt, tháp), `price` là số VND đã gồm VAT; `MenuCategory.short` là nhãn ngắn của nút lọc khi tên nhóm là tên vui ("Sục sôi" → "Lẩu"). `menuGroups`: hai tab dùng chung cho bảng giá và sách lật | `/menu/list`, nhãn tab của `/menu` |
+| `src/components/sites/the-hot/menuPages.ts` | `menuBooks`: mỗi nhóm một cuốn (`id`, `label`, `summary` lấy từ `menuGroups`; `base` là thư mục ảnh; `pages` gồm `file`, `label`, `alt`). "Món ăn chơi": 10 trang ảnh đăng trên Facebook tháng 9/2026 (`facebook-post-menu-2026-09/`). "Premium": 12 trang ảnh xuất từ file PDF menu chủ quán gửi (thiết kế trên Canva, tạo 2026-09-06), trang 12–22 và 24 (`menu-premium-2026-09/`, JPEG 1414×2000); bỏ bìa và trang bia (đã có ở "Món ăn chơi"). `menuPageSrc(book, page)` | `/menu` (sách lật), sitemap ảnh |
 
-Hai module mô tả cùng một menu giấy (bất biến I-07).
+Hai module mô tả cùng một menu giấy (bất biến I-07). Ảnh trang menu giữ nguyên như bản in; bản chữ ở `data.ts` sửa các lỗi chắc chắn của bản in (chính tả tiếng Anh, thiếu dấu cách, tên dịch nhầm, hai món in trùng) và ghi "mực một nắng" thống nhất. Chỗ chưa chắc giữ nguyên chữ in và chờ chủ quán trả lời ([Q16–Q24](../plan/tasks.md#câu-hỏi-chờ-chủ-quán)).
 
 ### 5.3 Sự kiện: `HomeEvent` (`src/components/sites/the-hot/home/events.ts`), dữ liệu `homeEvents` (`home/content.ts`)
 
@@ -174,7 +175,7 @@ Trạng thái form nằm trong state React của `ReservationForm.tsx`: ngày, g
 | I-04 | Mọi URL trong sitemap có `<lastmod>`; mọi `<loc>` và `<image:loc>` nằm trên domain của site và trả 200 (ảnh trả `image/*`) | `ci/sitemap-lastmod.sh`, `sitemap.ts` | `ci/smoke-test.sh` |
 | I-05 | Sitemap ảnh chỉ có ảnh thật của quán: không ảnh nền template, SVG trang trí, icon, logo hay ảnh OG; mỗi ảnh một lần mỗi trang, dùng file gốc (không `/_next/image`) | Quy tắc trong `src/seo/sitemap-images.ts` | Review; smoke test kiểm kiểu `image/*` |
 | I-06 | Sự kiện có `illustrative: true` luôn có nhãn minh hoạ trên UI và không bao giờ vào JSON-LD `Event` | `EventTimeline.tsx` | Review |
-| I-07 | Giá và tên món trong `menu/data.ts` khớp ảnh menu trong `menuPages.ts` | — | Kiểm tay mỗi lần đổi menu |
+| I-07 | Giá và tên món trong `menu/data.ts` khớp ảnh menu trong `menuPages.ts` (trừ lỗi in đã sửa có chủ đích, ghi ở mục 5.2); nhóm trong `data.ts` và cuốn trong `menuPages.ts` cùng `id`, cùng thứ tự | `menuBooks` dựng từ `menuGroups` | Kiểm tay mỗi lần đổi menu |
 | I-08 | Dữ liệu form đặt bàn không rời trình duyệt và không được ghi vào storage | `ReservationForm.tsx` chỉ dùng state React | AC-06 ở [đặc tả](../product/spec.md#7-tiêu-chí-nghiệm-thu-cấp-sản-phẩm) |
 | I-09 | Tiêu đề và mô tả cho tìm kiếm chỉ nằm ở `src/seo/page-meta.ts`; H1 và slogan hiển thị nằm ở module giao diện | Cấu trúc module | Review ([ADR 0005](../adr/0005-separate-search-titles-from-headings.md)) |
 
@@ -196,8 +197,8 @@ Sự kiện `dateOnly` không có trạng thái `live` (không biết giờ di�
 | Dữ liệu | Số lượng (2026-10-14) |
 |---|---|
 | Trang trong sitemap | 6 (`/`, `/menu`, `/menu/list`, `/about`, `/reservation`, `/terms`); `/privacy` để ngoài |
-| Mục trong sitemap ảnh | 25 mục, 19 file ảnh khác nhau (PR #3) |
-| Menu | 10 trang ảnh; 8 nhóm, 34 món trong bảng giá |
+| Mục trong sitemap ảnh | 37 mục, 31 file ảnh khác nhau (PR #3; thêm 12 trang menu Premium 2026-10-15) |
+| Menu | 2 tab. Sách lật: 10 + 12 trang ảnh. Bảng giá: 8 + 15 nhóm, 34 + 104 = 138 món |
 | Gallery trang chủ | 5 ảnh |
 | Sự kiện trang chủ | 5 (4 minh hoạ) |
 | Video | Hero khoảng 80 MB (H.264, 103 s); about và kitchen mỗi video có bản AV1 và H.264, mỗi bản dưới 12 MB |
@@ -207,7 +208,7 @@ Sự kiện `dateOnly` không có trạng thái `live` (không biết giờ di�
 - **Đổi tên, địa chỉ, hotline, giờ:** sửa `site.ts`, rồi `grep` các chỗ còn gõ lại ở I-01 và sửa cùng PR; cập nhật Google Business Profile cùng lúc. `lastmod` của mọi trang đổi theo (file `shared`).
 - **Thêm hoặc xoá trang:** thêm `src/app/<route>/page.tsx` và khai trong `seo/sitemap-pages.json` (`pages` kèm `sources`, hoặc `exclude`); thêm tiêu đề vào `page-meta.ts`; thêm route vào danh sách của `ci/smoke-test.sh`. Quên khai thì bước Check báo lỗi.
 - **Thêm sự kiện:** thêm mục vào `homeEvents` với `timing` có múi giờ; chỉ bỏ `illustrative` khi có lịch thật từ chủ quán.
-- **Đổi menu:** thay ảnh trong `public/sites/the-hot-beer-garden/images/facebook-post-menu-2026-09/` (hoặc thư mục mới) và `menuPages.ts`, sửa `menu/data.ts` cho khớp (I-07).
+- **Đổi menu:** thay ảnh trong thư mục của tab (`facebook-post-menu-2026-09/`, `menu-premium-2026-09/`, hoặc thư mục mới khi đổi cả menu) và `pages` trong `menuPages.ts`, sửa `menu/data.ts` cho khớp (I-07). Ảnh trang menu: JPEG 1414×2000, khoảng 150–300 KB mỗi trang (bản Premium xuất từ PDF bằng `pdftoppm`, chất lượng 76, progressive). Thêm tab: thêm nhóm vào `menu.groups` (kèm `id` mới trong `MenuGroupId`) và cuốn tương ứng vào `pagesByGroup` của `menuPages.ts`.
 - **Thay file trong `public/`:** đổi tên file khi đổi nội dung, để cache trình duyệt và Cloudflare không giữ bản cũ.
 
 ## 11. Câu hỏi mở

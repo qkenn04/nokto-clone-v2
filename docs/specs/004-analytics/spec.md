@@ -96,6 +96,7 @@ Lượt xem trang do Umami và GA4 tự đếm, kể cả khi chuyển trang tro
 | `booking_cta_click` | Bấm "Đặt bàn" / "Chốt bàn" | `location`: `hero` \| `floating` \| `nav` \| `event` \| `closing` \| `menu_top` \| `menu_bottom` \| `about` \| `not_found` | Không |
 | `reservation_complete` | Form đặt bàn tới bước thành công | `party_size` (số khách 1–8) | Có |
 | `menu_view_mode` | Chuyển giữa menu lật sách và danh sách (chỉ khi bấm lựa chọn chưa chọn) | `mode`: `book` \| `list` | Không |
+| `menu_tab_select` | Chọn tab menu "Món ăn chơi" hoặc "Premium" (bấm hoặc phím mũi tên, Home, End; chỉ khi chọn tab chưa chọn) | `tab`: `an_choi` \| `premium`; `mode`: `book` \| `list` (đang ở sách lật hay danh sách) | Không |
 | `event_view` | Mở poster sự kiện (đếm lần mở, không đếm khi lướt trong lightbox) | `event_id` (mã trong `homeEvents`) | Không |
 | `social_click` | Bấm link bài viết Facebook, Instagram, TikTok | `network`: `facebook` \| `instagram` \| `tiktok` | Không |
 
@@ -107,10 +108,11 @@ Vị trí gắn:
 | `booking_cta_click` | `HeroIntro` → `CheersButton`, `FloatingContact`, `PersistentChrome` (`NavItem` khi trỏ tới trang đặt bàn), `EventTimeline` (từng sự kiện, khối kết), `MenuBook` (trên, dưới), `AboutClosing`, `not-found.tsx` |
 | `reservation_complete` | `ReservationForm`, ngay trước khi chuyển sang bước thành công |
 | `menu_view_mode` | `MenuViewSwitcher` |
+| `menu_tab_select` | `MenuBook` (sách lật), `MenuList` (danh sách), qua `MenuTabs`; gọi `track()` vì phím mũi tên cũng đổi tab, `ClickTracker` chỉ nghe click |
 | `event_view` | `EventTimeline` (ảnh poster, nút "Xem poster") |
 | `social_click` | `EventTimeline` (lịch và bài sự kiện trên Facebook); Instagram, TikTok khi thêm link |
 
-GA4: custom dimension phạm vi Event cho `method`, `location`, `mode`, `event_id`, `network`; `party_size` tuỳ chọn làm custom metric.
+GA4: custom dimension phạm vi Event cho `method`, `location`, `mode`, `tab`, `event_id`, `network`; `party_size` tuỳ chọn làm custom metric.
 
 ### 4.2 Quy ước UTM
 
@@ -143,7 +145,7 @@ Site không có API. Request ra ngoài: tracker và điểm nhận số liệu c
 
 1. **Không bao giờ** gửi tên, số điện thoại, email hay nội dung khách nhập. Không đưa dữ liệu cá nhân lên URL (query được lưu). Form đặt bàn hiện không đổi URL giữa các bước.
 2. Form đặt bàn không gửi dữ liệu đi đâu; bước thành công hướng khách gọi hoặc nhắn. `reservation_complete` nghĩa là *ý định* đặt bàn; đặt thật đo bằng `contact_click` ngay sau đó.
-3. GA4 chỉ nhận thuộc tính trong danh sách cho phép: `method`, `location`, `mode`, `event_id`, `network`, `party_size`.
+3. GA4 chỉ nhận thuộc tính trong danh sách cho phép: `method`, `location`, `mode`, `tab`, `event_id`, `network`, `party_size`.
 4. Không xếp hàng sự kiện xảy ra trước khi đồng ý để gửi sau.
 5. Mọi sự kiện đi qua một hàm `track()`; analytics hỏng không được làm hỏng nút bấm.
 6. Gắn sự kiện bằng thuộc tính `data-track*` và một listener chung; **không** dùng `data-umami-event` (với link mở cùng tab, tracker Umami chặn click rồi tự chuyển trang, làm trang tải lại toàn bộ và màn hình chờ chạy lại).
@@ -219,3 +221,4 @@ Nội dung `/privacy` cần chủ quán duyệt; đây là nhận định chung,
 | Ngày | Thay đổi |
 |---|---|
 | 2026-10-14 | Tạo từ ghi chú kế hoạch analytics (chỉ phần website; phần hạ tầng chuyển sang repo hạ tầng riêng); trạng thái Đề xuất |
+| 2026-10-15 | Thêm sự kiện `menu_tab_select` và thuộc tính `tab` cho hai tab menu "Món ăn chơi" / "Premium" |

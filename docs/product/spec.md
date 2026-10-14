@@ -36,7 +36,7 @@ Tính tới 2026-10-14:
 | # | Mục tiêu | Cách đo | Trạng thái (2026-10-15) |
 |---|---|---|---|
 | G1 | Khách tìm thấy site khi tìm tên quán và các cụm như "quán nhậu Đà Lạt", "beer garden Đà Lạt" | Search Console: mọi trang trong sitemap được index; truy vấn tên quán ra `thehot.vn` | Đã gửi sitemap và yêu cầu index; `/` đã được index. Tìm tên quán: `thehot.vn/about` đứng thứ 4, sau Instagram, TripAdvisor, Facebook ([002, xếp hạng khi tìm tên quán](../specs/002-onpage-seo/tasks.md#xếp-hạng-khi-tìm-tên-quán)) |
-| G2 | Khách xem được menu và giá đúng (đã gồm VAT) | `/menu` (sách lật từ 10 ảnh menu) và `/menu/list` (bảng giá) khớp menu giấy; kiểm tay mỗi lần đổi menu | Đạt theo menu tháng 9/2026 |
+| G2 | Khách xem được menu và giá đúng (đã gồm VAT) | `/menu` (sách lật, hai tab: "Món ăn chơi" 10 trang, "Premium" 12 trang) và `/menu/list` (bảng giá, cùng hai tab) khớp menu giấy; kiểm tay mỗi lần đổi menu | Đạt theo menu tháng 9/2026; menu Premium thêm 2026-10-15 (PR chờ duyệt), còn câu hỏi về đơn vị giá đồ uống và vài tên món ([Q16–Q24](../plan/tasks.md#câu-hỏi-chờ-chủ-quán)) |
 | G3 | Khách liên hệ chốt bàn bằng một chạm từ mọi trang | Nút liên hệ nổi (Messenger, Facebook, Zalo, Gọi) và nút Đặt bàn trên mọi trang; sau khi có analytics: sự kiện `contact_click` | Đạt (kiểm tay); chưa đo được |
 | G4 | Tên, địa chỉ, hotline, giờ mở cửa giống nhau ở site, JSON-LD và Google Business Profile | Kiểm tay; Rich Results Test | Chưa đạt: giờ mở cửa lệch Google Maps (mục 10) |
 | G5 | Trang nhanh trên điện thoại | Ngân sách PERF ở [yêu cầu phi chức năng](nfr.md) | Chưa đạt: LCP 2,9 s trước PR #4; số sau PR #4 chưa đo |
@@ -57,7 +57,7 @@ Tính tới 2026-10-14:
 | Nhóm | Trang hoặc tính năng | Tài liệu |
 |---|---|---|
 | Trang chủ | `/`: video hero, slogan, gallery ảnh quán, dòng sự kiện | [Mô hình dữ liệu](../architecture/data-model.md) |
-| Menu | `/menu` (sách lật 10 trang ảnh menu), `/menu/list` (bảng giá theo nhóm món); `/the-hot/menu` chuyển hướng 308 về `/menu` | [Mô hình dữ liệu](../architecture/data-model.md) |
+| Menu | `/menu` (sách lật, tab "Món ăn chơi" 10 trang và tab "Premium" 12 trang ảnh menu), `/menu/list` (bảng giá theo nhóm món, cùng hai tab; món Premium có tên tiếng Anh); `/the-hot/menu` chuyển hướng 308 về `/menu` | [Mô hình dữ liệu](../architecture/data-model.md#52-menu) |
 | Giới thiệu, đặt bàn | `/about`, `/reservation` (form 3 bước, không gửi dữ liệu), `/terms` ("Thông tin đặt bàn": địa chỉ, giờ, cách đặt), `/privacy` | NG2 |
 | Liên hệ | Nút liên hệ nổi và nút Đặt bàn trên mọi trang | G3 |
 | SEO | Sitemap tự động, tiêu đề và mô tả cho tìm kiếm, ảnh chia sẻ, JSON-LD `Restaurant` | Spec `001-sitemap-automation`, `002-onpage-seo` |
@@ -116,3 +116,4 @@ Một thay đổi được coi là xong khi:
 |---|---|
 | 2026-10-14 | Tạo từ docs-template, điền theo hiện trạng site và các kế hoạch SEO, sitemap, hiệu năng, analytics ngày 2026-10-14 |
 | 2026-10-15 | Cập nhật trạng thái G1 (tình trạng tìm tên quán) và G7 (sự kiện 16/10, 17/10 là thật) |
+| 2026-10-15 | Menu có hai tab "Món ăn chơi" và "Premium" ở sách lật và bảng giá (G2, mục 6) |
