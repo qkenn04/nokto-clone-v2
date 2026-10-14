@@ -3,6 +3,12 @@ import { hotImage } from "../nokto/site";
 
 export type SiteVideo = { poster: string; sources: readonly VideoSource[] };
 
+/** Home hero loop. H.264 only; HeroVideo plays the first source. */
+export const heroVideo = {
+  poster: hotImage("hero-video-poster.jpg"),
+  sources: [{ src: "/videos/main.mp4", type: "video/mp4" }],
+} satisfies SiteVideo;
+
 /** Night at the venue, shared by the about and reservation pages. AV1 first, H.264 fallback. */
 export const aboutVideo = {
   poster: hotImage("about-video-poster.jpg"),
