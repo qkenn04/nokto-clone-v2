@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { hotImage, site } from "../site";
 
 export type LegalSection = { title: string; body: string };
@@ -6,7 +5,6 @@ export type LegalDocument = {
   path: "/terms" | "/privacy";
   eyebrow: string;
   title: string;
-  description: string;
   updated: string;
   intro: string;
   image: { src: string; alt: string };
@@ -17,7 +15,6 @@ export const terms: LegalDocument = {
   path: "/terms",
   eyebrow: "THE HOT · THÔNG TIN ĐẶT BÀN",
   title: "Thông tin đặt bàn",
-  description: `Địa chỉ, giờ mở cửa và cách liên hệ đặt bàn tại The Hot Beer Garden Đà Lạt. Hotline ${site.phone}.`,
   updated: "12 tháng 10, 2026",
   intro: "Hẹn bàn và trao đổi yêu cầu trực tiếp với The Hot để nhà hàng xác nhận cuộc hẹn của bạn.",
   image: { src: hotImage("welcome.jpg"), alt: "Quầy phục vụ The Hot Beer Garden" },
@@ -35,7 +32,6 @@ export const privacy: LegalDocument = {
   path: "/privacy",
   eyebrow: "THE HOT · THÔNG TIN RIÊNG TƯ",
   title: "Bảo mật thông tin",
-  description: "Thông tin về biểu mẫu đặt bàn và các liên kết liên hệ trên website The Hot.",
   updated: "12 tháng 10, 2026",
   intro: "Trang này giải thích cách thông tin bạn nhập được sử dụng trong phiên bản website hiện tại.",
   image: { src: hotImage("night.jpg"), alt: "Không khí buổi tối ở The Hot" },
@@ -47,12 +43,3 @@ export const privacy: LegalDocument = {
     { title: "Hỗ trợ", body: `Nếu cần trao đổi về thông tin bạn đã cung cấp trực tiếp cho nhà hàng, liên hệ ${site.phone} hoặc Facebook The Hot Beer Garden Đà Lạt.` },
   ],
 };
-
-export function legalMetadata(content: LegalDocument): Metadata {
-  return {
-    title: content.title,
-    description: content.description,
-    alternates: { canonical: content.path },
-    openGraph: { title: `${content.title} — ${site.name} ${site.location}`, description: content.description, url: content.path, type: "website" },
-  };
-}

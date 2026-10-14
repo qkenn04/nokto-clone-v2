@@ -3,15 +3,9 @@ import { FixedVideo } from "@/components/sites/nokto/chrome/FixedVideo";
 import { SiteFooter } from "@/components/sites/nokto/chrome/SiteFooter";
 import { MenuList } from "@/components/sites/nokto/menu/MenuList";
 import { kitchenVideo } from "@/components/sites/the-hot/videos";
+import { pageMetadata } from "@/seo/page-meta";
 
-const description = "Menu nhậu The Hot Beer Garden Đà Lạt: mồi từ 39.000₫, giá đã gồm VAT. Giá bia ưu đãi áp dụng Chủ nhật đến thứ Năm.";
-
-export const metadata: Metadata = {
-  title: "Thực đơn dạng danh sách",
-  description,
-  alternates: { canonical: "/menu/list" },
-  openGraph: { title: "Thực đơn dạng danh sách — The Hot Beer Garden Đà Lạt", description, url: "/menu/list", type: "website" },
-};
+export const metadata: Metadata = pageMetadata("/menu/list");
 
 export default function MenuListPage() {
   return (

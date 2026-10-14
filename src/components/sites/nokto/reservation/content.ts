@@ -5,10 +5,6 @@ export type ReservationStep = { number: StepNumber; label: string; title: string
 type SuccessCta = { label: string; variant: "ghost" } | { label: string; variant: "primary" | "link"; href: string };
 
 export const reservation = {
-  metadata: {
-    title: "Đặt bàn",
-    description: `Chốt bàn cho hội mình tại The Hot Beer Garden Đà Lạt. Hotline ${site.phone}. ${site.address.display}.`,
-  },
   hero: {
     label: "CHỐT KÈO Ở THE HOT",
     headline: ["Rủ đủ hội.", "Chốt bàn thôi."],
