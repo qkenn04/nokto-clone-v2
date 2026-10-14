@@ -57,7 +57,7 @@ Phương án 3 và cách B1, làm trong PR #16:
    - HTML từ server có `<video>` không nguồn (`preload="none"`) và ảnh poster `next/image` nằm dưới, hiện ngay với opacity 1, `loading="eager"`, không `fetchPriority="high"` (ảnh nền màn hình chờ là phần tử LCP trên điện thoại, [ADR 0006](0006-prioritize-lcp-with-fetchpriority.md)).
    - Không tải video (chỉ poster, 0 byte video) khi bật giảm chuyển động (theo dõi liên tục: bật giữa chừng thì dừng và gỡ nguồn), `navigator.connection.saveData`, hoặc `effectiveType` là `2g`/`slow-2g`.
    - Thứ tự chờ: sự kiện `load` của trang (tối đa 8 s sau hydrate) → màn hình chờ đang rời (`data-splash` là `exit` hoặc `done`, hoặc không có) → `requestIdleCallback` (tối đa 1 s).
-   - Chọn nguồn: AV1 chỉ khi `navigator.mediaCapabilities.decodingInfo` báo `supported`, `smooth` và `powerEfficient` (thực tế: có giải mã phần cứng); không có API thì `canPlayType` quyết định; còn lại dùng H.264 720p. Gắn nguồn đã chọn cùng các nguồn sau nó (AV1 kèm H.264 dự phòng; máy đã bị chuyển sang H.264 thì chỉ có H.264).
+   - Chọn nguồn: AV1 khi `navigator.mediaCapabilities.decodingInfo` báo `supported` và `smooth`, và trên màn hình hẹp hơn `lg` còn phải `powerEfficient` (thực tế: giải mã phần cứng). Máy tính là màn hình từ `lg` trở lên (`(min-width: 64rem)`, cùng điều kiện `FixedVideo` dùng), đọc một lần khi chọn nguồn: CPU máy tính giải mã AV1 1080p30 bằng phần mềm không vấn đề, còn trên điện thoại giải mã phần mềm tốn pin và nóng máy. Không có API thì `canPlayType` quyết định; còn lại dùng H.264 720p. Gắn nguồn đã chọn cùng các nguồn sau nó (AV1 kèm H.264 dự phòng; máy đã bị chuyển sang H.264 thì chỉ có H.264).
    - Lần phát đầu bắt đầu ở 2,25 s để không chuyển từ poster sáng sang đoạn mở đầu tối; các vòng lặp sau phát đủ 0–103 s. Lớp video mờ dần trong 1 s (`ease-in-out`) khi bắt đầu phát.
    - Tự phát bị chặn (ví dụ chế độ nguồn điện thấp trên iPhone) thì poster ở lại. Rời trang (điều hướng trong site) thì dừng, gỡ nguồn và gọi `load()` để huỷ tải.
 3. **Điện thoại**: vẫn tự phát, hoãn tải như trên (chủ quán, 2026-10-15).
@@ -70,20 +70,20 @@ Phương án 3 và cách B1, làm trong PR #16:
 - Mỗi vòng video tải 26,8 MB (AV1) hoặc 31,5 MB (H.264 720p) thay vì 83,7 MB; nội dung, độ dài và âm thanh không đổi.
 - Không còn request video trước sự kiện `load` và trước màn hình chờ, nên video không tranh băng thông với lần tải đầu của trang. Đo trong phòng thí nghiệm (mục "Nguồn/bằng chứng"): sự kiện `load` trên điện thoại sớm hơn khoảng 0,7 s; 30 s đầu tải 16,0 MB video thay vì 28,3 MB.
 - Trên máy tính, poster là phần tử LCP: LCP lab 1,36 s (poster của thẻ `<video>`) xuống 0,76 s (poster `next/image`).
-- Máy không có giải mã AV1 phần cứng không phải giải mã AV1 bằng CPU.
+- Điện thoại và màn hình nhỏ không có giải mã AV1 phần cứng không phải giải mã AV1 bằng CPU. Máy tính không có giải mã phần cứng vẫn nhận bản AV1 1080p: nét hơn bản 720p phóng to trong khung 55% màn hình (nhất là màn hình mật độ điểm ảnh cao) và nhẹ hơn (26,8 so với 31,5 MB).
 
 ### Xấu (cái giá chấp nhận trả)
 
 - Repo nặng thêm 58,3 MB cho hai bản encode, cho tới khi video ra khỏi git.
 - Dữ liệu trong **10 s đầu** chỉ giảm khoảng 11% trong lab (8,6 MB xuống 7,6 MB, Fast 4G): khi đã bắt đầu phát, Chrome tải trước video nhanh hết mức đường truyền cho phép. Chưa đạt 003-AC-03 (giảm 70%); lợi ích nằm ở khoảng sau và ở việc không tranh băng thông lúc trang tải.
 - Video trên điện thoại hiện muộn hơn (sau màn hình chờ, khoảng 3,9 s thay vì khoảng 2,2 s trong lab); trong lúc đó khách thấy poster.
-- Máy tính không giải mã AV1 bằng phần cứng nhận bản 720p phóng to trong khung 55% màn hình, hơi mềm hơn bản 1080p.
+- Máy tính không có giải mã AV1 phần cứng giải mã bằng CPU, tốn CPU hơn H.264 phần cứng. Máy tính bảng xoay ngang rộng từ 64rem cũng tính là máy tính.
 - React tự sinh một `<link rel="preload" as="image">` (không `fetchpriority`) cho poster vì ảnh `loading="eager"`. Đo được: LCP trên điện thoại không đổi (vẫn là ảnh nền màn hình chờ); thêm `fetchPriority="low"` để bỏ preload thì LCP trên máy tính chậm lại 1,64 s, nên giữ.
 - Thêm logic vào `HeroVideo`; hiệu ứng mờ dần đổi (chỉ lớp video mờ dần, poster không mờ).
 
 ### Cần theo dõi
 
-- DevTools Network trên production: request `main.v2.*` chỉ xuất hiện sau sự kiện `load` và sau màn hình chờ; Chrome trên máy có giải mã AV1 phần cứng tải bản AV1.
+- DevTools Network trên production: request `main.v2.*` chỉ xuất hiện sau sự kiện `load` và sau màn hình chờ; Chrome trên máy tính tải bản AV1; trên điện thoại chỉ tải bản AV1 khi có giải mã phần cứng.
 - iPhone thật (Safari) và Android thật: tự phát, bản được chọn, thời điểm bắt đầu 2,25 s (003-T34).
 - PageSpeed Mobile trước và sau ([dev/perf.md](../dev/perf.md)).
 
@@ -113,3 +113,4 @@ Phương án 3 và cách B1, làm trong PR #16:
 | 2026-10-14 | Tạo, trạng thái Đề xuất |
 | 2026-10-15 | Giữ âm thanh theo ý chủ quán: track âm thanh chỉ 1,7 MB (khoảng 2%), bỏ đi không giảm đáng kể; bước (a) đổi thành `-map 0 -c copy`, bước (b) giữ âm thanh; bỏ track âm thanh thành phương án 6 (loại); thêm cách cho khách nghe tiếng B1/B2/B3 (chờ chủ quán). Trạng thái vẫn Đề xuất |
 | 2026-10-15 | Chủ quán chốt: phương án 3 (gộp bước (a) vào bản encode), B1, AV1 CRF 48 + H.264 720p CRF 27, điện thoại vẫn phát nhưng hoãn tải, lần phát đầu từ 2,25 s. Trạng thái Chấp nhận; ghi số đo lab của PR #16 |
+| 2026-10-15 | Quy tắc chọn nguồn: máy tính (`(min-width: 64rem)`) chỉ cần `supported` và `smooth`; điện thoại và màn hình nhỏ vẫn cần thêm `powerEfficient` (PR #16, trước khi merge) |

@@ -65,7 +65,7 @@ Mọi thay đổi phải đo trước và sau; không sửa theo cảm tính.
   | B3 | Nút "Xem video có tiếng" mở trình phát riêng (có điều khiển, phát có tiếng) | Có, trong trình phát | Không làm lúc này; cần duyệt thiết kế |
 
 - Encode lại (chủ quán chọn mức 2026-10-15): AV1 1080×1920 CRF 48 (`main.v2.av1.mp4`, 26,8 MB) và H.264 720×1280 CRF 27 (`main.v2.720.mp4`, 31,5 MB), cả hai faststart, giữ track âm thanh. Bước "chỉ faststart" (đóng gói lại `main.mp4`) không làm riêng vì bản encode đã faststart. Tên file có phiên bản (`main.v2.*`): URL mới, không cần purge cache.
-- `HeroVideo`: HTML từ server có poster `next/image` (`loading="eager"`, không `fetchPriority="high"`) và `<video>` chưa có nguồn, `preload="none"`. Phía trình duyệt gắn nguồn sau sự kiện `load` (tối đa 8 s), sau khi màn hình chờ rời đi (`data-splash` là `exit` hoặc `done`) và một lúc rảnh (`requestIdleCallback`, tối đa 1 s). Chọn AV1 khi `navigator.mediaCapabilities` báo giải mã được, mượt và tiết kiệm điện (thực tế: có giải mã phần cứng), không thì H.264 720p. Lần phát đầu bắt đầu ở 2,25 s (bỏ đoạn mở đầu tối, vì poster sáng); các vòng sau phát đủ. Poster hiện ngay với opacity 1; chỉ lớp video mờ dần (1 s) khi bắt đầu phát.
+- `HeroVideo`: HTML từ server có poster `next/image` (`loading="eager"`, không `fetchPriority="high"`) và `<video>` chưa có nguồn, `preload="none"`. Phía trình duyệt gắn nguồn sau sự kiện `load` (tối đa 8 s), sau khi màn hình chờ rời đi (`data-splash` là `exit` hoặc `done`) và một lúc rảnh (`requestIdleCallback`, tối đa 1 s). Chọn AV1 khi `navigator.mediaCapabilities` báo giải mã được và mượt, và trên màn hình hẹp hơn `lg` còn phải tiết kiệm điện (thực tế: giải mã phần cứng); máy tính (từ `lg`, `(min-width: 64rem)`, đọc một lần khi chọn) giải mã AV1 bằng CPU không vấn đề. Còn lại dùng H.264 720p. Lần phát đầu bắt đầu ở 2,25 s (bỏ đoạn mở đầu tối, vì poster sáng); các vòng sau phát đủ. Poster hiện ngay với opacity 1; chỉ lớp video mờ dần (1 s) khi bắt đầu phát.
 - Không tải video khi bật giảm chuyển động (bật giữa chừng thì dừng và huỷ tải), bật tiết kiệm dữ liệu (`saveData`) hoặc mạng `2g`/`slow-2g`: chỉ hiện poster.
 - Điện thoại: vẫn tự phát, hoãn tải như trên (chủ quán, 2026-10-15).
 - Số đo lab trước và sau: [Hiệu năng, mục 5](../../dev/perf.md#5-thử-nghiệm-tối-ưu). MB trong 10 s đầu chỉ giảm khoảng 11% vì khi đã phát, Chrome tải trước nhanh hết đường truyền; 003-AC-03 chưa đạt.
@@ -124,7 +124,8 @@ Không có API.
 | Tình huống | Người dùng thấy |
 |---|---|
 | Trang đang tải, màn hình chờ chưa rời đi | Poster, chưa tải video |
-| Máy không giải mã AV1 mượt và tiết kiệm điện (thường là không có giải mã phần cứng), kể cả iPhone không có chip AV1 | Bản H.264 720p |
+| Điện thoại hoặc màn hình nhỏ không giải mã AV1 mượt và tiết kiệm điện (thường là không có giải mã phần cứng), kể cả iPhone không có chip AV1; máy tính không giải mã AV1 mượt | Bản H.264 720p |
+| Máy tính giải mã được AV1 mượt, kể cả bằng CPU | Bản AV1 1080p |
 | Giảm chuyển động, tiết kiệm dữ liệu, mạng 2g | Poster, không video |
 | Video lỗi, hoặc trình duyệt chặn tự phát (ví dụ chế độ nguồn điện thấp trên iPhone) | Poster (luôn nằm dưới video, `loading="eager"`) |
 | JS tắt | Màn hình chờ chạy theo đồng hồ CSS rồi mờ; trang đọc được |
@@ -140,7 +141,7 @@ Loại kiểm: xem [mục lục spec, mục 4](../README.md#4-quy-ước).
 | 003-AC-03 | Production, đã có mốc "MB trong 10 s đầu" | DevTools Network, Fast 4G, tắt cache, tải `/` | Dữ liệu 10 s đầu giảm ít nhất 70% so với mốc | M |
 | 003-AC-04 | Đã deploy phần B | Tải `/` | Request video chỉ xuất hiện sau sự kiện `load` và sau màn hình chờ; không có request `Range` tới cuối file | M |
 | 003-AC-05 | Đã deploy phần B; bật *Emulate prefers-reduced-motion* hoặc `saveData` | Tải `/` | Không có request video; poster hiện | M |
-| 003-AC-06 | Đã deploy phần B | Mở `/` trên Chrome ở máy có giải mã AV1 phần cứng, và trên iPhone không có chip AV1 | Chrome tải bản AV1; iPhone tải bản H.264 720p | M |
+| 003-AC-06 | Đã deploy phần B | Mở `/` trên Chrome máy tính, và trên iPhone không có chip AV1 | Chrome tải bản AV1; iPhone tải bản H.264 720p | M |
 | 003-AC-07 | Đã deploy phần C, D | Gọi cùng một URL `/_next/image?…` hai lần | Lần hai `cf-cache-status: HIT` | E |
 | 003-AC-08 | Đã deploy phần E | Search Console → Test live URL `/` | Ảnh chụp thấy chữ hero và nút Đặt bàn | E |
 | 003-AC-09 | Production (phần A) | Xem HTML trang bất kỳ | Preload ảnh nền có `fetchPriority="high"`; logo qua `/_next/image` với `sizes`, không preload | E |
@@ -173,4 +174,5 @@ Phần A: M1. Phần B–H: M3 ([lộ trình](../../plan/roadmap.md#m3-tốc-đ�
 |---|---|
 | 2026-10-14 | Tạo từ ghi chú kế hoạch tốc độ, cập nhật theo PR #4 đã merge; trạng thái Đang áp dụng |
 | 2026-10-15 | Phần C xong (Cloudflare, header 7 ngày ở reverse proxy); phần D: `minimumCacheTTL` 7 ngày thay 30 ngày (PR #9); phần B: giữ âm thanh theo ý chủ quán, thêm các cách B1/B2/B3; bỏ câu hỏi ai làm Cloudflare (chủ quán đã làm) |
-| 2026-10-15 | Phần B theo quyết định của chủ quán (B1, CRF 48 / 27, điện thoại vẫn phát, hoãn tải, lần phát đầu từ 2,25 s) và PR #16; poster eager, không ưu tiên cao; AC-06 nói rõ máy có giải mã AV1 phần cứng; bỏ ba câu hỏi đã trả lời |
+| 2026-10-15 | Phần B theo quyết định của chủ quán (B1, CRF 48 / 27, điện thoại vẫn phát, hoãn tải, lần phát đầu từ 2,25 s) và PR #16; poster eager, không ưu tiên cao; bỏ ba câu hỏi đã trả lời |
+| 2026-10-15 | Quy tắc chọn AV1: máy tính chỉ cần giải mã được và mượt, điện thoại còn phải tiết kiệm điện; mục 7 và AC-06 theo quy tắc này |

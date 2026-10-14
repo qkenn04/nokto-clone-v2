@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { useMediaQuery } from "../nokto/chrome/FixedVideo";
+import { DESKTOP_QUERY, useMediaQuery } from "../nokto/chrome/FixedVideo";
 import { usePageTick } from "../nokto/chrome/PageTransition";
 import { cx } from "../nokto/ui";
 import styles from "./HeroVideo.module.css";
@@ -88,14 +88,15 @@ function idle(signal: AbortSignal) {
 }
 
 /**
- * Whether this device plays `source` smoothly and power-efficiently (in practice: decodes it in hardware). Without the
- * Media Capabilities API, or without the stream facts to ask it, the element's `canPlayType` decides.
+ * Whether this device plays `source` smoothly, and power-efficiently (in practice: in hardware) unless it is a desktop:
+ * a desktop CPU decodes it in software without trouble, while on phones and small screens that costs battery and heat.
+ * Without the Media Capabilities API, or without the stream facts to ask it, the element's `canPlayType` decides.
  */
-async function decodesWell(video: HTMLVideoElement, source: ProbedVideoSource) {
+async function decodesWell(video: HTMLVideoElement, source: ProbedVideoSource, desktop: boolean) {
   if (source.video && navigator.mediaCapabilities) {
     try {
       const info = await navigator.mediaCapabilities.decodingInfo({ type: "file", video: source.video });
-      return info.supported && info.smooth && info.powerEfficient;
+      return info.supported && info.smooth && (info.powerEfficient || desktop);
     } catch {
       // A configuration this browser cannot parse: let canPlayType decide.
     }
@@ -105,8 +106,10 @@ async function decodesWell(video: HTMLVideoElement, source: ProbedVideoSource) {
 
 /** Index of the first source this device decodes well; the last source is the fallback for every other device. */
 async function chooseSource(video: HTMLVideoElement, sources: readonly ProbedVideoSource[]) {
+  // Read once: resizing the window later does not switch the source.
+  const desktop = window.matchMedia(DESKTOP_QUERY).matches;
   for (let index = 0; index < sources.length - 1; index += 1) {
-    if (await decodesWell(video, sources[index])) return index;
+    if (await decodesWell(video, sources[index], desktop)) return index;
   }
   return sources.length - 1;
 }

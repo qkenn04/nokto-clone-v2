@@ -11,8 +11,8 @@ export type ProbedVideoSource = VideoSource & { video?: VideoConfiguration };
 
 /**
  * Home hero loop: the full 103 s with its audio track (ADR 0008), best first. AV1 1080x1920 where it decodes smoothly
- * and power-efficiently, else H.264 720x1280; both faststart. HeroVideo picks one once the page has loaded. A new encode
- * gets a new file name: `/videos` is cached for 7 days.
+ * (and, below the `lg` breakpoint, power-efficiently), else H.264 720x1280; both faststart. HeroVideo picks one once the
+ * page has loaded. A new encode gets a new file name: `/videos` is cached for 7 days.
  */
 export const heroVideo = {
   poster: hotImage("hero-video-poster.jpg"),
