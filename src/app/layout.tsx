@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { preload } from "react-dom";
+import { ClickTracker } from "@/components/analytics/ClickTracker";
+import { UmamiScript } from "@/components/analytics/UmamiScript";
 import { CustomCursor } from "@/components/sites/nokto/chrome/CustomCursor";
 import { PageTransition } from "@/components/sites/nokto/chrome/PageTransition";
 import { PersistentChrome } from "@/components/sites/nokto/chrome/PersistentChrome";
@@ -65,6 +67,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <FloatingContact />
           <SmoothScroll />
         </div>
+        {/* Analytics, outside the splash root. No markup in the body: ClickTracker only listens for clicks, and
+            UmamiScript (only in builds with a website ID) adds the tracker after hydration. */}
+        <ClickTracker />
+        <UmamiScript />
       </body>
     </html>
   );
