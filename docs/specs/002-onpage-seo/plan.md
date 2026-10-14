@@ -1,10 +1,10 @@
 # 002: SEO trên trang, kế hoạch kỹ thuật
 
-> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-14 · Liên quan: [spec.md](spec.md), [tasks.md](tasks.md), [Mục lục ADR](../../adr/README.md) (ADR 0005)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-15 · Liên quan: [spec.md](spec.md), [tasks.md](tasks.md), [Mục lục ADR](../../adr/README.md) (ADR 0005)
 
 ## 1. Tóm tắt cách làm
 
-Tiêu đề và mô tả của mọi trang gom về một file `src/seo/page-meta.ts`; mỗi `page.tsx` chỉ gọi `pageMetadata(path)`. Thông tin quán (giờ, địa chỉ, hotline) đọc từ `site.ts`, nên sửa một chỗ là đổi cả tiêu đề, mô tả, footer và JSON-LD. Ảnh chia sẻ của trang con được khai rõ trong `pageMetadata()`. Phần JSON-LD còn lại sẽ dựng từ cùng nguồn dữ liệu đó, chỉ với thông tin đã xác nhận.
+Tiêu đề và mô tả của mọi trang gom về một file `src/seo/page-meta.ts`; mỗi `page.tsx` chỉ gọi `pageMetadata(path)`. Thông tin quán (giờ, địa chỉ, hotline) đọc từ `site.ts`, nên sửa một chỗ là đổi cả tiêu đề, mô tả, footer và JSON-LD. Ảnh chia sẻ của trang con được khai rõ trong `pageMetadata()`. JSON-LD dựng từ cùng nguồn dữ liệu đó, chỉ với thông tin đã xác nhận: đợt 1 ở PR #10 (chờ duyệt, 2026-10-15).
 
 ## 2. Thiết kế
 
@@ -19,13 +19,24 @@ Tiêu đề và mô tả của mọi trang gom về một file `src/seo/page-met
 
 Hệ quả phụ (đã chấp nhận ở PR #5): thẻ Twitter của trang con giờ lấy theo Open Graph của chính trang đó (trước đây mọi trang mang thẻ của trang chủ); tiêu đề trang 404 theo tiêu đề mặc định mới.
 
-### 2.2 Đề xuất cho phần C (JSON-LD)
+### 2.2 Phần C (JSON-LD)
 
-- Dữ liệu: thêm vào `site.ts` các trường đã xác nhận (`geo`, danh sách `sameAs`, giờ đóng cửa, `priceRange`, `paymentAccepted`). Không đặt giá trị chưa xác nhận dưới dạng giá trị mặc định.
-- Dựng JSON-LD ở một module riêng (ví dụ `src/seo/structured-data.ts`) thay cho hằng `restaurantSchema` trong `layout.tsx`; xuất một `@graph` gồm nút `Restaurant`/`BarOrPub`, nút `WebSite` và các nút `Event`.
-- `Event` sinh từ `homeEvents`: chỉ phần tử không có `illustrative: true` và có `timing.kind === "scheduled"` với giờ cụ thể (không `dateOnly`). Trường: `name`, `startDate`, `endDate`, `location` (trỏ `@id` của quán), `image`, `description`, `eventStatus`, `eventAttendanceMode` (offline). `offers`, `performer` chỉ thêm khi có thông tin thật.
-- `Restaurant.image`: 3–5 ảnh thật; tạm giữ ảnh OG cho tới khi có ảnh ngang (001-T40).
-- Giữ JSON-LD trong `<body>` của root layout như hiện tại (đã được Rich Results Test nhận: Local business, Organization).
+Đã xây:
+
+| PR | Thay đổi |
+|---|---|
+| PR #8 (merge `ed262e4`, Jenkins build #17, 2026-10-15) | `home/content.ts`: bỏ `illustrative` của Friday on Fire (16/10) và Hot Saturday (17/10), nên thẻ và chú thích lightbox không còn "Chương trình minh hoạ"; After Hours và Acoustic & Chill giữ nhãn. `site.ts`: `socialHref` → `https://www.facebook.com/thehot.dalat/`, `messengerHref` → `https://m.me/thehot.dalat` (cùng trang Facebook, đã đổi tên). Alt poster của hai sự kiện vẫn ghi "ảnh minh hoạ chương trình …" (ảnh không gian quán dùng làm poster), rà ở phần D |
+
+Chờ duyệt: PR #10 (`8d9ec01`, `6680248`, mở 2026-10-15):
+
+- `src/seo/structured-data.ts` (mới) dựng JSON-LD từ `site.ts` và dữ liệu trang chủ, thay hằng `restaurantSchema` trong `layout.tsx`. Root layout xuất một `@graph` trên mọi trang: nút `Restaurant` + `BarOrPub` (`@id` `/#restaurant`) và nút `WebSite` (`@id` `/#website`). Trường cụ thể ở [spec phần C](spec.md#phần-c-dữ-liệu-có-cấu-trúc-pr-10-chờ-duyệt).
+- `Event`: chỉ trang chủ xuất (Google muốn dữ liệu sự kiện nằm trên trang hiện sự kiện), một `@graph` thứ hai cho mọi phần tử của `homeEvents` không có `illustrative` và có lịch hợp lệ; sự kiện chỉ có ngày (`dateOnly`) dùng ngày không kèm giờ. Không có `offers` (chưa biết giá vé). Trang tĩnh, nên danh sách là bản trong `content.ts` lúc build.
+- `site.ts`: `pendingFacts` (giờ mở cửa, `priceRange`, `paymentAccepted`, nhạc sống) có kiểu nhưng **để trống**; chỉ xuất khi chủ quán xác nhận. Không đặt giá trị chưa xác nhận làm giá trị mặc định.
+- JSON được escape (`<` thành `\u003c`) theo hướng dẫn JSON-LD của Next.js.
+- `public/favicon.ico` (16/32/48 px, khoảng 5,6 KB) cho trình duyệt và crawler gọi thẳng `/favicon.ico` (đang 404). Là tệp tĩnh trong `public/`, không phải `app/favicon.ico`, nên Next.js không thêm `<link>` mới; link `/icon.png` giữ nguyên để Google tiếp tục đọc cùng URL favicon.
+- Kiểm trước merge: validator.schema.org cho JSON-LD trang chủ 0 lỗi, 0 cảnh báo; JSON đọc được trên 7 trang; mọi URL tuyệt đối và trả 200; `@id` trỏ đúng; ngày theo ISO 8601; sự kiện minh hoạ bị loại. `<body>` của 7 trang giống `main` trừ thẻ JSON-LD sự kiện mới trên `/`. Lint, typecheck, `check:sitemap`, build, `docker build --target check` đạt.
+- Hệ quả phụ: `site.ts` là nguồn sitemap dùng chung, nên merge PR #10 đưa `<lastmod>` của mọi trang về ngày merge.
+- Rich results cho sự kiện thường cần một trang cho mỗi sự kiện: dòng sự kiện ở trang chủ hợp lệ nhưng có thể không hiện kết quả Event (trang `/su-kien` dự kiến ở M5).
 
 ### 2.3 Đề xuất cho phần D–F
 
@@ -52,9 +63,9 @@ Hệ quả phụ (đã chấp nhận ở PR #5): thẻ Twitter của trang con g
 
 ## 5. Thứ tự làm
 
-1. Gỡ nhãn minh hoạ của sự kiện 16/10, 17/10 (đã xác nhận là thật). Làm sớm, trước ngày sự kiện.
+1. Gỡ nhãn minh hoạ của sự kiện 16/10, 17/10 (đã xác nhận là thật). Xong: PR #8, 2026-10-15.
 2. Lấy câu trả lời của chủ quán (spec mục 12).
-3. PR JSON-LD (phần C) với các trường đã xác nhận; kiểm bằng Rich Results Test trên bản preview hoặc bằng cách dán HTML.
+3. PR JSON-LD (phần C) với các trường đã xác nhận: PR #10, chờ duyệt (validator.schema.org đạt). Sau deploy: Rich Results Test trên production, Request indexing `/`. Các trường ở `pendingFacts` thêm bằng PR nhỏ khi chủ quán trả lời.
 4. PR alt (phần D), làm cùng đổi tên ảnh của 001 nếu ảnh đã có.
 5. PR ảnh chia sẻ riêng (phần E) khi có ảnh ngang.
 6. PR chữ trên trang (phần F) sau khi câu chữ và thiết kế được duyệt.
@@ -81,7 +92,7 @@ Hệ quả phụ (đã chấp nhận ở PR #5): thẻ Twitter của trang con g
 
 ## 8. Ước lượng
 
-Phần A, B: xong trong ngày 2026-10-14. Phần C–F: chưa ước lượng; phụ thuộc thời gian chờ câu trả lời và ảnh.
+Phần A, B: xong trong ngày 2026-10-14. Phần C: nhãn sự kiện và JSON-LD đợt 1 làm trong đêm 2026-10-14 sang 2026-10-15. Phần D–F: chưa ước lượng; phụ thuộc thời gian chờ câu trả lời và ảnh.
 
 ## 9. Câu hỏi mở
 

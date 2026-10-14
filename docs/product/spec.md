@@ -1,6 +1,6 @@
 # Đặc tả sản phẩm: The Hot Beer Garden (thehot.vn)
 
-> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-14 · Liên quan: [Yêu cầu phi chức năng](nfr.md), [Thuật ngữ](glossary.md), [Kiến trúc](../architecture/ARCHITECTURE.md), [Mô hình dữ liệu nội dung](../architecture/data-model.md), [Mục lục ADR](../adr/README.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-15 · Liên quan: [Yêu cầu phi chức năng](nfr.md), [Thuật ngữ](glossary.md), [Kiến trúc](../architecture/ARCHITECTURE.md), [Mô hình dữ liệu nội dung](../architecture/data-model.md), [Mục lục ADR](../adr/README.md)
 
 ## 1. Tóm tắt một đoạn
 
@@ -33,15 +33,15 @@ Tính tới 2026-10-14:
 
 ## 4. Mục tiêu
 
-| # | Mục tiêu | Cách đo | Trạng thái (2026-10-14) |
+| # | Mục tiêu | Cách đo | Trạng thái (2026-10-15) |
 |---|---|---|---|
-| G1 | Khách tìm thấy site khi tìm tên quán và các cụm như "quán nhậu Đà Lạt", "beer garden Đà Lạt" | Search Console: mọi trang trong sitemap được index; truy vấn tên quán ra `thehot.vn` | Đã gửi sitemap và yêu cầu index; chờ Google xử lý |
+| G1 | Khách tìm thấy site khi tìm tên quán và các cụm như "quán nhậu Đà Lạt", "beer garden Đà Lạt" | Search Console: mọi trang trong sitemap được index; truy vấn tên quán ra `thehot.vn` | Đã gửi sitemap và yêu cầu index; `/` đã được index. Tìm tên quán: `thehot.vn/about` đứng thứ 4, sau Instagram, TripAdvisor, Facebook ([002, xếp hạng khi tìm tên quán](../specs/002-onpage-seo/tasks.md#xếp-hạng-khi-tìm-tên-quán)) |
 | G2 | Khách xem được menu và giá đúng (đã gồm VAT) | `/menu` (sách lật từ 10 ảnh menu) và `/menu/list` (bảng giá) khớp menu giấy; kiểm tay mỗi lần đổi menu | Đạt theo menu tháng 9/2026 |
 | G3 | Khách liên hệ chốt bàn bằng một chạm từ mọi trang | Nút liên hệ nổi (Messenger, Facebook, Zalo, Gọi) và nút Đặt bàn trên mọi trang; sau khi có analytics: sự kiện `contact_click` | Đạt (kiểm tay); chưa đo được |
 | G4 | Tên, địa chỉ, hotline, giờ mở cửa giống nhau ở site, JSON-LD và Google Business Profile | Kiểm tay; Rich Results Test | Chưa đạt: giờ mở cửa lệch Google Maps (mục 10) |
 | G5 | Trang nhanh trên điện thoại | Ngân sách PERF ở [yêu cầu phi chức năng](nfr.md) | Chưa đạt: LCP 2,9 s trước PR #4; số sau PR #4 chưa đo |
 | G6 | Biết khách đến từ đâu và bao nhiêu người bấm liên hệ | Umami và GA4 theo [ADR 0007](../adr/0007-use-umami-and-consent-gated-ga4.md) | Chưa triển khai |
-| G7 | Cho khách thấy không gian và chương trình của quán | Gallery và dòng sự kiện ở trang chủ; sự kiện có lịch thật thay cho chương trình minh hoạ | Một sự kiện có ngày thật (10/10/2026), bốn chương trình đang là minh hoạ (`illustrative: true`) |
+| G7 | Cho khách thấy không gian và chương trình của quán | Gallery và dòng sự kiện ở trang chủ; sự kiện có lịch thật thay cho chương trình minh hoạ | Ba sự kiện có lịch thật (10/10, 16/10, 17/10/2026; hai sự kiện sau bỏ nhãn minh hoạ ở PR #8); hai chương trình còn là minh hoạ (`illustrative: true`) |
 
 ## 5. Không làm
 
@@ -115,3 +115,4 @@ Một thay đổi được coi là xong khi:
 | Ngày | Thay đổi |
 |---|---|
 | 2026-10-14 | Tạo từ docs-template, điền theo hiện trạng site và các kế hoạch SEO, sitemap, hiệu năng, analytics ngày 2026-10-14 |
+| 2026-10-15 | Cập nhật trạng thái G1 (tình trạng tìm tên quán) và G7 (sự kiện 16/10, 17/10 là thật) |

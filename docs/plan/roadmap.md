@@ -1,6 +1,6 @@
 # Lộ trình
 
-> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-14 · Liên quan: [Bản đồ tài liệu](../README.md), [Việc sắp làm](tasks.md), [Tiến độ](progress.md), [Mục lục spec](../specs/README.md), [Mục lục ADR](../adr/README.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-15 · Liên quan: [Bản đồ tài liệu](../README.md), [Việc sắp làm](tasks.md), [Tiến độ](progress.md), [Mục lục spec](../specs/README.md), [Mục lục ADR](../adr/README.md)
 
 Lộ trình đưa https://thehot.vn (The Hot Beer Garden Đà Lạt) lên Google và giữ nó nhanh, đo được: nền tảng kỹ thuật, nội dung trên trang, tốc độ, đo lường, rồi các việc ngoài website do chủ quán làm.
 
@@ -90,7 +90,7 @@ Vì sao thứ tự này:
 
 ### M2 On-page và dữ liệu có cấu trúc
 
-**Trạng thái:** chưa bắt đầu; chờ câu trả lời và ảnh của chủ quán ([tiến độ](progress.md#theo-mốc)).
+**Trạng thái:** đang làm từ 2026-10-15: nhãn sự kiện 16/10, 17/10 đã gỡ (PR #8); JSON-LD đợt 1 và `/favicon.ico` ở PR #10, chờ duyệt; phần còn lại chờ câu trả lời và ảnh của chủ quán ([tiến độ](progress.md#theo-mốc)).
 
 **Mục tiêu.** Google đọc được đầy đủ và đúng thông tin quán; trang có đủ chữ thật cho các từ khoá nhắm.
 
@@ -126,7 +126,7 @@ Vì sao thứ tự này:
 
 ### M3 Tốc độ vòng 2
 
-**Trạng thái:** chưa bắt đầu; việc đầu tiên là đo lại sau PR #4 ([tiến độ](progress.md#theo-mốc)).
+**Trạng thái:** đang làm từ 2026-10-15: cache xong (Cloudflare, repo hạ tầng, PR #9); chưa đo lại sau PR #4 và sau cache; video chờ chủ quán chọn cách xử lý âm thanh (giữ âm thanh, B1/B2/B3) ([tiến độ](progress.md#theo-mốc)).
 
 **Mục tiêu.** Đạt mục tiêu ở [003](../specs/003-performance/spec.md) mục 1 và giảm mạnh dữ liệu khách phải tải.
 
@@ -139,7 +139,7 @@ Vì sao thứ tự này:
 - [ ] PageSpeed Mobile `/`: LCP < 2,5 s, CLS < 0,1, TBT < 200 ms (003-AC-01, 003-AC-02)
 - [ ] Dữ liệu 10 s đầu ở trang chủ giảm ít nhất 70% so với mốc (003-AC-03)
 - [ ] Video chỉ tải sau khi trang xong, không tải khi giảm chuyển động hoặc tiết kiệm dữ liệu (003-AC-04, 003-AC-05)
-- [ ] `/_next/image` trúng cache Cloudflare ở lần hai (003-AC-07)
+- [x] `/_next/image` trúng cache Cloudflare ở lần hai (003-AC-07) · 2026-10-15
 - [ ] Ảnh chụp của Google thấy chữ hero (003-AC-08)
 
 **Ước lượng.** 1,5–2 ngày công (khoảng 11–16 giờ), chưa tính font và thời gian chờ duyệt.

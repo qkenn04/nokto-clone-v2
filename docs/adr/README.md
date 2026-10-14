@@ -1,6 +1,6 @@
 # Sổ quyết định kiến trúc (ADR)
 
-> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-14 · Liên quan: [Mẫu ADR](0000-template.md), [ADR 0001](0001-record-architecture-decisions.md), [Tài liệu](../README.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-15 · Liên quan: [Mẫu ADR](0000-template.md), [ADR 0001](0001-record-architecture-decisions.md), [Tài liệu](../README.md)
 
 Thư mục này ghi **vì sao** hệ thống có hình dạng như hiện nay: mỗi quyết định quan trọng là một file ngắn, đánh số, có trạng thái, có các phương án đã bị loại và có bằng chứng. Code cho biết hệ thống làm gì; ADR cho biết vì sao nó làm thế và cái giá phải trả. Lý do dùng ADR và quy tắc gốc: [ADR 0001](0001-record-architecture-decisions.md).
 
@@ -16,7 +16,7 @@ Thư mục này ghi **vì sao** hệ thống có hình dạng như hiện nay: m
 | [0005](0005-separate-search-titles-from-headings.md) | Tiêu đề, mô tả cho tìm kiếm tách khỏi H1 và slogan; trang con dùng chung ảnh chia sẻ | Chấp nhận | 2026-10-14 | — |
 | [0006](0006-prioritize-lcp-with-fetchpriority.md) | Ưu tiên tải phần tử LCP bằng `fetchPriority="high"`; logo đúng kích thước; giữ nguyên font | Chấp nhận | 2026-10-14 | — |
 | [0007](0007-use-umami-and-consent-gated-ga4.md) | Analytics: Umami tự cài luôn chạy + GA4 chỉ sau khi đồng ý | Chấp nhận (chưa triển khai) | 2026-10-14 | — |
-| [0008](0008-compress-hero-video-without-trimming.md) | Video hero giữ đủ 103 s, giảm dung lượng bằng faststart, bỏ âm thanh, AV1 + 720p, hoãn tải | Đề xuất | — | — |
+| [0008](0008-compress-hero-video-without-trimming.md) | Video hero giữ đủ 103 s và giữ âm thanh, giảm dung lượng bằng faststart, AV1 + 720p, hoãn tải | Đề xuất | — | — |
 
 ADR 0002 đến 0006 ghi lại các quyết định đã thực hiện trong ngày 2026-10-14, trước khi có thư mục này; ADR 0007 ghi lại quyết định đã chốt trong kế hoạch cùng ngày nhưng chưa triển khai. Tất cả có dòng "Ghi lại" theo quy tắc 5 của [ADR 0001](0001-record-architecture-decisions.md). Tài liệu cho phía máy chủ (nginx, stack, Jenkins) nằm ở repo `qkenn04/infra-qkenn`.
 
