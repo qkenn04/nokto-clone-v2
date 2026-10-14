@@ -55,7 +55,7 @@ Tên credential, cách xoay vòng và quyền của tài khoản robot: repo inf
 
 | Mục | Giá trị |
 |---|---|
-| Quy tắc Git và status check | PR vào `main`; không có status check từ Jenkins. `[CẦN XÁC NHẬN: branch protection]` |
+| Quy tắc Git và status check | PR vào `main`; không có status check từ Jenkins. `main` chưa bật branch protection (kiểm 2026-10-15; chủ quán chưa cần, khuyến nghị cân nhắc sau). |
 | Agent và vùng tin cậy | Agent nhãn `docker` trên máy CI, trong mạng riêng |
 | `Jenkinsfile`, người review | `Jenkinsfile`, `Dockerfile`, `ci/` đi qua PR như code |
 | Registry và lưu giữ | Harbor trên máy CI, project `nokto`, repository `web`; chính sách giữ image ở repo infra |

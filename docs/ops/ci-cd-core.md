@@ -10,7 +10,7 @@ Tính tới 2026-10-14, theo `Jenkinsfile`, `Dockerfile`, `ci/` và tài liệu 
 
 | Chính sách | Hiện trạng | Khoảng cách, việc cần làm |
 |---|---|---|
-| Review thay đổi (mục 4) | Thay đổi đi qua PR vào `main` trên GitHub | `[CẦN XÁC NHẬN: nhánh main đã bật branch protection, bắt buộc review chưa]`. Không có status check: PR không được build trước khi merge |
+| Review thay đổi (mục 4) | Thay đổi đi qua PR vào `main` trên GitHub | `main` chưa bật branch protection, chưa bắt buộc review (kiểm 2026-10-15; chủ quán chưa cần, khuyến nghị cân nhắc sau).. Không có status check: PR không được build trước khi merge |
 | Kiểm lại commit sau merge (mục 4, 5) | Mỗi commit trên `main` chạy lại lint, typecheck, guard sitemap, build, smoke test | Không có unit test, test tích hợp, quét secret, quét phụ thuộc |
 | Build một lần, artifact bất biến (mục 6) | Build một lần mỗi commit; image đã smoke test là image được deploy; tag = commit SHA đầy đủ | Deploy theo tag, chưa theo digest. `[CẦN XÁC NHẬN: Harbor đã bật tag immutability cho project chưa]` |
 | Chuỗi cung ứng (mục 7) | Lockfile + `npm ci`; image nền ghim tag và `--pull` mỗi build; nhãn OCI `revision`, `source` | Chưa có SBOM, chữ ký, provenance; pipeline không chặn theo kết quả quét lỗ hổng; image nền chưa ghim digest |
