@@ -2,7 +2,9 @@ import { hotImage, site } from "../site";
 
 export type StepNumber = 1 | 2 | 3;
 export type ReservationStep = { number: StepNumber; label: string; title: string };
-type SuccessCta = { label: string; variant: "ghost" } | { label: string; variant: "primary" | "link"; href: string };
+type SuccessCta =
+  | { label: string; variant: "ghost" }
+  | { label: string; variant: "primary" | "link"; href: string; method: "phone" | "facebook" };
 
 export const reservation = {
   hero: {
@@ -56,8 +58,8 @@ export const reservation = {
     title: "Giờ thì chốt bàn!",
     subtitle: `Kèo đã có ngày, giờ và đủ thông tin. Gọi ${site.phone} hoặc gửi thông tin bên dưới qua Facebook để The Hot xác nhận bàn nhé.`,
     ctas: [
-      { label: "Gọi The Hot", variant: "primary", href: site.phoneHref },
-      { label: "Nhắn Facebook →", variant: "link", href: site.socialHref },
+      { label: "Gọi The Hot", variant: "primary", href: site.phoneHref, method: "phone" },
+      { label: "Nhắn Facebook →", variant: "link", href: site.socialHref, method: "facebook" },
       { label: "Lên kèo khác", variant: "ghost" },
     ] satisfies SuccessCta[],
     demoNote: "Thông tin chưa được gửi. Nhớ gọi hoặc nhắn The Hot để được xác nhận bàn.",

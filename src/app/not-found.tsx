@@ -1,6 +1,7 @@
 import { BrandMark } from "@/components/sites/nokto/chrome/BrandMark";
 import { site } from "@/components/sites/nokto/site";
 import { ButtonLink, Heading, Section, Stack, Text } from "@/components/sites/nokto/ui";
+import { trackAttrs } from "@/lib/analytics";
 
 export default function NotFound() {
   return (
@@ -15,7 +16,7 @@ export default function NotFound() {
             Hẹn bạn ở The Hot.
           </Text>
           <div className="pt-4">
-            <ButtonLink href={site.cta.href}>{site.cta.label}</ButtonLink>
+            <ButtonLink href={site.cta.href} {...trackAttrs("booking_cta_click", { location: "not_found" })}>{site.cta.label}</ButtonLink>
           </div>
         </Stack>
         <span aria-hidden />

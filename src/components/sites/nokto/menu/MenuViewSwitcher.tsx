@@ -1,5 +1,6 @@
 import { BookOpen, List } from "lucide-react";
 import Link from "next/link";
+import { trackAttrs } from "@/lib/analytics";
 import { cx } from "../ui";
 
 const views = [
@@ -15,6 +16,7 @@ export function MenuViewSwitcher({ active }: { active: "list" | "book" }) {
         <Link
           key={value}
           href={href}
+          {...(active === value ? {} : trackAttrs("menu_view_mode", { mode: value }))}
           aria-current={active === value ? "page" : undefined}
           className={cx(
             "inline-flex min-h-11 items-center justify-center gap-2 px-3 text-small font-semibold transition-colors duration-[var(--duration-fast)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent sm:px-4",

@@ -4,6 +4,7 @@ import { ArrowUpRight, CalendarDays, Headphones, Maximize2, Ticket } from "lucid
 import { AnimatePresence, motion, useReducedMotion, useScroll } from "motion/react";
 import Image from "next/image";
 import { useRef, useState, useSyncExternalStore } from "react";
+import { track, trackAttrs } from "@/lib/analytics";
 import { EASE_CINEMA } from "../../nokto/motion";
 import { site } from "../../nokto/site";
 import { ButtonLink, Heading, Section, Text, cx } from "../../nokto/ui";
@@ -46,6 +47,11 @@ export function EventTimeline() {
   const now = minute === null ? null : minute * 60_000;
   const [active, setActive] = useState<EventFilter>("all");
   const [posterIndex, setPosterIndex] = useState<number | null>(null);
+  // Counts opening a poster, not paging through others inside the lightbox.
+  const openPoster = (event: (typeof homeEvents)[number]) => {
+    setPosterIndex(homeEvents.indexOf(event));
+    track("event_view", { event_id: event.id });
+  };
   const events = filterEvents(homeEvents, active, now);
   const posters = homeEvents.map(event => ({ src: event.poster, alt: event.posterAlt, title: event.title, caption: `${event.illustrative ? "Chương trình minh hoạ · " : ""}${event.subtitle}` }));
 
@@ -67,7 +73,7 @@ export function EventTimeline() {
             </span>
             <span>Good music.<br />Great company.</span>
           </div>
-          <a href={recentEventsHref} target="_blank" rel="noreferrer" className={styles.textLink}>Lịch trên Facebook <ArrowUpRight aria-hidden size={18} /></a>
+          <a href={recentEventsHref} target="_blank" rel="noreferrer" className={styles.textLink} {...trackAttrs("social_click", { network: "facebook" })}>Lịch trên Facebook <ArrowUpRight aria-hidden size={18} /></a>
         </div>
       </motion.header>
 
@@ -105,7 +111,7 @@ export function EventTimeline() {
                           </span>
                         </div>
                         <motion.article whileHover={reduce ? undefined : { y: -5 }} transition={{ type: "spring", stiffness: 260, damping: 22 }} className={styles.eventCard} aria-labelledby={`event-${event.id}`}>
-                          <button type="button" className={styles.eventPoster} onClick={() => setPosterIndex(homeEvents.indexOf(event))} aria-label={`${event.illustrative ? "Xem ảnh sự kiện" : "Xem poster"}: ${event.title}`} aria-haspopup="dialog">
+                          <button type="button" className={styles.eventPoster} onClick={() => openPoster(event)} aria-label={`${event.illustrative ? "Xem ảnh sự kiện" : "Xem poster"}: ${event.title}`} aria-haspopup="dialog">
                             <Image src={event.poster} alt={event.posterAlt} fill sizes="(max-width: 639px) 80vw, (max-width: 1023px) 40vw, 320px" className="object-cover" />
                             <span className={styles.photoExpand} aria-hidden><Maximize2 size={16} strokeWidth={1.5} /></span>
                           </button>
@@ -123,9 +129,9 @@ export function EventTimeline() {
                             <Text tone="muted" className={styles.eventDescription}>{event.description}</Text>
                             <ul className={styles.eventTags} aria-label="Trong chương trình">{event.tags.map(tag => <li key={tag}>{tag}</li>)}</ul>
                             <div className={styles.eventActions}>
-                              <button type="button" className={styles.textLink} onClick={() => setPosterIndex(homeEvents.indexOf(event))}>{event.illustrative ? "Xem ảnh" : "Xem poster"} <ArrowUpRight aria-hidden size={16} /></button>
-                              {event.sourceHref && <a href={event.sourceHref} target="_blank" rel="noreferrer" className={styles.textLink}>Bài sự kiện <ArrowUpRight aria-hidden size={16} /></a>}
-                              {(status === "live" || status === "upcoming") && <ButtonLink href={site.cta.href} className={styles.eventBook}>Chốt bàn <ArrowUpRight aria-hidden size={16} /></ButtonLink>}
+                              <button type="button" className={styles.textLink} onClick={() => openPoster(event)}>{event.illustrative ? "Xem ảnh" : "Xem poster"} <ArrowUpRight aria-hidden size={16} /></button>
+                              {event.sourceHref && <a href={event.sourceHref} target="_blank" rel="noreferrer" className={styles.textLink} {...trackAttrs("social_click", { network: "facebook" })}>Bài sự kiện <ArrowUpRight aria-hidden size={16} /></a>}
+                              {(status === "live" || status === "upcoming") && <ButtonLink href={site.cta.href} className={styles.eventBook} {...trackAttrs("booking_cta_click", { location: "event" })}>Chốt bàn <ArrowUpRight aria-hidden size={16} /></ButtonLink>}
                             </div>
                           </div>
                         </motion.article>
@@ -139,7 +145,7 @@ export function EventTimeline() {
                 <CalendarDays aria-hidden size={30} strokeWidth={1.2} className="text-accent" />
                 <Heading as="h3" level="h2">{emptyCopy[active].title}</Heading>
                 <Text tone="muted" measure="comfort">{emptyCopy[active].body}</Text>
-                <a href={site.socialHref} target="_blank" rel="noreferrer" className={styles.textLink}>Ghé Facebook The Hot <ArrowUpRight aria-hidden size={16} /></a>
+                <a href={site.socialHref} target="_blank" rel="noreferrer" className={styles.textLink} {...trackAttrs("contact_click", { method: "facebook", location: "event" })}>Ghé Facebook The Hot <ArrowUpRight aria-hidden size={16} /></a>
               </motion.div>
             )}
           </motion.div>
@@ -179,7 +185,7 @@ export function EventTimeline() {
             whileTap={reduce ? undefined : { scale: 0.97 }}
             transition={{ type: "spring", stiffness: 320, damping: 22 }}
           >
-            <ButtonLink href={site.cta.href} className={styles.closingButton}>Chốt bàn <ArrowUpRight aria-hidden size={20} /></ButtonLink>
+            <ButtonLink href={site.cta.href} className={styles.closingButton} {...trackAttrs("booking_cta_click", { location: "closing" })}>Chốt bàn <ArrowUpRight aria-hidden size={20} /></ButtonLink>
           </motion.div>
         </motion.div>
       </motion.div>

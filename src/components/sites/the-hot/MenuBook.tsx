@@ -23,6 +23,7 @@ import {
 } from "react";
 import { MenuViewSwitcher } from "../nokto/menu/MenuViewSwitcher";
 import { EASE_CINEMA } from "../nokto/motion";
+import { trackAttrs } from "@/lib/analytics";
 import { site } from "../nokto/site";
 import { ButtonLink, Heading, Section, Stack, Text, cx } from "../nokto/ui";
 import styles from "./MenuBook.module.css";
@@ -571,7 +572,7 @@ export function MenuBook() {
             <MenuViewSwitcher active="book" />
             <div className={styles.introNote}>
               <Text variant="small" tone="muted">Mồi từ 39K · Bia từ 19K*</Text>
-              <ButtonLink href={site.cta.href} variant="link">Chốt bàn cho hội mình →</ButtonLink>
+              <ButtonLink href={site.cta.href} variant="link" {...trackAttrs("booking_cta_click", { location: "menu_top" })}>Chốt bàn cho hội mình →</ButtonLink>
             </div>
           </Stack>
         </motion.header>
@@ -679,7 +680,7 @@ export function MenuBook() {
           <Text variant="small" tone="muted">Giá VNĐ, đã gồm VAT. * {site.beerOffer}</Text>
           <Text variant="small" tone="subtle">Món đang có và ưu đãi hôm bạn ghé? Nhắn The Hot để hỏi nhé.</Text>
         </Stack>
-        <ButtonLink href={site.cta.href} className="shrink-0 whitespace-nowrap">Chốt bàn</ButtonLink>
+        <ButtonLink href={site.cta.href} className="shrink-0 whitespace-nowrap" {...trackAttrs("booking_cta_click", { location: "menu_bottom" })}>Chốt bàn</ButtonLink>
       </div>
 
       <dialog ref={dialogRef} className={styles.readerDialog} aria-labelledby="menu-reader-title" onKeyDown={handleReaderKey} onClose={() => setZoomed(false)} data-lenis-prevent>

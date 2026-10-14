@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { trackAttrs } from "@/lib/analytics";
 import { siteImage } from "../site";
 import { ButtonLink, Heading, Stack, Text, buttonClass } from "../ui";
 import { reservation } from "./content";
@@ -30,7 +31,7 @@ export function ReservationSuccess({ data, onReset }: { data: ReservationData; o
         <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-8">
           {success.ctas.map((cta) =>
             cta.variant !== "ghost" ? (
-              <ButtonLink key={cta.label} href={cta.href} variant={cta.variant}>
+              <ButtonLink key={cta.label} href={cta.href} variant={cta.variant} {...trackAttrs("contact_click", { method: cta.method, location: "reservation" })}>
                 {cta.label}
               </ButtonLink>
             ) : (
