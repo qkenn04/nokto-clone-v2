@@ -128,7 +128,7 @@ Tính tới 2026-10-14 có 5 mục: 1 sự kiện có ngày thật ("Sạc pin �
 |---|---|
 | `home/content.ts` → `galleryPhotos` | 5 ảnh quán (`id`, `src`, `alt`, `title`, `caption`, `category`: `space` \| `friends` \| `food`), cắt từ video quán cung cấp |
 | `nokto/about/content.ts` → `about` | Nội dung `/about`: đoạn văn, ảnh, gallery 3 ảnh, số liệu nổi bật |
-| `the-hot/videos.ts` | `heroVideo` (chỉ H.264, ảnh poster), `aboutVideo` và `kitchenVideo` (AV1 trước, H.264 dự phòng) |
+| `the-hot/videos.ts` | `heroVideo` (AV1 trước, H.264 720p dự phòng; bản AV1 kèm thông số luồng hình cho `mediaCapabilities`; ảnh poster), `aboutVideo` và `kitchenVideo` (AV1 trước, H.264 dự phòng) |
 | `nokto/legal/content.ts` | `terms` ("Thông tin đặt bàn") và `privacy`, mỗi tài liệu một ảnh và các mục |
 
 ### 5.5 Cấu hình sitemap: `seo/sitemap-pages.json`
@@ -201,7 +201,7 @@ Sự kiện `dateOnly` không có trạng thái `live` (không biết giờ di�
 | Menu | 2 tab. Sách lật: 10 + 12 trang ảnh. Bảng giá: 8 + 15 nhóm, 34 + 104 = 138 món |
 | Gallery trang chủ | 5 ảnh |
 | Sự kiện trang chủ | 5 (4 minh hoạ) |
-| Video | Hero khoảng 80 MB (H.264, 103 s); about và kitchen mỗi video có bản AV1 và H.264, mỗi bản dưới 12 MB |
+| Video | Hero 103 s: AV1 1080p 26,8 MB và H.264 720p 31,5 MB (PR #16); about và kitchen mỗi video có bản AV1 và H.264, mỗi bản dưới 12 MB |
 
 ## 10. Đổi dữ liệu thế nào
 

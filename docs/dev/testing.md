@@ -81,6 +81,7 @@ Sau deploy một PR chạm phần tương ứng:
 - [ ] Đổi tiêu đề, mô tả, ảnh chia sẻ: xem nguồn trang; Facebook Sharing Debugger (https://developers.facebook.com/tools/debug/) → Scrape Again.
 - [ ] Đổi JSON-LD hoặc thông tin quán: https://search.google.com/test/rich-results.
 - [ ] Đổi phần ảnh hưởng tải trang: PageSpeed Mobile 3 lần, ghi trung vị vào [perf.md](perf.md).
+- [ ] Đổi video hero: DevTools → Network (lọc `videos`, tắt cache) tải `/`: request `main.v2.*` chỉ có sau sự kiện `load` và sau màn hình chờ; bật *Emulate prefers-reduced-motion* thì không có request video ([003-AC-04, 003-AC-05](../specs/003-performance/spec.md#8-tiêu-chí-nghiệm-thu)).
 - [ ] Đổi trang mới hoặc URL: Search Console → URL Inspection → Request indexing.
 
 ## 7. Nợ test

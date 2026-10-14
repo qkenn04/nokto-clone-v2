@@ -16,7 +16,7 @@ Thư mục này ghi **vì sao** hệ thống có hình dạng như hiện nay: m
 | [0005](0005-separate-search-titles-from-headings.md) | Tiêu đề, mô tả cho tìm kiếm tách khỏi H1 và slogan; trang con dùng chung ảnh chia sẻ | Chấp nhận | 2026-10-14 | — |
 | [0006](0006-prioritize-lcp-with-fetchpriority.md) | Ưu tiên tải phần tử LCP bằng `fetchPriority="high"`; logo đúng kích thước; giữ nguyên font | Chấp nhận | 2026-10-14 | — |
 | [0007](0007-use-umami-and-consent-gated-ga4.md) | Analytics: Umami tự cài luôn chạy + GA4 chỉ sau khi đồng ý | Chấp nhận (chưa triển khai) | 2026-10-14 | — |
-| [0008](0008-compress-hero-video-without-trimming.md) | Video hero giữ đủ 103 s và giữ âm thanh, giảm dung lượng bằng faststart, AV1 + 720p, hoãn tải | Đề xuất | — | — |
+| [0008](0008-compress-hero-video-without-trimming.md) | Video hero giữ đủ 103 s và giữ âm thanh, giảm dung lượng bằng AV1 + 720p faststart, hoãn tải | Chấp nhận | 2026-10-15 | — |
 
 ADR 0002 đến 0006 ghi lại các quyết định đã thực hiện trong ngày 2026-10-14, trước khi có thư mục này; ADR 0007 ghi lại quyết định đã chốt trong kế hoạch cùng ngày nhưng chưa triển khai. Tất cả có dòng "Ghi lại" theo quy tắc 5 của [ADR 0001](0001-record-architecture-decisions.md). Tài liệu cho phía máy chủ (nginx, stack, Jenkins) nằm ở repo `qkenn04/infra-qkenn`.
 
@@ -33,7 +33,7 @@ flowchart LR
   A5["0005 Tiêu đề tìm kiếm tách khỏi H1"]
   A6["0006 fetchPriority cho ảnh LCP"]
   A7["0007 Umami + GA4 sau đồng ý"]
-  A8["0008 Nén video hero (Đề xuất)"]
+  A8["0008 Nén video hero, hoãn tải"]
   A2 --> A3
   A3 --> A4
   A3 -->|"ảnh nền là phần tử LCP"| A6

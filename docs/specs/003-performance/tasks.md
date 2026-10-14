@@ -6,7 +6,7 @@
 
 - [x] 003-T01 Đo mốc PageSpeed Mobile `/` · 2026-10-14 16:41: 90 / LCP 2,9 s / CLS 0 / TBT 40 ms / SI 5,6 s; phần tử LCP là ảnh nền màn hình chờ
 - [x] 003-T02 Chủ quán quyết định giữ đủ 103 s video hero và giữ ảnh nền template · 2026-10-14
-- [ ] 003-T03 Đo mốc còn thiếu: Desktop `/`, Mobile `/menu`, MB tải trong 10 s đầu (DevTools, Fast 4G, tắt cache) · xong khi: ghi vào [Hiệu năng: số đo](../../dev/perf.md)
+- [ ] 003-T03 Đo mốc còn thiếu: Desktop `/`, Mobile `/menu`, MB tải trong 10 s đầu (DevTools, Fast 4G, tắt cache) · xong khi: ghi vào [Hiệu năng: số đo](../../dev/perf.md) · MB trong 10 s đầu đã có số lab (8,6 MB trước PR #16, không qua Cloudflare, [Hiệu năng, mục 5](../../dev/perf.md#5-thử-nghiệm-tối-ưu)); còn đo trên production
 - [ ] 003-T04 Chủ quán trả lời [spec.md mục 12](spec.md#12-câu-hỏi-mở)
 
 ## Phần A: ưu tiên LCP, logo
@@ -28,13 +28,13 @@
 
 ## Phần B: video hero
 
-- [ ] 003-T30 Cài `ffmpeg` có encoder AV1 (hoặc dùng image Docker)
-- [ ] 003-T31 Bước nhanh (B1): faststart cho `main.mp4`, giữ nguyên mọi track (`ffmpeg -i main.mp4 -map 0 -c copy -movflags +faststart`; hình và tiếng giống hệt từng byte) · AC: 003-AC-04 (phần không còn `Range` tới cuối file) · chặn bởi 003-T30 và 003-T35
-- [ ] 003-T32 Encode AV1 1080p và H.264 720p, 2–3 mức `crf`, giữ track âm thanh (`-c:a copy`) · chủ quán duyệt chất lượng
-- [ ] 003-T33 `HeroVideo` nhận `sources`, hoãn tải, bỏ qua khi giảm chuyển động / `saveData` / 2g, poster ưu tiên cao · AC: 003-AC-04, 003-AC-05, 003-AC-06 · chặn bởi quyết định phát video trên điện thoại
-- [ ] 003-T34 Thử trên iPhone thật (Safari, không AV1) và Android
-- [ ] 003-T35 Chủ quán chọn cách xử lý âm thanh (giữ âm thanh, đã chốt 2026-10-15): B1 chỉ faststart, B2 nút bật tiếng, B3 trình phát "Xem video có tiếng" · [TK18, Q15](../../plan/tasks.md)
-- [ ] 003-T36 Nếu chọn B2 hoặc B3: dựng nút bật tiếng hoặc trình phát có tiếng, quay màn hình trước/sau để duyệt · chặn bởi 003-T35
+- [x] 003-T30 Cài `ffmpeg` có encoder AV1 (hoặc dùng image Docker) · máy dev có `ffmpeg` 8.0.1 với `libsvtav1` · 2026-10-15
+- [x] 003-T31 Bước nhanh (B1): faststart cho `main.mp4`, giữ nguyên mọi track · AC: 003-AC-04 (phần không còn `Range` tới cuối file) · không làm riêng: bản encode ở 003-T32 đã faststart và thay `main.mp4` (PR #16)
+- [x] 003-T32 Encode AV1 1080p và H.264 720p, 2–3 mức `crf`, giữ track âm thanh (`-c:a copy`) · chủ quán duyệt chất lượng · AV1 CRF 48/52/56, H.264 CRF 27/29/31; chủ quán chọn AV1 CRF 48 (26,8 MB) và H.264 CRF 27 (31,5 MB), 2026-10-15; PR #16
+- [x] 003-T33 `HeroVideo` nhận `sources`, hoãn tải, bỏ qua khi giảm chuyển động / `saveData` / 2g, poster hiện ngay (`loading="eager"`, không ưu tiên cao) · AC: 003-AC-04, 003-AC-05, 003-AC-06 · PR #16; kiểm bằng Chromium chạy ngầm (lab): không request video trước `load` và màn hình chờ; giảm chuyển động, `saveData`, `2g`, `slow-2g` không request video; phát lần đầu từ 2,25 s; rời trang huỷ request. Còn kiểm trên production sau deploy
+- [ ] 003-T34 Thử trên iPhone thật (Safari, không AV1) và Android · bản xem trước của PR #16 hoặc production sau merge
+- [x] 003-T35 Chủ quán chọn cách xử lý âm thanh (giữ âm thanh, đã chốt 2026-10-15): B1 chỉ faststart, B2 nút bật tiếng, B3 trình phát "Xem video có tiếng" · [TK18, Q15](../../plan/tasks.md) · chọn B1, 2026-10-15
+- [ ] 003-T36 Nếu chọn B2 hoặc B3: dựng nút bật tiếng hoặc trình phát có tiếng, quay màn hình trước/sau để duyệt · không làm lúc này (chủ quán chọn B1, 2026-10-15)
 
 ## Phần D: ảnh
 
@@ -71,3 +71,5 @@
 | 2026-10-15 | `images.minimumCacheTTL` 7 ngày | PR #9, `5fda453`, merge `6c246e1`, Jenkins build #19 |
 | 2026-10-15 | Lần hai `cf-cache-status: HIT`; HTML `DYNAMIC` | `curl -sI`, [Hiệu năng, mục 4.1](../../dev/perf.md#41-cache-đã-kiểm-2026-10-15) |
 | 2026-10-15 | Âm thanh video hero: 1,7 MB / 83,7 MB; chủ quán muốn giữ; chờ chọn B1/B2/B3 | `ffprobe`; [ADR 0008](../../adr/0008-compress-hero-video-without-trimming.md) |
+| 2026-10-15 | Chủ quán chốt phần B: B1, AV1 CRF 48 + H.264 720p CRF 27, điện thoại vẫn phát (hoãn tải), lần phát đầu từ 2,25 s; ADR 0008 Chấp nhận | [ADR 0008](../../adr/0008-compress-hero-video-without-trimming.md) |
+| 2026-10-15 | Video `main.v2.av1.mp4` (26,8 MB) + `main.v2.720.mp4` (31,5 MB) thay `main.mp4`; `HeroVideo` hoãn tải. Lab (Fast 4G, điện thoại): request video sau `load` và màn hình chờ; MB trong 10 s đầu 8,6 → 7,6; LCP không đổi | PR #16; [Hiệu năng, mục 5](../../dev/perf.md#5-thử-nghiệm-tối-ưu) |

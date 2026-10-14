@@ -211,7 +211,7 @@ Không có unit test. Lớp bảo vệ là lint, typecheck, guard sitemap (bư�
 - **Một VPS là điểm lỗi chung.** Không có bản dự phòng; chấp nhận cho một site giới thiệu quán. Ngưỡng sẵn sàng chưa chốt (AVAIL-01 ở [yêu cầu phi chức năng](../product/nfr.md)).
 - **Không có staging và deploy tự động sau merge.** Một PR đã merge lên production sau khoảng 10 phút (ước lượng thô); đường lùi là revert và deploy lại, hoặc quay image trên VPS.
 - **Deploy theo tag commit SHA, chưa theo digest;** pipeline chưa ký image hay tạo SBOM, chưa chặn theo kết quả quét lỗ hổng ([CI/CD core, mục 0](../ops/ci-cd-core.md#0-áp-dụng-ở-dự-án-này)).
-- **Video nằm thẳng trong git** (video hero khoảng 80 MB), làm repo và image nặng ([ADR 0008](../adr/0008-compress-hero-video-without-trimming.md)).
+- **Video nằm thẳng trong git** (từ PR #16 video hero là hai bản 26,8 MB và 31,5 MB; bản 83,7 MB cũ vẫn nằm trong lịch sử git), làm repo và image nặng ([ADR 0008](../adr/0008-compress-hero-video-without-trimming.md)).
 - **Còn dùng tài sản của template NOKTO:** ảnh nền `hero-backdrop.jpg` trên mọi trang và vài SVG trang trí ([ADR 0003](../adr/0003-allow-search-indexing.md)).
 - **Cache ảnh của Next.js nằm trong container** nên mất sau mỗi lần deploy; Cloudflare chưa cache `/_next/image` (spec hiệu năng).
 - **Máy CI là một máy WSL;** khởi động lại không sạch từng làm hỏng cache git của Jenkins ([runbook 001](../ops/runbooks/001-jenkins-git-cache-corrupted.md)).

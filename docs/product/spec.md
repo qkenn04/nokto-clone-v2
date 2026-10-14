@@ -16,7 +16,7 @@ Tính tới 2026-10-14:
 | Sitemap viết tay, `lastmod` gõ cứng, thiếu `/terms` | Google nhận ngày sai, bỏ sót trang thông tin đặt bàn | Đã sửa ở PR #3 ([ADR 0004](../adr/0004-automate-sitemap-from-page-config-and-git.md)) |
 | Tiêu đề trang chủ chỉ là slogan | Không chứa từ khách tìm ("quán nhậu", "bia lạnh", "Đà Lạt") | Đã sửa ở PR #5 ([ADR 0005](../adr/0005-separate-search-titles-from-headings.md)) |
 | LCP trên điện thoại 2,9 s (PageSpeed Mobile, 2026-10-14) | Vượt ngưỡng "tốt" 2,5 s của Core Web Vitals | [Số đo](../dev/perf.md); PR #4 ([ADR 0006](../adr/0006-prioritize-lcp-with-fetchpriority.md)) |
-| Video đầu trang chủ nặng khoảng 80 MB | Tốn dữ liệu di động của khách | [ADR 0008](../adr/0008-compress-hero-video-without-trimming.md) (Đề xuất) |
+| Video đầu trang chủ nặng khoảng 80 MB | Tốn dữ liệu di động của khách | Sửa ở PR #16: bản AV1 26,8 MB hoặc H.264 720p 31,5 MB, chỉ tải sau khi trang tải xong và qua màn hình chờ ([ADR 0008](../adr/0008-compress-hero-video-without-trimming.md)) |
 | Google Maps ghi giờ mở cửa 16:30–00:00, site ghi "từ 17:30" | Thông tin quán không nhất quán, ảnh hưởng SEO địa phương và lòng tin của khách | Mục 10, câu hỏi 1 |
 | Chưa có công cụ đo lượt truy cập ngoài Cloudflare Web Analytics | Không biết khách đến từ đâu, bấm liên hệ bao nhiêu | [ADR 0007](../adr/0007-use-umami-and-consent-gated-ga4.md) |
 | Ảnh nền `hero-backdrop.jpg` của template NOKTO vẫn hiện trên mọi trang | Ảnh thuộc chủ template | [ADR 0003](../adr/0003-allow-search-indexing.md), mục Hệ quả |
@@ -107,7 +107,7 @@ Một thay đổi được coi là xong khi:
 3. Khoảng giá phổ biến (`priceRange`)? Chưa xác định — cần chủ quán xác nhận.
 4. Lịch sự kiện thật thay cho 4 chương trình minh hoạ ở trang chủ? Chưa xác định — cần chủ quán xác nhận. Ảnh hưởng: G7, NG4.
 5. Thay ảnh nền template `hero-backdrop.jpg` bằng ảnh của quán hay gradient CSS, và khi nào? Chủ quán chọn giữ tạm ([ADR 0003](../adr/0003-allow-search-indexing.md)); thời hạn thay: Chưa xác định — cần chủ quán xác nhận.
-6. Đoạn video hero dùng lâu dài và có phát video trên điện thoại hay chỉ hiện ảnh poster? Chưa xác định — cần chủ quán xác nhận ([ADR 0008](../adr/0008-compress-hero-video-without-trimming.md)).
+6. Đoạn video hero dùng lâu dài? Chưa xác định — cần chủ quán xác nhận (hiện giữ đủ 103 s). Trên điện thoại: vẫn phát video, hoãn tải (chủ quán, 2026-10-15; [ADR 0008](../adr/0008-compress-hero-video-without-trimming.md)).
 7. Site có cần bản tiếng Anh cho khách du lịch không? Chưa xác định — cần chủ quán xác nhận.
 
 ## Lịch sử thay đổi
@@ -117,3 +117,4 @@ Một thay đổi được coi là xong khi:
 | 2026-10-14 | Tạo từ docs-template, điền theo hiện trạng site và các kế hoạch SEO, sitemap, hiệu năng, analytics ngày 2026-10-14 |
 | 2026-10-15 | Cập nhật trạng thái G1 (tình trạng tìm tên quán) và G7 (sự kiện 16/10, 17/10 là thật) |
 | 2026-10-15 | Menu có hai tab "Món ăn chơi" và "Premium" ở sách lật và bảng giá (G2, mục 6) |
+| 2026-10-15 | Video hero: điện thoại vẫn phát, hoãn tải; bản AV1 + 720p (câu hỏi 6, PR #16) |
