@@ -1,5 +1,5 @@
 import { about } from "@/components/sites/nokto/about/content";
-import { galleryPhotos } from "@/components/sites/the-hot/home/content";
+import { galleryPhotos, homeEvents } from "@/components/sites/the-hot/home/content";
 import { MENU_IMAGE_BASE, menuPages } from "@/components/sites/the-hot/menuPages";
 import { aboutVideo, heroVideo, kitchenVideo } from "@/components/sites/the-hot/videos";
 
@@ -8,7 +8,7 @@ import { aboutVideo, heroVideo, kitchenVideo } from "@/components/sites/the-hot/
 // (/sites/nokto/images/hero-backdrop.jpg), SVG decorations, icons, the logo or OG images.
 // Each image is listed once per page, as its original static file (not /_next/image?...).
 const imagesByPath = new Map<string, readonly string[]>([
-  ["/", [heroVideo.poster, ...galleryPhotos.map((photo) => photo.src)]],
+  ["/", [heroVideo.poster, ...galleryPhotos.map((photo) => photo.src), ...homeEvents.map((event) => event.poster)]],
   ["/menu", menuPages.map((page) => `${MENU_IMAGE_BASE}/${page.file}`)],
   ["/menu/list", [kitchenVideo.poster]],
   // about.heroImage is left out: no about component renders it.

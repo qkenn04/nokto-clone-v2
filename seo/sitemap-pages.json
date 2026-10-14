@@ -19,7 +19,8 @@
         "public/sites/the-hot-beer-garden/images/kitchen.jpg",
         "public/sites/the-hot-beer-garden/images/welcome.jpg",
         "public/sites/the-hot-beer-garden/images/night.jpg",
-        "public/images/main.jpg"
+        "public/images/main.jpg",
+        "src/components/sites/the-hot/videos.ts"
       ]
     },
     {
@@ -30,7 +31,8 @@
         "src/components/sites/the-hot/MenuBook.module.css",
         "src/components/sites/the-hot/menuBookFold.ts",
         "src/components/sites/nokto/menu/MenuViewSwitcher.tsx",
-        "public/sites/the-hot-beer-garden/images/facebook-post-menu-2026-09"
+        "public/sites/the-hot-beer-garden/images/facebook-post-menu-2026-09",
+        "src/components/sites/the-hot/menuPages.ts"
       ]
     },
     {
