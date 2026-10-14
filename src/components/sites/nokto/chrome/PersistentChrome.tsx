@@ -249,7 +249,7 @@ export function PersistentChrome() {
   return (
     <>
       <SiteNavigation />
-      {!isHome && <Backdrop preload />}
+      {!isHome && <Backdrop priority />}
       {!isHome && <FixedBrand />}
     </>
   );
