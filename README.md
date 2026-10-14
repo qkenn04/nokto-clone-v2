@@ -20,16 +20,18 @@ Every push to `main` is built and deployed to https://thehot.vn (the old https:/
 
 ```
 GitHub main ──poll 5 min──▶ Jenkins (qkenn-ci, WSL) ──push──▶ Harbor (qkenn-ci) ◀──pull── VPS
-                            check → build → smoke test                         /srv/nokto/deploy.sh
+                            sitemap dates → check → build → smoke test         /srv/nokto/deploy.sh
 ```
 
-- `Jenkinsfile` — `docker build --target check` (lint + typecheck), build the `runner` image with `NEXT_PUBLIC_SITE_URL`, run `ci/smoke-test.sh`, push `nokto/web:<commit sha>` to Harbor, then SSH to the VPS with `deploy <sha>`.
+- `Jenkinsfile` — write the sitemap dates (`ci/sitemap-lastmod.sh`, below), `docker build --target check` (lint + typecheck + `check:sitemap`), build the `runner` image with `NEXT_PUBLIC_SITE_URL`, run `ci/smoke-test.sh`, push `nokto/web:<commit sha>` to Harbor, then SSH to the VPS with `deploy <sha>`.
+- Sitemap `<lastmod>`: the *Sitemap dates* stage runs `ci/sitemap-lastmod.sh`, which gives each page in `seo/sitemap-pages.json` the date of the last commit on `main` that touched its `sources` or `shared` paths (`git log --first-parent`, so a merged PR counts from its merge commit) and writes it to `src/generated/sitemap-lastmod.json` (git-ignored). It runs on the agent because the Docker build context has no `.git`; the file goes into the build with the rest of the context and `src/app/sitemap.ts` reads it at build time. The stage fails on a shallow clone or a listed path with no commits. Without the file (a plain local `npm run build`) the sitemap just has no `<lastmod>`.
 - The VPS side (forced-command `deploy.sh`, compose stack, Nginx vhost) and the Jenkins/Harbor setup live in [`qkenn04/infra-qkenn`](https://github.com/qkenn04/infra-qkenn) (`stacks/nokto/`, `ci/`).
 - `deploy.sh` waits for the container healthcheck and rolls back to the previous image if it fails; it keeps the last 3 images for manual rollback.
 - Diagrams (Archify, open the HTML in a browser): [`docs/archify/nokto-architecture.html`](docs/archify/nokto-architecture.html) for the system architecture and [`docs/archify/nokto-cicd.html`](docs/archify/nokto-cicd.html) for the pipeline and its failure paths. Edit the `*.json` beside them, then run `node ~/.claude/skills/archify/bin/archify.mjs finalize <architecture|workflow> <spec.json> <out.html> --quality showcase` from `docs/archify/`.
 - Test the image locally the way CI does:
 
   ```bash
+  bash ci/sitemap-lastmod.sh
   docker build --target check .
   docker build --target runner --build-arg NEXT_PUBLIC_SITE_URL=https://thehot.vn -t nokto:local .
   ci/smoke-test.sh nokto:local
