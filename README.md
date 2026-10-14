@@ -2,6 +2,10 @@
 
 A Next.js recreation of the public [NOKTO restaurant template](https://nokto-template.vercel.app/), rebuilt from scratch with the [AI Website Cloner Template](https://github.com/JCodesMore/ai-website-cloner-template) `clone-website` workflow (template v0.6.1). It replaces the earlier `nokto-clone` attempt, which is kept separately for comparison.
 
+## Documentation (Tài liệu)
+
+Project documentation, written in Vietnamese, starts at [`docs/README.md`](docs/README.md): product spec and non-functional budgets, architecture, content data model, ADRs, testing, configuration, deployment, runbooks and threat model. This repo is public, so server addresses, paths and secrets are documented only in the private [`qkenn04/infra-qkenn`](https://github.com/qkenn04/infra-qkenn).
+
 ## Run locally
 
 Requires Node.js 24 or newer.
@@ -64,5 +68,5 @@ The form reproduces the source's three steps, validation, and confirmation scree
 ## Notes
 
 - Inspection notes and the build brief: `docs/research/nokto/brief.md`. Comparison screenshots: `docs/design-references/nokto/`.
-- The legal pages reproduce the source template's sample text; they do not describe this app.
-- Since 2026-10-14 the deployment at thehot.vn is The Hot Beer Garden's real site and search engines may index it (the `noindex` header was removed). The pages use The Hot's own content; the original NOKTO template files under `public/sites/nokto/` are no longer referenced by the app but are still served — they belong to the template's owner, so remove them rather than reuse them.
+- The legal pages (`/terms`, `/privacy`) carry The Hot's own booking information and privacy notice (`src/components/sites/nokto/legal/content.ts`); `/privacy` still has to mention Cloudflare Web Analytics (see [`docs/security/threat-model.md`](docs/security/threat-model.md)).
+- Since 2026-10-14 the deployment at thehot.vn is The Hot Beer Garden's real site and search engines may index it (the `noindex` header was removed). The pages use The Hot's own content, but some NOKTO template files under `public/sites/nokto/` are still in use: `images/hero-backdrop.jpg` is the backdrop on every page (splash screen, inner pages and the desktop home intro), and `images/path.svg`, `path2.svg`, `path-horizontal.svg` and `check.svg` decorate the about and reservation pages. The owner chose to keep the backdrop for now; replacing it is planned ([ADR 0003](docs/adr/0003-allow-search-indexing.md)). The other files in that folder are no longer referenced but are still served. All of them belong to the template's owner: do not reuse them for anything new, and remove each one once nothing references it.
