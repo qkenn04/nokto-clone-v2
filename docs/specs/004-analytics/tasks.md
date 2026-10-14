@@ -2,13 +2,13 @@
 
 > Trạng thái: Đề xuất · Cập nhật: 2026-10-15 · Liên quan: [spec.md](spec.md), [plan.md](plan.md), [Tiến độ](../../plan/progress.md), [Việc sắp làm](../../plan/tasks.md)
 
-PR A (Umami) là PR #13, chờ review; Website ID chưa có nên merge PR A chưa bật gì trên production. Hạ tầng Umami: tài liệu ở repo hạ tầng riêng (private); ở đây chỉ ghi việc trong repo website và việc của chủ quán trên giao diện GA4.
+PR A (Umami) là PR #13, merge 2026-10-15. Website ID có từ 2026-10-15; tracker bật trên production từ build có ID trong `Jenkinsfile` (004-T19). Hạ tầng Umami: tài liệu ở repo hạ tầng riêng (private); ở đây chỉ ghi việc trong repo website và việc của chủ quán trên giao diện GA4.
 
 ## Chuẩn bị
 
 - [x] 004-T01 Chốt hướng: Umami luôn chạy, GA4 sau đồng ý, Google Signals tắt · 2026-10-14
 - [ ] 004-T02 Chủ quán trả lời [spec.md mục 12](spec.md#12-câu-hỏi-mở) · xong khi: không còn `[CẦN XÁC NHẬN]` chặn PR A hay PR B
-- [ ] 004-T03 Hạ tầng Umami chạy, có Website ID · repo hạ tầng riêng
+- [x] 004-T03 Hạ tầng Umami chạy, có Website ID (2026-10-15) · repo hạ tầng riêng
 - [ ] 004-T04 Quyết định giữ hay tắt Cloudflare Web Analytics
 
 ## PR A: Umami
@@ -20,7 +20,7 @@ PR A (Umami) là PR #13, chờ review; Website ID chưa có nên merge PR A chư
 - [x] 004-T14 Biến build `NEXT_PUBLIC_UMAMI_WEBSITE_ID`, `NEXT_PUBLIC_UMAMI_SRC` qua `Jenkinsfile` → `Dockerfile` (ID để trống tới khi có Website ID); smoke test nhận Website ID làm tham số thứ ba: có ID thì mọi trang HTML phải có tracker đúng ID, không có ID thì không trang nào có · PR A
 - [x] 004-T15 `/privacy`: mục "Thống kê lượt truy cập" (chỉ hiện khi build có Website ID), mục "Thống kê của Cloudflare"; mục "Tùy chọn hiển thị" thay bằng "Cookie và lưu trữ trên trình duyệt" (code không còn dùng `sessionStorage`, `localStorage` hay cookie) · AC: 004-AC-14 (phần Umami, Cloudflare) · PR A · **chữ chờ chủ quán duyệt**
 - [x] 004-T16 Kiểm trước merge (plan mục 5) · AC: 004-AC-01 · 2026-10-15, xem nhật ký
-- [ ] 004-T19 Có Website ID: điền `UMAMI_WEBSITE_ID` trong `Jenkinsfile` (PR nhỏ), đổi ngày "Cập nhật" của `/privacy` (`legal/content.ts`) vì mục Umami hiện từ build đó; smoke test của build đó kiểm tracker và ID · xong khi: production có tracker, `/privacy` có mục "Thống kê lượt truy cập"
+- [ ] 004-T19 Có Website ID: điền `UMAMI_WEBSITE_ID` (nhánh `feat/umami-website-id`, chờ merge) trong `Jenkinsfile` (PR nhỏ), đổi ngày "Cập nhật" của `/privacy` (`legal/content.ts`) vì mục Umami hiện từ build đó; smoke test của build đó kiểm tracker và ID · xong khi: production có tracker, `/privacy` có mục "Thống kê lượt truy cập"
 - [ ] 004-T17 Deploy, kiểm Umami Realtime, sự kiện, UTM, không cookie · AC: 004-AC-09, 004-AC-10
 - [ ] 004-T18 Chủ quán cùng dev xem dashboard sau 1 tuần
 

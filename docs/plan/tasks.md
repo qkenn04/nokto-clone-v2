@@ -42,8 +42,8 @@ Người làm: **Chủ quán** (chủ quán hoặc người quản lý) · **Dev
 - [ ] TK23 JSON-LD đợt 1 chỉ với thông tin đã xác nhận (`geo`, `sameAs`, `hasMap`, `WebSite`, `Event` cho sự kiện thật) và `/favicon.ico` · M2 · [002-T21, 002-T22, 002-T26](../specs/002-onpage-seo/tasks.md) · **PR #10 chờ duyệt** (validator.schema.org 0 lỗi, 0 cảnh báo) · xong khi: PR #10 merge, deploy, `/favicon.ico` trả 200
 - [x] TK24 Header cache cho tệp `public/` ở reverse proxy · M3 · [003-T22](../specs/003-performance/tasks.md) · xong 2026-10-15: PR #7 của repo `qkenn04/infra-qkenn` (7 ngày); kèm PR #9 (`images.minimumCacheTTL` 7 ngày, build #19)
 - [ ] TK25 Video hero bước nhanh: faststart, **giữ âm thanh** (`-map 0 -c copy`, mọi track giữ nguyên từng byte; cần `ffmpeg`); nếu chủ quán chọn B2 hoặc B3 thì thêm phần giao diện · M3 · [003-T30, 003-T31, 003-T36](../specs/003-performance/tasks.md) · chặn bởi TK18
-- [ ] TK26 Sửa mục "Tùy chọn hiển thị" đang sai ở `/privacy` (nói về `sessionStorage` đã bỏ từ `d0a8e34`): gộp vào 003 phần E hoặc 004 PR A, tuỳ cái nào làm trước · [003-T51](../specs/003-performance/tasks.md), [004-T15](../specs/004-analytics/tasks.md) · **PR #13 chờ duyệt** (chữ cần chủ quán duyệt) · xong khi: PR #13 merge, deploy
-- [ ] TK27 Hạ tầng Umami (repo hạ tầng riêng, private), lấy Website ID · M4 · [004-T03](../specs/004-analytics/tasks.md)
+- [x] TK26 Sửa mục "Tùy chọn hiển thị" đang sai ở `/privacy` (nói về `sessionStorage` đã bỏ từ `d0a8e34`): gộp vào 003 phần E hoặc 004 PR A, tuỳ cái nào làm trước · [003-T51](../specs/003-performance/tasks.md), [004-T15](../specs/004-analytics/tasks.md) · PR #13 merge 2026-10-15
+- [x] TK27 Hạ tầng Umami (repo hạ tầng riêng, private), lấy Website ID (2026-10-15) · M4 · [004-T03](../specs/004-analytics/tasks.md)
 - [ ] TK28 Dọn tệp template NOKTO không còn dùng trong `public/sites/nokto/` · M2 · [002-T32](../specs/002-onpage-seo/tasks.md)
 - [ ] TK29 Theo dõi kết quả tìm tên quán "the hot beer garden đà lạt": vị trí của `thehot.vn`, tiêu đề mới, biểu tượng The Hot thay quả địa cầu (dịch vụ favicon của Google đã trả logo từ 2026-10-15) · M2, M6 · [002-T60, 002-T63](../specs/002-onpage-seo/tasks.md)
 
