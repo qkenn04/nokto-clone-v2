@@ -56,9 +56,9 @@ Trang con có tiêu đề dạng `<tiêu đề> — The Hot Beer Garden Đà L�
 
 H1 và slogan trên giao diện không đổi.
 
-**Đề xuất mới cho `/menu` và `/menu/list` (2026-10-15, chờ chủ quán duyệt; `page-meta.ts` chưa đổi).** Từ khi có menu Premium (combo, lẩu, mẹt, rượu), mô tả cũ chỉ nói món ăn chơi. Bản đề xuất bỏ câu "Bia ưu đãi Chủ nhật đến thứ Năm" vì menu PDF không ghi điều kiện này ([Q16](../../plan/tasks.md#câu-hỏi-chờ-chủ-quán)); nếu chủ quán xác nhận ưu đãi còn áp dụng thì thêm lại "Bia từ 19K, Chủ nhật đến thứ Năm":
+**Mô tả mới cho `/menu` và `/menu/list` (chủ quán duyệt bản xem thử 2026-10-15, đã áp dụng trong `page-meta.ts`).** Từ khi có menu Premium (combo, lẩu, mẹt, rượu), mô tả cũ chỉ nói món ăn chơi. Bản đề xuất bỏ câu "Bia ưu đãi Chủ nhật đến thứ Năm" vì menu PDF không ghi điều kiện này ([Q16](../../plan/tasks.md#câu-hỏi-chờ-chủ-quán)); nếu chủ quán xác nhận ưu đãi còn áp dụng thì thêm lại "Bia từ 19K, Chủ nhật đến thứ Năm":
 
-| Trang | Mô tả đề xuất | Độ dài |
+| Trang | Mô tả | Độ dài |
 |---|---|---|
 | `/menu` | Menu The Hot Beer Garden Đà Lạt: mồi từ 39K, combo cho 4 và 6 người kèm bia, lẩu, mẹt, rượu và tháp bia. Giá đã gồm VAT. Lật menu, chốt món rồi đặt bàn. | 152 ký tự |
 | `/menu/list` | Bảng giá The Hot Đà Lạt: mồi từ 39.000₫, combo cho 4 và 6 người kèm bia Tiger, lẩu, mẹt, món heo, bò, gà, tôm, rượu và vang. Giá đã gồm VAT. | 140 ký tự |
