@@ -18,7 +18,7 @@ export default function HomePage() {
           <HeroIntro />
         </section>
         <aside className="absolute inset-0 z-0 overflow-hidden lg:relative lg:inset-auto lg:min-h-0 lg:w-[55%] lg:flex-none">
-          <HeroVideo src={heroVideo.sources[0].src} poster={heroVideo.poster} />
+          <HeroVideo sources={heroVideo.sources} poster={heroVideo.poster} />
         </aside>
         <div className="section-pad pointer-events-none absolute inset-x-0 bottom-6 z-20">
           <a href="#gallery" className="pointer-events-auto inline-flex min-h-11 items-center gap-3 text-small font-semibold text-accent transition-colors hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent">

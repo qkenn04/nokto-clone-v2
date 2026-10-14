@@ -3,11 +3,17 @@ import { hotImage } from "../nokto/site";
 
 export type SiteVideo = { poster: string; sources: readonly VideoSource[] };
 
-/** Home hero loop. H.264 only; HeroVideo plays the first source. */
+/**
+ * A source plus, optionally, its video track as `navigator.mediaCapabilities.decodingInfo` takes it: the video codec
+ * alone (the API takes one codec per track) and the stream's size, bitrate and frame rate, read with `ffprobe`.
+ */
+export type ProbedVideoSource = VideoSource & { video?: VideoConfiguration };
+
+/** Home hero loop. H.264 only; HeroVideo attaches it once the page has loaded. */
 export const heroVideo = {
   poster: hotImage("hero-video-poster.jpg"),
   sources: [{ src: "/videos/main.mp4", type: "video/mp4" }],
-} satisfies SiteVideo;
+} satisfies { poster: string; sources: readonly ProbedVideoSource[] };
 
 /** Night at the venue, shared by the about and reservation pages. AV1 first, H.264 fallback. */
 export const aboutVideo = {
