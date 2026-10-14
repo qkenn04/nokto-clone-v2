@@ -1,6 +1,6 @@
 # 004: Đo lường truy cập, kế hoạch kỹ thuật
 
-> Trạng thái: Đề xuất · Cập nhật: 2026-10-14 · Liên quan: [spec.md](spec.md), [tasks.md](tasks.md), [Triển khai](../../ops/deployment.md), [Mục lục ADR](../../adr/README.md) (ADR 0007)
+> Trạng thái: Đề xuất · Cập nhật: 2026-10-15 · Liên quan: [spec.md](spec.md), [tasks.md](tasks.md), [Triển khai](../../ops/deployment.md), [Mục lục ADR](../../adr/README.md) (ADR 0007)
 
 Chỉ phần website. Hạ tầng Umami: tài liệu ở repo hạ tầng riêng (private).
 
@@ -69,14 +69,23 @@ export type AnalyticsEvent =
   | "contact_click" | "booking_cta_click" | "reservation_complete"
   | "menu_view_mode" | "event_view" | "social_click";
 
+export type AnalyticsPropKey = "method" | "location" | "mode" | "event_id" | "network" | "party_size";
+export type AnalyticsProps = Partial<Record<AnalyticsPropKey, string | number>>;
+
+/** Website ID của Umami lúc build; rỗng thì không tracker, `/privacy` không có mục Umami. */
+export const UMAMI_WEBSITE_ID: string;
+
 /** Gửi một sự kiện cho Umami (luôn) và GA4 (chỉ khi đã đồng ý). Không bao giờ ném lỗi, không chặn thao tác. */
-export function track(name: AnalyticsEvent, props?: Record<string, string | number>): void;
+export function track(name: AnalyticsEvent, props?: Readonly<Record<string, string | number>>): void;
+
+/** Danh sách cho phép: chỉ giữ khoá ở AnalyticsPropKey; chuỗi bỏ khoảng trắng hai đầu, cắt còn 100 ký tự, rỗng thì bỏ. */
+export function cleanProps(props?: Readonly<Record<string, unknown>>): AnalyticsProps;
 
 export function isAnalyticsEvent(value: string): value is AnalyticsEvent;
 
 /** Thuộc tính `data-track*` cho link/nút; dùng được cả trong Server Component. ClickTracker đọc và gọi track(). */
 export type TrackAttrs = { [key: `data-track${string}`]: string };
-export function trackAttrs(name: AnalyticsEvent, props?: Record<string, string>): TrackAttrs;
+export function trackAttrs(name: AnalyticsEvent, props?: Partial<Record<AnalyticsPropKey, string>>): TrackAttrs;
 
 declare global {
   interface Window {
@@ -194,4 +203,6 @@ Dev (ước lượng thô): PR A 4–5 giờ + kiểm sau deploy 1 giờ; PR B k
 
 ## 8. Câu hỏi mở
 
-Xem [spec.md mục 12](spec.md#12-câu-hỏi-mở). Điểm kỹ thuật chưa kiểm: Website ID có nằm trong HTML render phía server của `next/script` `afterInteractive` không (để smoke test kiểm được; nếu không thì bỏ kiểm đó); Lenis (`anchors: true`) có đổi hash trên URL không (`data-exclude-hash` xử lý được cả hai trường hợp).
+Xem [spec.md mục 12](spec.md#12-câu-hỏi-mở). Điểm kỹ thuật chưa kiểm: Lenis (`anchors: true`) có đổi hash trên URL không (`data-exclude-hash` xử lý được cả hai trường hợp).
+
+Đã kiểm 2026-10-15 (next 16.3.5): HTML render phía server **không** có thẻ `<script>` của `next/script` `afterInteractive` (thẻ được chèn trên trình duyệt sau khi hydrate), nhưng có `<link rel="preload" href="<tracker>" as="script">` trong `<head>` và thuộc tính của `<Script>` (kể cả Website ID) trong payload React. Smoke test kiểm hai thứ này. Cái preload làm trình duyệt tải tracker ngay khi đọc HTML (ưu tiên cao, thêm một kết nối tới tên miền analytics); theo dõi ở 004-AC-13, nếu PageSpeed giảm thì cân nhắc `lazyOnload` (không preload).

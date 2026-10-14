@@ -1,8 +1,8 @@
 # Mô hình đe doạ
 
-> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-14 · Liên quan: [Kiến trúc](../architecture/ARCHITECTURE.md), [Yêu cầu phi chức năng](../product/nfr.md), [Cấu hình](../dev/configuration.md), [Triển khai](../ops/deployment.md), [Runbook](../ops/runbooks/README.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-15 · Liên quan: [Kiến trúc](../architecture/ARCHITECTURE.md), [Yêu cầu phi chức năng](../product/nfr.md), [Cấu hình](../dev/configuration.md), [Triển khai](../ops/deployment.md), [Runbook](../ops/runbooks/README.md)
 
-Bản ngắn (tầng T2) cho một site giới thiệu không có tài khoản và không nhận dữ liệu. Repo công khai: file này không ghi địa chỉ, tên bí mật hay chi tiết khai thác được; cấu hình bảo vệ phía máy chủ nằm ở `qkenn04/infra-qkenn`. Tính tới 2026-10-14.
+Bản ngắn (tầng T2) cho một site giới thiệu không có tài khoản và không nhận dữ liệu. Repo công khai: file này không ghi địa chỉ, tên bí mật hay chi tiết khai thác được; cấu hình bảo vệ phía máy chủ nằm ở `qkenn04/infra-qkenn`. Tính tới 2026-10-15.
 
 ## 0. Tóm tắt một trang
 
@@ -10,7 +10,7 @@ Bản ngắn (tầng T2) cho một site giới thiệu không có tài khoản v
 |---|---|---|
 | Tài khoản, phần quản trị | Không có trên site | NG3 ở [đặc tả](../product/spec.md#5-không-làm) |
 | Dữ liệu khách | Form đặt bàn chỉ giữ dữ liệu trong trình duyệt, không gửi, không lưu | T04, PRIV-01 |
-| Bên thứ ba chạy trên trang | Cloudflare Web Analytics (beacon do Cloudflare tự chèn, đang chạy). Dự kiến: Umami (không cookie) và GA4 chỉ sau khi khách đồng ý | T04, [ADR 0007](../adr/0007-use-umami-and-consent-gated-ga4.md) |
+| Bên thứ ba chạy trên trang | Cloudflare Web Analytics (beacon do Cloudflare tự chèn, đang chạy, có trong `/privacy`). Umami (không cookie): code có sẵn, chỉ tải khi build có Website ID. Dự kiến: GA4 chỉ sau khi khách đồng ý | T04, [ADR 0007](../adr/0007-use-umami-and-consent-gated-ga4.md) |
 | Đường giao hàng | Jenkins chỉ bind bí mật trong stage cần dùng; khoá deploy chỉ chạy được một lệnh; host key được ghim | T05, mục 4 |
 | Header bảo mật | Thiếu HSTS, CSP, `X-Frame-Options`, COOP (PageSpeed 2026-10-14) | T03, việc cần làm |
 
@@ -86,7 +86,7 @@ Ranh giới cần giữ:
 | T01 | Lộ secret qua repo công khai | A4 → commit | Mất TS1 | Ứng dụng không dùng secret; secret CI chỉ nằm trong Jenkins Credentials | Review PR | Một phần: chưa có quét secret tự động (L8) |
 | T02 | Gói npm, image nền hoặc plugin có mã độc hay lỗ hổng | A3 → build, runtime | Chạy mã lúc build hoặc trong container | `package-lock.json` + `npm ci`; image Node ghim tag; container chạy user `node`; build trong Docker riêng của máy CI | — | Một phần: pipeline chưa quét và chặn theo lỗ hổng; image nền ghim tag, chưa ghim digest |
 | T03 | Nhúng site vào iframe (clickjacking), hạ cấp HTTPS lần đầu truy cập | A1, A2 → trình duyệt khách | Lừa khách bấm, nghe lén lần truy cập HTTP đầu | Always Use HTTPS (Cloudflare) | `curl -sI https://thehot.vn/` | Chưa đủ: thiếu HSTS, `X-Frame-Options`/`frame-ancestors`, CSP |
-| T04 | Script bên thứ ba nhận dữ liệu khách ngoài điều `/privacy` mô tả, hoặc trước khi khách đồng ý | A4, A3 → thêm script | Vi phạm riêng tư, rủi ro pháp lý | GA4 chỉ tải sau đồng ý; chỉ gửi tham số trong danh sách cho phép; `/privacy` liệt kê bên thứ ba | DevTools Network và Cookies | Chưa đạt: beacon Cloudflare Web Analytics chưa có trong `/privacy` |
+| T04 | Script bên thứ ba nhận dữ liệu khách ngoài điều `/privacy` mô tả, hoặc trước khi khách đồng ý | A4, A3 → thêm script | Vi phạm riêng tư, rủi ro pháp lý | Mọi sự kiện đi qua `track()` (`src/lib/analytics.ts`), chỉ gửi tham số trong danh sách cho phép; Umami chỉ tải khi build có Website ID và chỉ đếm trên `thehot.vn`; mục Umami của `/privacy` chỉ hiện khi tracker được tải; GA4 chỉ tải sau đồng ý; `/privacy` liệt kê bên thứ ba | DevTools Network và Cookies; smoke test kiểm tracker khớp Website ID | Một phần: Umami và Cloudflare Web Analytics đã có trong `/privacy` (chữ chờ chủ quán duyệt); GA4 chưa làm |
 | T05 | Dùng quyền Jenkins hoặc khoá deploy để chạy lệnh tuỳ ý trên VPS | A2 → máy CI, khoá deploy | Chiếm TS1, sửa site | Forced command; khoá chỉ dùng được từ mạng riêng; host key ghim; Jenkins không mở ra Internet | Cấu hình ở repo infra | Có |
 | T06 | Thông tin quán sai trên site (sửa nhầm, hoặc lệch giữa các chỗ) | A4 → PR | Khách đến sai giờ, gọi nhầm số | Một nguồn `site.ts` (I-01); chủ quán duyệt; review | Kiểm tay, Rich Results Test | Một phần: còn chỗ gõ lại (I-01), giờ lệch Google Maps |
 | T07 | Site hoặc khả năng deploy ngừng do sự cố hạ tầng | A5 | Khách không vào được; không sửa được site | Tự rollback khi healthcheck lỗi; VPS giữ image cũ; lỗi CI không chạm VPS | [Runbook 001](../ops/runbooks/001-jenkins-git-cache-corrupted.md) | Có |
@@ -102,7 +102,7 @@ Ranh giới cần giữ:
 | L4 | Bí mật CI bind theo stage, đăng xuất registry sau push, forced command, host key ghim | T01, T05 | `Jenkinsfile`, repo infra | Có |
 | L5 | Lockfile, `npm ci`, image Node ghim phiên bản | T02 | `package-lock.json`, `Dockerfile` | Có |
 | L6 | Header bảo mật HSTS, `X-Frame-Options` hoặc CSP `frame-ancestors`, `X-Content-Type-Options` | T03 | Cloudflare hoặc nginx (repo infra) | Chưa có |
-| L7 | GA4 sau đồng ý, danh sách tham số cho phép, `/privacy` đầy đủ | T04 | Code site (dự kiến), `legal/content.ts` | Đề xuất ([ADR 0007](../adr/0007-use-umami-and-consent-gated-ga4.md)) |
+| L7 | GA4 sau đồng ý, danh sách tham số cho phép, `/privacy` đầy đủ | T04 | `src/lib/analytics.ts`, `legal/content.ts` | Một phần: danh sách cho phép và `/privacy` cho Umami, Cloudflare có trong code; GA4 đề xuất ([ADR 0007](../adr/0007-use-umami-and-consent-gated-ga4.md)) |
 | L8 | Quét secret cho repo công khai | T01 | CI hoặc GitHub | Chưa có |
 | L9 | Quét lỗ hổng phụ thuộc và image, có ngưỡng chặn | T02 | Pipeline | Chưa có trong `Jenkinsfile` |
 
@@ -113,7 +113,7 @@ Ranh giới cần giữ:
 ## 6. Việc cần làm
 
 - [ ] L6: thêm HSTS (Cloudflare Edge Certificates hoặc nginx), `X-Frame-Options: DENY` hoặc CSP `frame-ancestors 'none'`, `X-Content-Type-Options: nosniff`. Làm ở `qkenn04/infra-qkenn`; kiểm bằng `curl -sI https://thehot.vn/`.
-- [ ] T04: ghi Cloudflare Web Analytics vào `/privacy`, hoặc tắt nếu chọn chỉ dùng Umami ([ADR 0007](../adr/0007-use-umami-and-consent-gated-ga4.md)); sửa mục "Tùy chọn hiển thị" của `/privacy` (code không còn ghi nhớ gì trong tab).
+- [x] T04: ghi Cloudflare Web Analytics vào `/privacy` ([ADR 0007](../adr/0007-use-umami-and-consent-gated-ga4.md)); thay mục "Tùy chọn hiển thị" của `/privacy` bằng "Cookie và lưu trữ trên trình duyệt" (code không dùng cookie, `sessionStorage` hay `localStorage`) · spec 004 PR A, chữ chờ chủ quán duyệt. Nếu sau này tắt Cloudflare Web Analytics thì bỏ mục đó.
 - [ ] L8: chọn và bật quét secret.
 - [ ] L9: quyết định ngưỡng chặn theo kết quả quét lỗ hổng image.
 

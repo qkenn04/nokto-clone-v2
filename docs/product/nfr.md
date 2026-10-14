@@ -42,8 +42,8 @@ Speed Index (5,6 s ngày 2026-10-14) và dung lượng tải trong 10 giây đ�
 |---|---|---|---|
 | PRIV-01 | Dữ liệu khách nhập vào form đặt bàn không rời trình duyệt và không được lưu | DevTools Network khi gửi form; review code | Đạt (2026-10-14) |
 | PRIV-02 | Không tải script nào đặt cookie theo dõi trước khi khách đồng ý | DevTools → Network, Application → Cookies trên trang mới mở | Đạt (2026-10-14: chưa có GA4); áp dụng cho GA4 theo [ADR 0007](../adr/0007-use-umami-and-consent-gated-ga4.md) |
-| PRIV-03 | Trang `/privacy` liệt kê mọi bên thứ ba nhận dữ liệu truy cập của khách | So danh sách request bên thứ ba trên trang với nội dung `/privacy` | Chưa đạt (2026-10-14): beacon Cloudflare Web Analytics chưa được nhắc; mục "Tùy chọn hiển thị" mô tả việc ghi nhớ trong tab không còn đúng với code |
-| PRIV-04 | Không gửi tên, số điện thoại hay nội dung khách nhập vào công cụ analytics | Review code; danh sách tham số cho phép | Áp dụng khi triển khai analytics |
+| PRIV-03 | Trang `/privacy` liệt kê mọi bên thứ ba nhận dữ liệu truy cập của khách | So danh sách request bên thứ ba trên trang với nội dung `/privacy` | Chưa đạt (2026-10-15): beacon Cloudflare Web Analytics chưa được nhắc trên production; spec 004 PR A thêm mục Cloudflare, mục Umami (hiện khi có tracker) và sửa mục "Tùy chọn hiển thị" (chờ duyệt, merge) |
+| PRIV-04 | Không gửi tên, số điện thoại hay nội dung khách nhập vào công cụ analytics | Review code; danh sách tham số cho phép (`src/lib/analytics.ts`) | Áp dụng từ spec 004 PR A: `track()` chỉ gửi `method`, `location`, `mode`, `event_id`, `network`, `party_size`; form đặt bàn chỉ gửi `party_size` |
 
 ## 5. Sẵn sàng và phục hồi
 

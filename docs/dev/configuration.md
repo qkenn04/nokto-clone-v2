@@ -1,8 +1,8 @@
 # Cấu hình
 
-> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-14 · Liên quan: [Triển khai](../ops/deployment.md), [Kiểm thử](testing.md), [Kiến trúc](../architecture/ARCHITECTURE.md), [Mô hình đe doạ](../security/threat-model.md), [Tài liệu](../README.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-15 · Liên quan: [Triển khai](../ops/deployment.md), [Kiểm thử](testing.md), [Kiến trúc](../architecture/ARCHITECTURE.md), [Mô hình đe doạ](../security/threat-model.md), [Tài liệu](../README.md)
 
-Ứng dụng gần như không có cấu hình lúc chạy: nội dung nằm trong code, không có cơ sở dữ liệu, không có bí mật. Cấu hình quan trọng nhất là **build arg** `NEXT_PUBLIC_SITE_URL` và file ngày sitemap do CI sinh. Tính tới 2026-10-14.
+Ứng dụng gần như không có cấu hình lúc chạy: nội dung nằm trong code, không có cơ sở dữ liệu, không có bí mật. Cấu hình quan trọng nhất là **build arg** `NEXT_PUBLIC_SITE_URL` và file ngày sitemap do CI sinh; hai build arg của Umami bật hoặc tắt thống kê truy cập. Tính tới 2026-10-15.
 
 ## 1. Nguyên tắc
 
@@ -19,6 +19,8 @@
 |---|---|---|---|---|---|---|
 | `NEXT_PUBLIC_SITE_URL` | có cho production | `http://localhost:3000` | `https://thehot.vn` | không | `src/app/layout.tsx` (`metadataBase`, URL trong JSON-LD), `src/app/robots.ts`, `src/app/sitemap.ts` | Truyền bằng `--build-arg` (Jenkins đặt `SITE_URL = 'https://thehot.vn'`). Không có dấu `/` ở cuối: `sitemap.ts` tự bỏ, còn `layout.tsx` và `robots.ts` thì không |
 | `src/generated/sitemap-lastmod.json` (file, không phải biến) | có cho production | không có file | `{ "/": "2026-10-14T09:39:54+07:00" }` | không | `src/app/sitemap.ts` | Sinh bằng `bash ci/sitemap-lastmod.sh` trước `docker build` (cần `git`, `jq`, lịch sử git đầy đủ). Thiếu file: sitemap không có `<lastmod>` và smoke test báo lỗi ([ADR 0004](../adr/0004-automate-sitemap-from-page-config-and-git.md)) |
+| `NEXT_PUBLIC_UMAMI_WEBSITE_ID` | không (có khi muốn đếm lượt truy cập) | trống: không tải tracker Umami, `/privacy` không có mục "Thống kê lượt truy cập" | `00000000-0000-0000-0000-000000000000` | không (nằm trong HTML) | `src/lib/analytics.ts` (`UMAMI_WEBSITE_ID`), `src/components/analytics/UmamiScript.tsx`, `src/components/sites/nokto/legal/content.ts` | Website ID trong Umami ([ADR 0007](../adr/0007-use-umami-and-consent-gated-ga4.md), [spec 004](../specs/004-analytics/spec.md)). Jenkins đặt `UMAMI_WEBSITE_ID` (đang để trống tới khi có Website ID) và truyền bằng `--build-arg`; smoke test nhận cùng giá trị để kiểm |
+| `NEXT_PUBLIC_UMAMI_SRC` | không | URL tracker trên tên miền con analytics của `thehot.vn` (mặc định trong `UmamiScript.tsx`) | `https://stats.thehot.vn/ht.js` | không (nằm trong HTML) | `src/components/analytics/UmamiScript.tsx` | Chỉ có tác dụng khi có Website ID. Jenkins đặt `UMAMI_SRC` |
 | `NEXT_TELEMETRY_DISABLED` | không | `1` trong `Dockerfile` | `1` | không | Next.js CLI | Tắt telemetry ẩn danh của Next.js |
 
 ### 2.2 Lúc chạy (container)
@@ -40,15 +42,13 @@
 
 ### 2.4 Dự kiến (chưa có trong code)
 
-Theo [ADR 0007](../adr/0007-use-umami-and-consent-gated-ga4.md), khi triển khai analytics:
+Theo [ADR 0007](../adr/0007-use-umami-and-consent-gated-ga4.md), khi triển khai GA4 (spec 004, PR B):
 
 | Biến | Nghĩa | Ghi chú |
 |---|---|---|
-| `NEXT_PUBLIC_UMAMI_WEBSITE_ID` | Website ID của site trong Umami | Build arg truyền qua `Jenkinsfile` giống `SITE_URL`; không có thì không tải script Umami |
-| `NEXT_PUBLIC_UMAMI_SRC` | URL script tracker Umami | Như trên |
 | `NEXT_PUBLIC_GA_ID` | Measurement ID của GA4 (`G-…`) | Không có thì không có banner đồng ý và không tải GA4 |
 
-Các giá trị này công khai (nằm trong HTML gửi cho khách), không phải bí mật. Khi thêm, cập nhật bảng 2.1, `Dockerfile` (`ARG`/`ENV` ở stage `builder`), `Jenkinsfile` và [Triển khai](../ops/deployment.md) trong cùng PR.
+Giá trị này công khai (nằm trong URL `gtag.js`), không phải bí mật. Khi thêm, cập nhật bảng 2.1, `Dockerfile` (`ARG`/`ENV` ở stage `builder`), `Jenkinsfile` và [Triển khai](../ops/deployment.md) trong cùng PR, như hai biến Umami.
 
 ## 3. Kiểm cấu hình
 
@@ -56,6 +56,7 @@ Các giá trị này công khai (nằm trong HTML gửi cho khách), không ph�
 
 - Thiếu `NEXT_PUBLIC_SITE_URL` lúc build: `robots.txt` trỏ sitemap về `http://localhost:3000`; `ci/smoke-test.sh` kiểm `robots.txt` chứa `<SITE_URL>/sitemap.xml` nên build dừng trước khi push.
 - Thiếu `src/generated/sitemap-lastmod.json`: `sitemap.ts` in cảnh báo và bỏ `<lastmod>`; smoke test kiểm mỗi `<url>` có `<lastmod>` nên build dừng.
+- Website ID của Umami không khớp: Jenkins truyền cùng `UMAMI_WEBSITE_ID` cho build và cho smoke test. Có ID mà trang thiếu tracker (hoặc sai ID), hay không có ID mà trang vẫn có tracker, thì smoke test báo lỗi và build dừng.
 - `ci/sitemap-lastmod.sh` tự dừng khi repo là shallow clone, khi một đường dẫn trong `seo/sitemap-pages.json` chưa có commit nào, hoặc khi thiếu `git`/`jq`.
 
 ## 4. Khác nhau theo môi trường
@@ -64,6 +65,7 @@ Các giá trị này công khai (nằm trong HTML gửi cho khách), không ph�
 |---|---|---|---|
 | `NEXT_PUBLIC_SITE_URL` | không đặt (`http://localhost:3000`) | `https://thehot.vn` | `https://thehot.vn` (cùng image đã qua smoke test) |
 | `sitemap-lastmod.json` | chỉ khi tự chạy `bash ci/sitemap-lastmod.sh` | luôn có | luôn có |
+| `NEXT_PUBLIC_UMAMI_WEBSITE_ID` | không đặt (không tracker) | như `Jenkinsfile` | như `Jenkinsfile`; tracker chỉ đếm trên `thehot.vn` (`data-domains`) |
 | Lệnh chạy | `npm run dev` | `docker run` image `runner` | container do script deploy chạy |
 
 ## 5. Bí mật: nơi giữ, xoay vòng, thu hồi
