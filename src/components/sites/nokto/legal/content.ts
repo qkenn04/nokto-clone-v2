@@ -1,3 +1,4 @@
+import { UMAMI_WEBSITE_ID } from "@/lib/analytics";
 import { hotImage, site } from "../site";
 
 export type LegalSection = { title: string; body: string };
@@ -28,18 +29,27 @@ export const terms: LegalDocument = {
   ],
 };
 
+// Shown only in builds that load the Umami tracker (src/components/analytics/UmamiScript.tsx), so the page never
+// describes a tool that is not running.
+const umamiSection: LegalSection = {
+  title: "Thống kê lượt truy cập",
+  body: "Website dùng Umami để đếm lượt truy cập ẩn danh: trang được xem, nguồn truy cập (ví dụ Google, Facebook), loại thiết bị và trình duyệt, quốc gia và thành phố ước tính, cùng các lượt bấm nút liên hệ, đặt bàn hoặc xem sự kiện. Khi bạn hoàn tất biểu mẫu đặt bàn, chỉ số khách dự kiến được ghi lại, không kèm tên, số điện thoại hay ghi chú. Umami không dùng cookie. Địa chỉ IP chỉ được dùng tạm thời để ước tính vị trí và nhận ra các lượt xem từ cùng một thiết bị bằng một mã ẩn danh đổi mỗi tháng; IP không được lưu lại. Umami được cài trên máy chủ riêng của website, dữ liệu chỉ dùng để thống kê nội bộ và không dùng để nhận diện bạn.",
+};
+
 export const privacy: LegalDocument = {
   path: "/privacy",
   eyebrow: "THE HOT · THÔNG TIN RIÊNG TƯ",
   title: "Bảo mật thông tin",
-  updated: "12 tháng 10, 2026",
-  intro: "Trang này giải thích cách thông tin bạn nhập được sử dụng trong phiên bản website hiện tại.",
+  updated: "15 tháng 10, 2026",
+  intro: "Trang này giải thích cách thông tin bạn nhập và số liệu truy cập được sử dụng trong phiên bản website hiện tại.",
   image: { src: hotImage("night.jpg"), alt: "Không khí buổi tối ở The Hot" },
   sections: [
     { title: "Biểu mẫu chuẩn bị đặt bàn", body: "Thông tin nhập trong biểu mẫu được dùng để hiển thị bản kiểm tra cuộc hẹn ngay trên trang. Website hiện chưa gửi thông tin này đến nhà hàng, chưa lưu đặt bàn vào hệ thống và chưa gửi email xác nhận. Tải lại trang sẽ xóa nội dung biểu mẫu." },
     { title: "Liên hệ qua điện thoại và Facebook", body: "Bạn chủ động chia sẻ thông tin với The Hot khi gọi hotline hoặc nhắn Facebook. Khi truy cập Facebook, thông tin được xử lý theo chính sách của Facebook." },
     { title: "Thông tin thanh toán", body: "Biểu mẫu trên website không yêu cầu số thẻ hoặc thông tin thanh toán." },
-    { title: "Tùy chọn hiển thị", body: "Website ghi nhớ việc bạn đã xem phần giới thiệu logo trong tab hiện tại. Dữ liệu này không chứa thông tin đặt bàn và hết hiệu lực khi đóng tab." },
+    { title: "Cookie và lưu trữ trên trình duyệt", body: "Website không đặt cookie và không lưu thông tin nào trong trình duyệt của bạn. Phần giới thiệu logo chạy lại mỗi lần tải trang, nội dung biểu mẫu chỉ nằm trên trang đang mở." },
+    ...(UMAMI_WEBSITE_ID ? [umamiSection] : []),
+    { title: "Thống kê của Cloudflare", body: "Website được phân phối qua Cloudflare. Công cụ Cloudflare Web Analytics, do Cloudflare tự thêm vào trang, đếm lượt truy cập và đo tốc độ tải trang mà không dùng cookie. Dữ liệu này được Cloudflare xử lý theo chính sách quyền riêng tư của Cloudflare." },
     { title: "Hỗ trợ", body: `Nếu cần trao đổi về thông tin bạn đã cung cấp trực tiếp cho nhà hàng, liên hệ ${site.phone} hoặc Facebook The Hot Beer Garden Đà Lạt.` },
   ],
 };
