@@ -2,7 +2,7 @@
 
 > Trạng thái: Đề xuất · Cập nhật: 2026-10-15 · Liên quan: [spec.md](spec.md), [plan.md](plan.md), [Tiến độ](../../plan/progress.md), [Việc sắp làm](../../plan/tasks.md)
 
-PR A (Umami) đã mở, chờ review; Website ID chưa có nên merge PR A chưa bật gì trên production. Hạ tầng Umami: tài liệu ở repo hạ tầng riêng (private); ở đây chỉ ghi việc trong repo website và việc của chủ quán trên giao diện GA4.
+PR A (Umami) là PR #13, chờ review; Website ID chưa có nên merge PR A chưa bật gì trên production. Hạ tầng Umami: tài liệu ở repo hạ tầng riêng (private); ở đây chỉ ghi việc trong repo website và việc của chủ quán trên giao diện GA4.
 
 ## Chuẩn bị
 
@@ -20,7 +20,7 @@ PR A (Umami) đã mở, chờ review; Website ID chưa có nên merge PR A chưa
 - [x] 004-T14 Biến build `NEXT_PUBLIC_UMAMI_WEBSITE_ID`, `NEXT_PUBLIC_UMAMI_SRC` qua `Jenkinsfile` → `Dockerfile` (ID để trống tới khi có Website ID); smoke test nhận Website ID làm tham số thứ ba: có ID thì mọi trang HTML phải có tracker đúng ID, không có ID thì không trang nào có · PR A
 - [x] 004-T15 `/privacy`: mục "Thống kê lượt truy cập" (chỉ hiện khi build có Website ID), mục "Thống kê của Cloudflare"; mục "Tùy chọn hiển thị" thay bằng "Cookie và lưu trữ trên trình duyệt" (code không còn dùng `sessionStorage`, `localStorage` hay cookie) · AC: 004-AC-14 (phần Umami, Cloudflare) · PR A · **chữ chờ chủ quán duyệt**
 - [x] 004-T16 Kiểm trước merge (plan mục 5) · AC: 004-AC-01 · 2026-10-15, xem nhật ký
-- [ ] 004-T19 Có Website ID: điền `UMAMI_WEBSITE_ID` trong `Jenkinsfile` (PR nhỏ); smoke test của build đó kiểm tracker và ID · xong khi: production có tracker, `/privacy` có mục "Thống kê lượt truy cập"
+- [ ] 004-T19 Có Website ID: điền `UMAMI_WEBSITE_ID` trong `Jenkinsfile` (PR nhỏ), đổi ngày "Cập nhật" của `/privacy` (`legal/content.ts`) vì mục Umami hiện từ build đó; smoke test của build đó kiểm tracker và ID · xong khi: production có tracker, `/privacy` có mục "Thống kê lượt truy cập"
 - [ ] 004-T17 Deploy, kiểm Umami Realtime, sự kiện, UTM, không cookie · AC: 004-AC-09, 004-AC-10
 - [ ] 004-T18 Chủ quán cùng dev xem dashboard sau 1 tuần
 
@@ -55,4 +55,4 @@ PR A (Umami) đã mở, chờ review; Website ID chưa có nên merge PR A chưa
 | Ngày | Việc | Bằng chứng |
 |---|---|---|
 | 2026-10-14 | Chốt hướng Umami + GA4 sau đồng ý | ADR 0007 ([mục lục ADR](../../adr/README.md)) |
-| 2026-10-15 | PR A: `npm run lint`, `typecheck`, `check:sitemap`, `build`, `docker build --target check` qua. Build không biến Umami: không trang nào có tracker, không request tới tên miền analytics; `<body>` 7 trang và trang 404 giống hệt bản `main` (`89957bc`) sau khi bỏ script, mã chunk, mã `useId` và thuộc tính `data-track*`, trừ chữ của `/privacy`. Build có Website ID thử: tracker được chèn với `data-website-id`, `data-domains="thehot.vn"`, `data-exclude-hash="true"`, không `data-exclude-search`. Trình duyệt headless (tracker giả, mọi request ra ngoài bị chặn): đủ 6 sự kiện ở mọi vị trí của spec mục 4.1, link nội bộ vẫn chuyển trang không tải lại, khoá lạ bị bỏ, tracker lỗi không làm hỏng nút. Smoke test: hai image (có, không có ID) qua; ba cách truyền sai ID đều báo FAIL | Nhánh `feat/umami-tracking` |
+| 2026-10-15 | PR A: `npm run lint`, `typecheck`, `check:sitemap`, `build`, `docker build --target check` qua. Build không biến Umami: không trang nào có tracker, không request tới tên miền analytics; `<body>` 7 trang và trang 404 giống hệt bản `main` (`89957bc`) sau khi bỏ script, mã chunk, mã `useId` và thuộc tính `data-track*`, trừ chữ của `/privacy`. Build có Website ID thử: tracker được chèn với `data-website-id`, `data-domains="thehot.vn"`, `data-exclude-hash="true"`, không `data-exclude-search`. Trình duyệt headless (tracker giả, mọi request ra ngoài bị chặn): đủ 6 sự kiện ở mọi vị trí của spec mục 4.1, link nội bộ vẫn chuyển trang không tải lại, khoá lạ bị bỏ, tracker lỗi không làm hỏng nút. Smoke test: hai image (có, không có ID) qua; ba cách truyền sai ID đều báo FAIL | PR #13 (nhánh `feat/umami-tracking`) |
