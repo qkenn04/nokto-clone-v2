@@ -1,50 +1,56 @@
 name: Feature Request
-description: Suggest a new feature or improvement
+description: Suggest an improvement to the website
 title: "[Feature]: "
 labels: ["enhancement"]
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for suggesting a feature! Please describe the problem and your proposed solution.
+        Thanks for the suggestion. Changes to the venue's business information (opening hours, prices, events, menu) need confirmation from the venue owner before they go on the site.
 
   - type: textarea
-    id: problem
+    id: what
     attributes:
-      label: Problem
-      description: What problem does this feature solve? What's missing or frustrating?
-      placeholder: "I'm always frustrated when..."
+      label: What would you like?
+      description: Describe the change or the new feature.
+      placeholder: Show the opening hours on the menu page.
     validations:
       required: true
 
   - type: textarea
-    id: solution
+    id: why
     attributes:
-      label: Proposed Solution
-      description: How would you like this to work?
+      label: Why?
+      description: What problem does it solve, and for whom (guests, the venue, search engines)?
+      placeholder: Guests looking at the menu cannot see whether the venue is open tonight.
     validations:
       required: true
 
-  - type: textarea
-    id: alternatives
+  - type: input
+    id: pages
     attributes:
-      label: Alternatives Considered
-      description: Any other approaches you've thought about?
+      label: Page or pages
+      description: Which page or pages it affects, if any.
+      placeholder: https://thehot.vn/menu
 
   - type: dropdown
     id: category
     attributes:
       label: Category
       options:
-        - Cloning pipeline
-        - Asset extraction
-        - Component generation
+        - Content
+        - Design and layout
+        - Menu
+        - Events
+        - Booking and contact
+        - Search and social sharing
+        - Performance
+        - Accessibility
         - Documentation
-        - Developer experience
         - Other
 
   - type: textarea
     id: additional
     attributes:
-      label: Additional Context
-      description: Screenshots, mockups, links, or any other context.
+      label: Additional context
+      description: Examples, mockups, screenshots or links.

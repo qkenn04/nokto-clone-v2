@@ -10,7 +10,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 # Project docs
 
-This repo is the live site of The Hot Beer Garden (https://thehot.vn). Start at [docs/README.md](docs/README.md) (Vietnamese) before changing code or content: product spec, architecture, content data model, ADRs, testing and deployment. Update the matching docs in the same PR (Definition of Done in `docs/README.md`), write new ADRs as "Đề xuất" (proposed) only, and run `python3 scripts/check-links.py . --exclude CONTRIBUTING.md --exclude SECURITY.md`. The repo is public: never add server addresses, internal ports, server paths or secret names; those live in `qkenn04/infra-qkenn`.
+This repo is the live site of The Hot Beer Garden (https://thehot.vn). Start at [docs/README.md](docs/README.md) (Vietnamese) before changing code or content: product spec, architecture, content data model, ADRs, testing and deployment. Update the matching docs in the same PR (Definition of Done in `docs/README.md`), write new ADRs as "Đề xuất" (proposed) only, and run `python3 scripts/check-links.py .`. Branching, commits, pull requests and repo-specific rules (sitemap, business facts, media, secrets) are in [CONTRIBUTING.md](CONTRIBUTING.md). The repo is public: never add server addresses, internal ports, server paths or secret names; those live in `qkenn04/infra-qkenn`.
 
 # Website Reverse-Engineer Template
 

@@ -1,6 +1,6 @@
 # Tài liệu The Hot Beer Garden (thehot.vn)
 
-> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-14 · Liên quan: [README repo](../README.md), [AGENTS.md](../AGENTS.md), [Đặc tả sản phẩm](product/spec.md), [Kiến trúc](architecture/ARCHITECTURE.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-15 · Liên quan: [README repo](../README.md), [AGENTS.md](../AGENTS.md), [Đặc tả sản phẩm](product/spec.md), [Kiến trúc](architecture/ARCHITECTURE.md)
 
 Bộ tài liệu của website https://thehot.vn, trang chính thức của quán The Hot Beer Garden Đà Lạt. Site là một ứng dụng Next.js 16 dựng từ bản clone template NOKTO, đã thay nội dung bằng nội dung thật của quán từ 2026-10-13. Tài liệu theo khung phân tầng của docs-template (hồ sơ STANDARD): mỗi thư mục trả lời một câu hỏi, mỗi loại thông tin có đúng một nơi là nguồn sự thật.
 
@@ -52,10 +52,10 @@ Trạng thái dự án (mốc nào xong, việc nào đang làm) chỉ ghi ở `
 
 ## Quy ước
 
-- **Ngôn ngữ.** Văn xuôi tiếng Việt; tên file, định danh, lệnh, tên sản phẩm và commit message tiếng Anh ([quy ước commit](dev/commit-conventions.md)). Không emoji. `README.md` ở gốc repo giữ tiếng Anh.
+- **Ngôn ngữ.** Văn xuôi tiếng Việt; tên file, định danh, lệnh, tên sản phẩm và commit message tiếng Anh ([quy ước commit](dev/commit-conventions.md)). Không emoji. `README.md`, `CONTRIBUTING.md` và `SECURITY.md` ở gốc repo giữ tiếng Anh.
 - **Tên file.** ASCII, kebab-case, tiếng Anh: `threat-model.md`, `0004-automate-sitemap-from-page-config-and-git.md`. Giữ nguyên chữ hoa quen thuộc: `README.md`, `AGENTS.md`, `CLAUDE.md`, `ARCHITECTURE.md`.
 - **Đầu mỗi file.** `# Tiêu đề`, rồi một dòng metadata `> Trạng thái: … · Cập nhật: YYYY-MM-DD · Liên quan: …`. Đổi ngày `Cập nhật` khi sửa nội dung (sửa link hỏng, chính tả thì không cần).
-- **Link** giữa các tài liệu dùng đường dẫn tương đối. Kiểm bằng `python3 scripts/check-links.py . --exclude CONTRIBUTING.md --exclude SECURITY.md` (hai file bị loại kế thừa từ template upstream và còn link hỏng, xem [Kiểm thử](dev/testing.md#2-lệnh)).
+- **Link** giữa các tài liệu dùng đường dẫn tương đối. Kiểm bằng `python3 scripts/check-links.py .` (xem [Kiểm thử](dev/testing.md#2-lệnh)).
 - **Chưa biết** thì không đoán: chi tiết kỹ thuật ghi `[CẦN XÁC NHẬN: …]`; thông tin kinh doanh của quán (giờ mở cửa, nhạc sống, lịch sự kiện…) ghi "Chưa xác định — cần chủ quán xác nhận". **Ước lượng** ghi "ước lượng thô". **Số liệu** ghi nguồn và "tính tới YYYY-MM-DD".
 - **Sơ đồ** viết bằng Mermaid trong Markdown để sửa được bằng tay ([quy ước sơ đồ](architecture/diagrams/README.md)).
 - **Công khai được.** Không secret, token, mật khẩu, IP, hostname nội bộ, cổng nội bộ, đường dẫn trên máy chủ, tên bí mật trong CI, dữ liệu cá nhân, chi tiết lỗ hổng chưa vá. Những thứ đó thuộc `qkenn04/infra-qkenn`.

@@ -1,6 +1,6 @@
 # Yêu cầu phi chức năng
 
-> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-14 · Liên quan: [Đặc tả sản phẩm](spec.md), [Kiến trúc](../architecture/ARCHITECTURE.md), [Số đo hiệu năng](../dev/perf.md), [Kiểm thử](../dev/testing.md), [Mô hình đe doạ](../security/threat-model.md), [Triển khai](../ops/deployment.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-15 · Liên quan: [Đặc tả sản phẩm](spec.md), [Kiến trúc](../architecture/ARCHITECTURE.md), [Số đo hiệu năng](../dev/perf.md), [Kiểm thử](../dev/testing.md), [Mô hình đe doạ](../security/threat-model.md), [Triển khai](../ops/deployment.md)
 
 File này là **ngân sách**: ngưỡng phải đạt và cách đo. Số đo thật nằm ở [dev/perf.md](../dev/perf.md); ở đây chỉ ghi kết quả gần nhất.
 
@@ -78,7 +78,7 @@ Chi tiết đe doạ và lớp bảo vệ: [mô hình đe doạ](../security/thr
 
 | Mã | Yêu cầu | Ngưỡng | Cách kiểm | Trạng thái |
 |---|---|---|---|---|
-| OPS-01 | Mỗi build thành công hoặc thất bại đều có thông báo, phân biệt "build hỏng, VPS không bị đụng" với "deploy hỏng, VPS đã tự quay về" | 100% build | Khối `post` trong `Jenkinsfile` | Có (2026-10-14) |
+| OPS-01 | Mỗi build thành công hoặc thất bại đều có thông báo, phân biệt "build hỏng, VPS không bị đụng" với "deploy hỏng, VPS đã tự quay về" | 100% build | Khối `post` trong `Jenkinsfile`; Jenkins phải có webhook Discord | Một phần (2026-10-15): code có, nhưng lúc sự cố 2026-10-14 webhook chưa được cấu hình nên build hỏng không báo cho ai ([postmortem 001](../ops/postmortems/001-wsl-restart-corrupted-jenkins-git-cache.md)). `[CẦN XÁC NHẬN: đã cấu hình webhook chưa]` |
 | OPS-02 | Commit merge vào `main` lên production mà không cần thao tác tay | Poll mỗi 5 phút | `Jenkinsfile` (`pollSCM`) | Có (2026-10-14) |
 
 ## 9. Tương thích, dữ liệu và riêng tư

@@ -1,6 +1,6 @@
 # Kiểm thử
 
-> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-14 · Liên quan: [Đặc tả sản phẩm](../product/spec.md), [Yêu cầu phi chức năng](../product/nfr.md), [Cấu hình](configuration.md), [Số đo hiệu năng](perf.md), [Triển khai](../ops/deployment.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-15 · Liên quan: [Đặc tả sản phẩm](../product/spec.md), [Yêu cầu phi chức năng](../product/nfr.md), [Cấu hình](configuration.md), [Số đo hiệu năng](perf.md), [Triển khai](../ops/deployment.md)
 
 Site không có unit test hay test trình duyệt tự động. Lớp bảo vệ là các bước kiểm tĩnh (lint, typecheck, guard sitemap), build, và **smoke test trên chính image sẽ được deploy**. Hiệu năng, SEO và giao diện được kiểm tay, có ghi lại. Tính tới 2026-10-14.
 
@@ -24,7 +24,7 @@ Chạy từ gốc repo. Cần Node.js 24 trở lên (`.nvmrc`).
 | Từng bước | `npm run lint` · `npm run typecheck` · `npm run check:sitemap` · `npm run build` |
 | Tính ngày sitemap như CI | `bash ci/sitemap-lastmod.sh` (cần `git`, `jq`, lịch sử git đầy đủ) |
 | Chạy lại đúng các bước Jenkins bằng Docker | xem khối lệnh dưới bảng |
-| Kiểm link tài liệu | `python3 scripts/check-links.py . --exclude CONTRIBUTING.md --exclude SECURITY.md` |
+| Kiểm link tài liệu | `python3 scripts/check-links.py .` |
 
 ```bash
 # Giống Jenkins: Sitemap dates → Check → Build → Smoke test
@@ -33,8 +33,6 @@ docker build --target check .
 docker build --target runner --build-arg NEXT_PUBLIC_SITE_URL=https://thehot.vn -t nokto:local .
 ci/smoke-test.sh nokto:local
 ```
-
-`CONTRIBUTING.md` và `SECURITY.md` kế thừa từ template upstream và còn link tới mục không có trong `README.md` của repo này, nên được loại khỏi lệnh kiểm link cho tới khi hai file đó được viết lại.
 
 ## 3. Smoke test kiểm gì
 

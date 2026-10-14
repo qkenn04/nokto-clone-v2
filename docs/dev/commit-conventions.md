@@ -1,6 +1,6 @@
 # Quy ước commit
 
-> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-14 · Liên quan: [Tài liệu](../README.md), [Kiểm thử](testing.md), [Triển khai](../ops/deployment.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-15 · Liên quan: [Tài liệu](../README.md), [Kiểm thử](testing.md), [Triển khai](../ops/deployment.md)
 
 ## 1. Mục đích
 
@@ -14,7 +14,7 @@ Commit message cho biết thay đổi nhằm việc gì, để người đọc q
 <footer tùy chọn>
 ```
 
-`scope`, body và footer là tùy chọn. Dòng đầu phải có type, dấu `: ` và mô tả. `CONTRIBUTING.md` (kế thừa từ template upstream) ghi tiền tố là không bắt buộc; ở repo này thì bắt buộc, theo quy ước dưới đây.
+`scope`, body và footer là tùy chọn. Dòng đầu phải có type, dấu `: ` và mô tả. [`CONTRIBUTING.md`](../../CONTRIBUTING.md) tóm tắt quy ước này cho người đóng góp.
 
 ## 2. Type
 
