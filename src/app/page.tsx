@@ -4,6 +4,7 @@ import { HeroIntro } from "@/components/sites/nokto/home/HeroIntro";
 import { HeroVideo } from "@/components/sites/the-hot/HeroVideo";
 import { HomeGallery } from "@/components/sites/the-hot/home/HomeGallery";
 import { EventTimeline } from "@/components/sites/the-hot/home/EventTimeline";
+import { heroVideo } from "@/components/sites/the-hot/videos";
 
 // Video fills the mobile hero; desktop uses the intro and video side by side.
 export default function HomePage() {
@@ -14,10 +15,7 @@ export default function HomePage() {
           <HeroIntro />
         </section>
         <aside className="absolute inset-0 z-0 overflow-hidden lg:relative lg:inset-auto lg:min-h-0 lg:w-[55%] lg:flex-none">
-          <HeroVideo
-            src="/videos/main.mp4"
-            poster="/sites/the-hot-beer-garden/images/hero-video-poster.jpg"
-          />
+          <HeroVideo src={heroVideo.sources[0].src} poster={heroVideo.poster} />
         </aside>
         <div className="section-pad pointer-events-none absolute inset-x-0 bottom-6 z-20">
           <a href="#gallery" className="pointer-events-auto inline-flex min-h-11 items-center gap-3 text-small font-semibold text-accent transition-colors hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent">

@@ -16,4 +16,4 @@
 
 ## Checklist
 
-- [ ] `npm run check` passes (lint + typecheck + build)
+- [ ] `npm run check` passes (lint + typecheck + sitemap check + build)

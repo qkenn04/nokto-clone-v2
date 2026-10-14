@@ -47,6 +47,14 @@ pipeline {
   }
 
   stages {
+    // The Docker build has no .git, so the sitemap <lastmod> dates are computed here from the full
+    // history into src/generated/sitemap-lastmod.json, which goes into the build context.
+    stage('Sitemap dates') {
+      steps {
+        sh 'bash ci/sitemap-lastmod.sh'
+      }
+    }
+
     stage('Check') {
       steps {
         sh 'docker build --target check --progress=plain .'

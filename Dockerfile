@@ -35,11 +35,11 @@ RUN --mount=type=cache,target=/root/.npm \
 # Stage 1b: Quality gate — CI runs `docker build --target check .`
 # ============================================
 
-# Lint and typecheck against the same lockfile install as the build. BuildKit skips
-# this stage when building `--target runner`, so it never slows down the image build.
+# Lint, typecheck and check seo/sitemap-pages.json against the same lockfile install as the build.
+# BuildKit skips this stage when building `--target runner`, so it never slows down the image build.
 FROM dependencies AS check
 COPY . .
-RUN npm run lint && npm run typecheck
+RUN npm run lint && npm run typecheck && npm run check:sitemap
 
 # ============================================
 # Stage 2: Build Next.js application in standalone mode
