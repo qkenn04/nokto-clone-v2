@@ -2,8 +2,6 @@
 
 > Trạng thái: Đang áp dụng · Cập nhật: 2026-10-14 · Liên quan: [Mẫu ADR](0000-template.md), [Tài liệu](../README.md)
 
-<!-- ADR này được tạo sẵn khi dựng bộ tài liệu. Đọc lại, sửa bối cảnh cho đúng dự án (ví dụ số người, cách làm việc với agent AI), rồi giữ nguyên. Sau khi chấp nhận, nội dung không sửa nữa. -->
-
 ## Trạng thái
 
 Chấp nhận.
@@ -11,15 +9,16 @@ Chấp nhận.
 ## Ngày
 
 - Quyết định: 2026-10-14
-- Người quyết định: <tên hoặc vai trò>
+- Người quyết định: chủ repo (`qkenn04`)
 
 ## Bối cảnh
 
+- Dự án có chủ repo, ít nhất một người đóng góp khác (PR #1, #2 từ nhánh `dev` của `kennle04`), nhiều phiên làm việc với agent AI, và chủ quán duyệt nội dung. Trong ngày 2026-10-14 đã có nhiều quyết định lớn (domain, cho index, sitemap, tiêu đề tìm kiếm, ưu tiên tải ảnh, analytics) mà lý do chỉ nằm trong mô tả PR và các file kế hoạch chưa commit.
 - Quyết định kiến trúc dễ bị quên lý do: commit message ghi cái đã làm, hiếm khi ghi phương án đã bỏ và vì sao.
 - Lý do thường nằm rải rác: tin nhắn, ghi chú cá nhân, tài liệu thiết kế bị sửa đè, bộ nhớ của từng người.
 - Agent AI không nhớ giữa các phiên làm việc. Nếu không có chỗ ghi "đã bác phương án X vì Y", agent (và người mới) dễ đề xuất lại đúng phương án đã bác.
 - Khi đổi hướng, cần thấy được quyết định nào thay quyết định nào mà không phải viết lại lịch sử.
-- Tài liệu có thể được công khai cùng repo, nên cách ghi phải công khai được.
+- Repo công khai, nên cách ghi phải công khai được: không địa chỉ máy chủ, không bí mật.
 
 ## Các phương án đã cân nhắc
 
