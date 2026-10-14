@@ -16,6 +16,7 @@ export type AnalyticsEvent =
   | "booking_cta_click"
   | "reservation_complete"
   | "menu_view_mode"
+  | "menu_tab_select"
   | "event_view"
   | "social_click";
 
@@ -24,14 +25,15 @@ const EVENTS: readonly AnalyticsEvent[] = [
   "booking_cta_click",
   "reservation_complete",
   "menu_view_mode",
+  "menu_tab_select",
   "event_view",
   "social_click",
 ];
 
 /** Property keys an event may carry (spec 004 §4.1). Anything else is dropped before it is sent. */
-export type AnalyticsPropKey = "method" | "location" | "mode" | "event_id" | "network" | "party_size";
+export type AnalyticsPropKey = "method" | "location" | "mode" | "tab" | "event_id" | "network" | "party_size";
 
-const ALLOWED_PROPS: readonly AnalyticsPropKey[] = ["method", "location", "mode", "event_id", "network", "party_size"];
+const ALLOWED_PROPS: readonly AnalyticsPropKey[] = ["method", "location", "mode", "tab", "event_id", "network", "party_size"];
 
 /** Longest property value sent; longer strings are cut. */
 const MAX_VALUE_LENGTH = 100;
