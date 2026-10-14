@@ -63,6 +63,14 @@ ENV NODE_ENV=production
 ARG NEXT_PUBLIC_SITE_URL
 ENV NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL}
 
+# Umami analytics (docs/specs/004-analytics), inlined at build time like NEXT_PUBLIC_SITE_URL. Public values, not
+# secrets. Only the Jenkinsfile passes them: without a website ID the image loads no tracker and /privacy has no
+# Umami section. NEXT_PUBLIC_UMAMI_SRC is optional (UmamiScript.tsx has the default tracker URL).
+ARG NEXT_PUBLIC_UMAMI_WEBSITE_ID
+ARG NEXT_PUBLIC_UMAMI_SRC
+ENV NEXT_PUBLIC_UMAMI_WEBSITE_ID=${NEXT_PUBLIC_UMAMI_WEBSITE_ID}
+ENV NEXT_PUBLIC_UMAMI_SRC=${NEXT_PUBLIC_UMAMI_SRC}
+
 # Next.js collects completely anonymous telemetry data about general usage.
 # Learn more here: https://nextjs.org/telemetry
 ENV NEXT_TELEMETRY_DISABLED=1
