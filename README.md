@@ -16,7 +16,7 @@ npm run check      # lint + typecheck + production build
 
 ## CI/CD
 
-Every push to `main` is built and deployed to https://thehot.k2-tech.dev (the old https://nokto.qkenn.cloud redirects there):
+Every push to `main` is built and deployed to https://thehot.vn (the old https://thehot.k2-tech.dev and https://nokto.qkenn.cloud redirect there):
 
 ```
 GitHub main ──poll 5 min──▶ Jenkins (qkenn-ci, WSL) ──push──▶ Harbor (qkenn-ci) ◀──pull── VPS
@@ -31,7 +31,7 @@ GitHub main ──poll 5 min──▶ Jenkins (qkenn-ci, WSL) ──push──�
 
   ```bash
   docker build --target check .
-  docker build --target runner --build-arg NEXT_PUBLIC_SITE_URL=https://thehot.k2-tech.dev -t nokto:local .
+  docker build --target runner --build-arg NEXT_PUBLIC_SITE_URL=https://thehot.vn -t nokto:local .
   ci/smoke-test.sh nokto:local
   ```
 
@@ -61,4 +61,4 @@ The form reproduces the source's three steps, validation, and confirmation scree
 
 - Inspection notes and the build brief: `docs/research/nokto/brief.md`. Comparison screenshots: `docs/design-references/nokto/`.
 - The legal pages reproduce the source template's sample text; they do not describe this app.
-- Images, logo, fonts, and copy belong to the source template's owner. This repository and the deployment at thehot.k2-tech.dev are public as a learning project; the deployment sends `X-Robots-Tag: noindex, nofollow` so search engines do not index it. Check the template's licence before any other public use.
+- Since 2026-10-14 the deployment at thehot.vn is The Hot Beer Garden's real site and search engines may index it (the `noindex` header was removed). The pages use The Hot's own content; the original NOKTO template files under `public/sites/nokto/` are no longer referenced by the app but are still served — they belong to the template's owner, so remove them rather than reuse them.
