@@ -1,6 +1,6 @@
 # 004: Đo lường truy cập (Umami + GA4)
 
-> Trạng thái: Đề xuất · Cập nhật: 2026-10-14 · Liên quan: [Mục lục spec](../README.md), [plan.md](plan.md), [tasks.md](tasks.md), [Mục lục ADR](../../adr/README.md) (ADR 0007), [Lộ trình M4](../../plan/roadmap.md#m4-analytics)
+> Trạng thái: Đề xuất · Cập nhật: 2026-10-15 · Liên quan: [Mục lục spec](../README.md), [plan.md](plan.md), [tasks.md](tasks.md), [Mục lục ADR](../../adr/README.md) (ADR 0007), [Lộ trình M4](../../plan/roadmap.md#m4-analytics)
 
 Chủ quán cần biết bao nhiêu người vào web, họ đến từ đâu (Google, Maps, Facebook, Instagram, TikTok, QR tại quán) và bao nhiêu người bấm Gọi, Zalo, Messenger hay Đặt bàn. Quyết định ngày 2026-10-14 dùng hai công cụ:
 
@@ -9,7 +9,7 @@ Chủ quán cần biết bao nhiêu người vào web, họ đến từ đâu (G
 
 Ngoài ra, zone Cloudflare của `thehot.vn` **đang bật sẵn Cloudflare Web Analytics** (Cloudflare tự chèn beacon `static.cloudflareinsights.com` và `/cdn-cgi/rum`): thống kê không cookie và Core Web Vitals của khách thật. Phải nhắc trong `/privacy` và quyết định giữ song song hay tắt.
 
-Hiện thực: chưa bắt đầu. Spec này chỉ mô tả phần nằm trong repo website.
+Hiện thực: PR A (Umami, sự kiện, `/privacy`) đang chờ review, chưa bật trên production vì chưa có Website ID ([tasks.md](tasks.md)); GA4 và banner chưa làm. Spec này chỉ mô tả phần nằm trong repo website.
 
 ## 1. Mục tiêu
 

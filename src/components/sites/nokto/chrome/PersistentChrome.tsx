@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { trackAttrs } from "@/lib/analytics";
 import { EASE_CINEMA } from "../motion";
 import { site } from "../site";
 import { Stack } from "../ui";
@@ -56,6 +57,7 @@ function NavItem({ label, href, index, isActive, delay, reduce }: NavItemProps) 
     >
       <Link
         href={href}
+        {...(href === site.cta.href ? trackAttrs("booking_cta_click", { location: "nav" }) : {})}
         aria-current={isActive ? "page" : undefined}
         className={`relative flex w-full items-baseline gap-6 py-10 transition-colors duration-[var(--duration-fast)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent sm:py-12 ${
           isActive ? "text-accent" : "text-foreground hover:text-accent"
@@ -227,7 +229,7 @@ function SiteNavigation() {
                 <Stack gap={8}>
                   <InfoItem label="Địa chỉ" value={site.address.display} />
                   <InfoItem label="Giờ mở cửa" value={site.hours.display} />
-                  <InfoItem label="Facebook" value={site.social} href={site.socialHref} />
+                  <InfoItem label="Facebook" value={site.social} href={site.socialHref} tracking={trackAttrs("contact_click", { method: "facebook", location: "nav" })} />
                 </Stack>
               </motion.aside>
             </div>

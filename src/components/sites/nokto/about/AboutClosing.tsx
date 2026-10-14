@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "motion/react";
+import { trackAttrs } from "@/lib/analytics";
 import { revealOnView } from "../motion";
 import { ButtonLink, Heading, Section, Text } from "../ui";
 import { about } from "./content";
@@ -24,7 +25,7 @@ export function AboutClosing() {
             </Text>
           </motion.div>
           <motion.div {...revealOnView(reduce, 0.3)} className="mt-[200px]">
-            <ButtonLink href={about.closing.cta.href} variant="link">
+            <ButtonLink href={about.closing.cta.href} variant="link" {...trackAttrs("booking_cta_click", { location: "about" })}>
               {about.closing.cta.label}
             </ButtonLink>
           </motion.div>

@@ -10,7 +10,7 @@ Site không có unit test hay test trình duyệt tự động. Lớp bảo vệ
 |---|---|---|---|---|---|
 | Tĩnh | S | Lỗi lint, kiểu TypeScript (strict), `seo/sitemap-pages.json` lệch với `src/app` | ESLint 9, `tsc --noEmit`, `seo/check-sitemap-pages.mjs` | Máy dev (`npm run check`); Jenkins stage Check (`docker build --target check`) | Trước khi mở PR; mỗi commit trên `main` |
 | Build | B | Next.js build được bản production | `next build` trong stage `builder` của `Dockerfile` | Máy dev; Jenkins stage Build | Như trên |
-| Smoke test image | E | Image khởi động và qua healthcheck; mọi trang trả đúng mã; `robots.txt` và `sitemap.xml` đúng | `ci/smoke-test.sh` | Jenkins stage Smoke test; máy dev có Docker | Mỗi commit trên `main`, trước khi push image |
+| Smoke test image | E | Image khởi động và qua healthcheck; mọi trang trả đúng mã; `robots.txt` và `sitemap.xml` đúng; tracker Umami có hay không đúng theo Website ID | `ci/smoke-test.sh` | Jenkins stage Smoke test; máy dev có Docker | Mỗi commit trên `main`, trước khi push image |
 | Kiểm tay | M | Điều chưa tự động: hiệu năng, dữ liệu cấu trúc, ảnh chia sẻ, giao diện trên điện thoại | Checklist mục 6 | `https://thehot.vn` sau deploy, hoặc bản build trên máy | Khi PR chạm phần đó |
 
 ## 2. Lệnh
@@ -36,13 +36,14 @@ ci/smoke-test.sh nokto:local
 
 ## 3. Smoke test kiểm gì
 
-`ci/smoke-test.sh <image> [site-url]` (mặc định `https://thehot.vn`) chạy image trong một container tạm, rồi gọi từ bên trong container (image slim không có `curl`):
+`ci/smoke-test.sh <image> [site-url] [umami-website-id]` (mặc định `https://thehot.vn`, không có Website ID) chạy image trong một container tạm, rồi gọi từ bên trong container (image slim không có `curl`):
 
 1. Đợi Docker `HEALTHCHECK` báo `healthy` (tối đa 30 lần × 2 s); không khoẻ thì in 50 dòng log cuối và dừng.
 2. `/`, `/menu`, `/menu/list`, `/about`, `/reservation`, `/terms`, `/privacy`, `/sitemap.xml` trả 200; `/smoke-test-missing-page` trả 404.
 3. `robots.txt` chứa `<site-url>/sitemap.xml` (bắt lỗi quên build arg `NEXT_PUBLIC_SITE_URL`).
 4. `sitemap.xml` có ít nhất một `<url>` và số `<lastmod>` bằng số `<url>` (bắt lỗi build thiếu file ngày).
 5. Mọi `<loc>` và `<image:loc>` là URL tuyệt đối trên đúng origin của site, trả 200 khi gọi không theo chuyển hướng; ảnh có `content-type` bắt đầu bằng `image/`.
+6. Tracker Umami ([spec 004](../specs/004-analytics/spec.md)), trên mọi trang HTML ở bước 2 kể cả trang 404: có Website ID thì HTML phải có tracker với đúng ID, `data-domains="thehot.vn"`, `data-exclude-hash="true"`, không `data-exclude-search`, kèm `<link rel="preload" as="script">` tới URL tracker; không có ID thì không trang nào có tracker. `next/script` (`afterInteractive`) chỉ chèn thẻ `<script>` trên trình duyệt sau khi hydrate, nên bước này đọc thuộc tính của nó trong payload React của HTML. Jenkins truyền cùng `UMAMI_WEBSITE_ID` cho build và cho bước này.
 
 Container tạm luôn bị xoá khi script kết thúc.
 

@@ -3,6 +3,7 @@
 import { motion, useReducedMotion, type Variants } from "motion/react";
 import Link from "next/link";
 import { useId } from "react";
+import type { TrackAttrs } from "@/lib/analytics";
 import { EASE_CINEMA } from "../../nokto/motion";
 import { buttonClass, cx } from "../../nokto/ui";
 import { BeerPour } from "../BeerPour";
@@ -109,7 +110,7 @@ function Mug() {
 }
 
 /** Home CTA: the primary button, with beer pouring in and two mugs that clink on hover or focus. */
-export function CheersButton({ href, label }: { href: string; label: string }) {
+export function CheersButton({ href, label, tracking }: { href: string; label: string; tracking?: TrackAttrs }) {
   const reduce = useReducedMotion() ?? false;
   // Reduced motion: no clink or pour; the mugs settle into a static toast and CSS shows a full pint on hover.
   const gestures = reduce
@@ -117,7 +118,7 @@ export function CheersButton({ href, label }: { href: string; label: string }) {
     : { animate: "rest", whileHover: "cheers", whileFocus: "cheers" };
 
   return (
-    <MotionLink href={href} initial="rest" className={buttonClass("primary", "before:hidden")} {...gestures}>
+    <MotionLink href={href} initial="rest" className={buttonClass("primary", "before:hidden")} {...gestures} {...tracking}>
       <BeerPour mode="follow" streamAt={92} />
       <span aria-hidden className={styles.mugs}>
         <motion.span variants={MUG_VARIANTS.left} className={cx(styles.mug, styles.mugLeft)}>

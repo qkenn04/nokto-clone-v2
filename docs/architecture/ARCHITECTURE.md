@@ -1,6 +1,6 @@
 # Kiến trúc The Hot Beer Garden (thehot.vn)
 
-> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-14 · Liên quan: [Đặc tả sản phẩm](../product/spec.md), [Yêu cầu phi chức năng](../product/nfr.md), [Mô hình dữ liệu nội dung](data-model.md), [Sơ đồ](diagrams/README.md), [Mục lục ADR](../adr/README.md), [Triển khai](../ops/deployment.md), [Mô hình đe doạ](../security/threat-model.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-15 · Liên quan: [Đặc tả sản phẩm](../product/spec.md), [Yêu cầu phi chức năng](../product/nfr.md), [Mô hình dữ liệu nội dung](data-model.md), [Sơ đồ](diagrams/README.md), [Mục lục ADR](../adr/README.md), [Triển khai](../ops/deployment.md), [Mô hình đe doạ](../security/threat-model.md)
 
 Tính tới 2026-10-14. Repo công khai: tài liệu này chỉ mô tả hạ tầng ở mức đã thấy trong `Jenkinsfile`. Địa chỉ máy chủ, cổng nội bộ, đường dẫn trên máy chủ, cấu hình nginx và script deploy nằm ở repo riêng tư `qkenn04/infra-qkenn`.
 
@@ -83,10 +83,12 @@ flowchart LR
 | Jenkins | Jenkins Pipeline, agent nhãn `docker` | Chạy `Jenkinsfile`: tính ngày sitemap, kiểm, build, smoke test, push, deploy; báo kết quả lên Discord | Máy CI (nguồn ở `qkenn04/infra-qkenn`) | Lịch sử build | — |
 | Harbor | Harbor | Lưu image `nokto/web:<commit sha>` | Máy CI | Image | — |
 | GitHub | Dịch vụ ngoài | Nguồn code, PR, review | GitHub | Lịch sử git (cũng là nguồn ngày `lastmod`) | [0004](../adr/0004-automate-sitemap-from-page-config-and-git.md) |
+| Umami | Umami tự cài (hạ tầng ở repo riêng) | Nhận lượt xem và sự kiện từ trình duyệt khách, không cookie. Site chỉ tải tracker khi build có Website ID (chưa bật tính tới 2026-10-15) | Tên miền con của `thehot.vn` | Số liệu truy cập | [0007](../adr/0007-use-umami-and-consent-gated-ga4.md) |
 
 ### 3.1 Ranh giới giữa các phần
 
 - **Ứng dụng không gọi dịch vụ nào lúc chạy:** không cơ sở dữ liệu, không API, không gửi form. Liên hệ đều là link ra ngoài (`tel:`, `facebook.com`, `m.me`, `zalo.me`). Kiểm bằng review; AC-06 ở [đặc tả](../product/spec.md#7-tiêu-chí-nghiệm-thu-cấp-sản-phẩm).
+- **Số liệu truy cập đi thẳng từ trình duyệt khách tới Umami** (khi build có Website ID), không qua container. Sự kiện tự định nghĩa chỉ đi qua `track()` trong `src/lib/analytics.ts`, với danh sách thuộc tính cho phép; không bao giờ có dữ liệu khách nhập ([spec 004](../specs/004-analytics/spec.md)).
 - **Container chỉ nhận traffic từ nginx;** nginx chỉ nhận traffic từ Cloudflare. Cấu hình và kiểm ở `qkenn04/infra-qkenn`.
 - **Jenkins không có quyền shell trên VPS:** khoá deploy chỉ chạy được một lệnh deploy định sẵn, host key được ghim (`StrictHostKeyChecking=yes` trong `Jenkinsfile`). VPS tự kéo image từ Harbor.
 - **Lỗi trước stage Deploy không chạm VPS.** Thông báo Discord phân biệt "Build thất bại, VPS không bị đụng" với "Deploy thất bại, VPS đã tự quay về bản cũ".
@@ -177,6 +179,7 @@ Site không có tài khoản, không nhận dữ liệu từ khách, không có 
 nokto-clone-v2/
 ├── src/app/                 route Next.js: 7 trang, layout (metadata, JSON-LD, màn hình chờ), sitemap.ts, robots.ts, ảnh OG
 ├── src/components/sites/    giao diện và dữ liệu nội dung: nokto/ (khung dựng từ template) và the-hot/ (phần riêng của quán)
+├── src/components/analytics/, src/lib/analytics.ts   tracker Umami, listener click, track() (spec 004)
 ├── src/seo/                 page-meta.ts (tiêu đề, mô tả), sitemap-images.ts (sitemap ảnh)
 ├── src/generated/           sitemap-lastmod.json do CI sinh (git-ignored)
 ├── seo/                     sitemap-pages.json (danh sách trang), check-sitemap-pages.mjs (guard chạy trong bước Check)

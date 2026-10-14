@@ -10,7 +10,7 @@ Tính tới 2026-10-15:
 
 | Hạng mục | Trạng thái |
 |---|---|
-| Mốc hiện tại | M1 gần xong (còn 4 ô); M2 đang làm (nhãn sự kiện xong, JSON-LD ở PR #10 chờ duyệt); M3 đang làm (cache xong); M4–M6 chưa bắt đầu |
+| Mốc hiện tại | M1 gần xong (còn 4 ô); M2 đang làm (nhãn sự kiện xong, JSON-LD ở PR #10 chờ duyệt); M3 đang làm (cache xong); M4 đang làm (PR #13 chờ duyệt); M5–M6 chưa bắt đầu |
 | Đang chạy ở đâu | https://thehot.vn, commit `6c246e1`, Jenkins build #19 |
 | Đang bị chặn bởi | Duyệt PR #10 và câu trả lời, ảnh của chủ quán (M2); chủ quán chọn cách xử lý âm thanh video hero, `ffmpeg`, duyệt chất lượng video (M3); hạ tầng Umami và Measurement ID GA4 (M4) |
 | Quyết định đang chờ | Giờ đóng cửa, nhạc sống, khoảng giá, thanh toán, chuỗi địa chỉ, video hero trên điện thoại, âm thanh video hero (B1/B2/B3), các câu hỏi analytics ([danh sách](tasks.md#câu-hỏi-chờ-chủ-quán)) |
@@ -35,7 +35,7 @@ Tính tới 2026-10-15:
 | [`001-sitemap-automation`](../specs/001-sitemap-automation/spec.md) | M1 | Đang áp dụng | Xong (M1) | Việc tiếp theo: đổi tên ảnh, ảnh độ phân giải cao (chờ ảnh) |
 | [`002-onpage-seo`](../specs/002-onpage-seo/spec.md) | M1, M2 | Đang áp dụng | Đang làm | Phần A, B xong (M1); phần C: nhãn sự kiện xong (PR #8), JSON-LD ở PR #10 chờ duyệt; D–F chưa làm |
 | [`003-performance`](../specs/003-performance/spec.md) | M1, M3 | Đang áp dụng | Đang làm | Phần A xong (M1); C xong (2026-10-15); D một phần (`minimumCacheTTL` 7 ngày); B chờ chủ quán chọn cách xử lý âm thanh; E–H chưa làm |
-| [`004-analytics`](../specs/004-analytics/spec.md) | M4 | Đề xuất | Chưa làm | |
+| [`004-analytics`](../specs/004-analytics/spec.md) | M4 | Đề xuất | Đang làm | PR A (Umami, sự kiện, `/privacy`) là PR #13, chờ duyệt; chưa bật trên production tới khi có Website ID. PR B (GA4, banner) chưa làm |
 
 ## Đo lường
 
@@ -66,6 +66,7 @@ Mới nhất ở trên. Giờ theo giờ Việt Nam (UTC+7).
 
 | Ngày | Việc | Bằng chứng |
 |---|---|---|
+| 2026-10-15 | Mở PR #13 (spec 004 PR A): `track()` với danh sách thuộc tính cho phép, `ClickTracker`, tracker Umami qua `next/script` (chỉ khi build có Website ID; `Jenkinsfile` để trống), gắn 6 sự kiện, smoke test kiểm tracker theo Website ID; `/privacy` thêm mục Cloudflare Web Analytics, mục Umami (chỉ khi có tracker), thay mục "Tùy chọn hiển thị". Chữ `/privacy` chờ chủ quán duyệt | PR #13, [004 tasks](../specs/004-analytics/tasks.md) |
 | 2026-10-15 | Video hero: track âm thanh chỉ 1,7 MB (AAC khoảng 129 kbps) trên 83,7 MB, bỏ đi chỉ tiết kiệm khoảng 2%. Chủ quán muốn **giữ âm thanh**. Hiện khách không nghe được (autoplay bắt buộc `muted`, không có nút bật tiếng). Chờ chủ quán chọn B1 (chỉ faststart), B2 (nút bật tiếng) hoặc B3 (trình phát "Xem video có tiếng") | `ffprobe`; [ADR 0008](../adr/0008-compress-hero-video-without-trimming.md) |
 | 2026-10-15 | Tình trạng trên Google (ảnh chụp của chủ quán): tìm "the hot beer garden đà lạt" thì Instagram #1, TripAdvisor #2, Facebook #3, `thehot.vn/about` #4 (còn tiêu đề cũ, biểu tượng quả địa cầu); `/` đã được index ("URL is on Google"); dịch vụ favicon của Google (`https://www.google.com/s2/favicons?domain=thehot.vn&sz=64`) đã trả logo The Hot, biểu tượng trong kết quả tìm kiếm dự kiến đổi trong vài ngày. AI Overview hiện giờ mở 4:30 PM–12 AM, lấy từ Google Maps và TripAdvisor | Search Console, ảnh chụp kết quả tìm kiếm |
 | 2026-10-15 | TripAdvisor có trang của quán nhưng xếp loại Events/Attraction (không phải nhà hàng), giờ 16:30, ghim bản đồ lệch khoảng 40 m: chủ quán cần nhận (claim) trang để sửa | [Việc sắp làm](tasks.md) TK15 |

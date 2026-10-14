@@ -1,8 +1,8 @@
 # Front-end: cấu trúc và quy ước
 
-> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-14 · Liên quan: [Kiến trúc](../architecture/ARCHITECTURE.md), [Mô hình dữ liệu nội dung](../architecture/data-model.md), [Kiểm thử](testing.md), [Số đo hiệu năng](perf.md), [AGENTS.md](../../AGENTS.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-15 · Liên quan: [Kiến trúc](../architecture/ARCHITECTURE.md), [Mô hình dữ liệu nội dung](../architecture/data-model.md), [Kiểm thử](testing.md), [Số đo hiệu năng](perf.md), [AGENTS.md](../../AGENTS.md)
 
-Site là một ứng dụng Next.js 16 (App Router, React 19, TypeScript strict, Tailwind CSS 4) không có API, không có state phía server. File này trả lời: file mới đặt ở đâu, module nào được import module nào, và các quy tắc đã rút ra từ những lần sửa trước. Mẫu front-end lớn của docs-template (React có API, state) không áp dụng cho site này. Tính tới 2026-10-14.
+Site là một ứng dụng Next.js 16 (App Router, React 19, TypeScript strict, Tailwind CSS 4) không có API, không có state phía server. File này trả lời: file mới đặt ở đâu, module nào được import module nào, và các quy tắc đã rút ra từ những lần sửa trước. Mẫu front-end lớn của docs-template (React có API, state) không áp dụng cho site này. Tính tới 2026-10-15.
 
 **Next.js 16 khác nhiều so với bản cũ.** Trước khi viết code, đọc hướng dẫn trong `node_modules/next/dist/docs/` như [AGENTS.md](../../AGENTS.md) yêu cầu.
 
@@ -13,6 +13,8 @@ src/
 ├── app/                          route: page.tsx mỗi trang, layout.tsx, sitemap.ts, robots.ts, error.tsx, not-found.tsx,
 │                                 icon, ảnh Open Graph/Twitter, globals.css (design token), fonts.css
 ├── components/
+│   ├── analytics/                ClickTracker (một listener click đọc data-track*), UmamiScript (next/script; không
+│   │                             render khi build thiếu Website ID) — spec 004
 │   ├── sites/nokto/              khung và trang dựng từ template NOKTO (nội dung đã là của The Hot)
 │   │   ├── site.ts               thông tin quán: nguồn sự thật của tên, địa chỉ, hotline, giờ
 │   │   ├── ui.tsx, motion.ts     primitive (Section, Heading, Text, Stack, ButtonLink, cx) và giá trị hiệu ứng dùng chung
@@ -23,6 +25,7 @@ src/
 │   │                             menuPages.ts, videos.ts, home/ (gallery, dòng sự kiện, lightbox, dữ liệu trang chủ)
 │   └── ui/                       primitive shadcn/ui (button)
 ├── lib/utils.ts                  cn() của shadcn
+├── lib/analytics.ts              track(), trackAttrs(), danh sách thuộc tính cho phép, UMAMI_WEBSITE_ID (spec 004)
 ├── seo/                          page-meta.ts (tiêu đề, mô tả), sitemap-images.ts (sitemap ảnh)
 └── generated/                    sitemap-lastmod.json do CI sinh (git-ignored)
 ```
@@ -34,8 +37,9 @@ Tên thư mục `nokto` là dấu vết lịch sử của template, không phả
 | Từ | Được import | Không import |
 |---|---|---|
 | `src/app/**` | Component trong `components/`, `src/seo/*`, module dữ liệu | — |
-| Component trong `components/sites/**` | Module dữ liệu, primitive (`nokto/ui.tsx`, `components/ui`), component khác trong `sites/` | `src/app/**` |
-| Module dữ liệu (`site.ts`, `content.ts`, `data.ts`, `menuPages.ts`, `videos.ts`, `events.ts`) | Module dữ liệu khác, helper `hotImage`/`siteImage` | Component React; module có `"use client"` |
+| Component trong `components/sites/**` | Module dữ liệu, primitive (`nokto/ui.tsx`, `components/ui`), component khác trong `sites/`, `src/lib/analytics.ts` | `src/app/**` |
+| Module dữ liệu (`site.ts`, `content.ts`, `data.ts`, `menuPages.ts`, `videos.ts`, `events.ts`) | Module dữ liệu khác, helper `hotImage`/`siteImage`, `UMAMI_WEBSITE_ID` của `src/lib/analytics.ts` | Component React; module có `"use client"` |
+| `src/lib/analytics.ts` | Không import gì của site (TS thuần, không `"use client"`) | Mọi thứ trong `components/`, `src/app/**` |
 | `src/seo/*`, `src/app/sitemap.ts` | Module dữ liệu, `seo/sitemap-pages.json` | Component có `"use client"` |
 
 Chưa có lint rule nào chặn các luật trên; giữ bằng review. Quy tắc quan trọng nhất là hàng thứ ba: giá trị export từ file `"use client"` chỉ là client reference khi code phía server import, nên dữ liệu mà sitemap hay metadata cần phải nằm trong module thường (lý do `menuPages.ts` được tách khỏi `MenuBook.tsx` ở PR #3).
@@ -50,6 +54,7 @@ Chưa có lint rule nào chặn các luật trên; giữ bằng review. Quy tắ
 6. **Thời gian hiện tại** không đọc lúc render phía server: dùng `useSyncExternalStore` với snapshot server là `null` (như `EventTimeline.tsx`), tránh lệch hydrate.
 7. **File trong `public/`:** đổi nội dung thì đổi tên file, để cache trình duyệt và Cloudflare không giữ bản cũ.
 8. **Không gửi dữ liệu khách đi đâu:** form đặt bàn chỉ dùng state React ([Đặc tả, NG2](../product/spec.md#5-không-làm)); thêm bất kỳ request mạng nào chứa dữ liệu khách cần ADR mới.
+9. **Sự kiện analytics** ([spec 004](../specs/004-analytics/spec.md)): link và nút gắn `{...trackAttrs("tên", { … })}` (dùng được trong Server Component, `ClickTracker` gửi khi bấm); sự kiện trạng thái (form xong, mở poster) gọi `track()` trong Client Component. Không dùng `data-umami-event` (tracker Umami chặn click rồi tự chuyển trang, làm trang tải lại và màn hình chờ chạy lại). Khoá thuộc tính ngoài danh sách cho phép bị bỏ trước khi gửi; thêm khoá hay sự kiện thì sửa spec 004 và `src/lib/analytics.ts` cùng PR.
 
 ## 4. Quy ước code
 

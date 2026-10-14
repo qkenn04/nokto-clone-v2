@@ -3,6 +3,7 @@
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
+import { track } from "@/lib/analytics";
 import { scaleVariants, slideVariants } from "../motion";
 import { Section, Stack, buttonClass } from "../ui";
 import { reservation, type StepNumber } from "./content";
@@ -83,6 +84,8 @@ export function ReservationForm() {
         reportErrors(found);
         return;
       }
+      // Party size only: never names, phone numbers, emails or notes.
+      track("reservation_complete", { party_size: data.guests });
       goTo("success", 1);
     },
     [data, goForward, goTo, reportErrors, step],

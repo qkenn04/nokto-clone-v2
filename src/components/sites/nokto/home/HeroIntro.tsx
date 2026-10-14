@@ -4,6 +4,7 @@ import { motion, useReducedMotion } from "motion/react";
 import { LocateIcon } from "lucide-react";
 import Image from "next/image";
 import { Fragment, useEffect, useState, type CSSProperties } from "react";
+import { trackAttrs } from "@/lib/analytics";
 import { BeerPour } from "../../the-hot/BeerPour";
 import { CheersButton } from "../../the-hot/home/CheersButton";
 import { BrandMark } from "../chrome/BrandMark";
@@ -142,7 +143,7 @@ export function HeroIntro() {
             </div>
             <div className={styles.enter} style={enter(16, 0.95, 0.8)}>
               <Stack direction="row" align="center" gap={6} wrap className="pt-2">
-                <CheersButton href={site.cta.href} label={site.cta.label} />
+                <CheersButton href={site.cta.href} label={site.cta.label} tracking={trackAttrs("booking_cta_click", { location: "hero" })} />
                 <ButtonLink href="/menu" variant="link">
                   Xem menu
                 </ButtonLink>

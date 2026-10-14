@@ -43,6 +43,10 @@ pipeline {
     REGISTRY = 'qkenn-ci.tailb41a82.ts.net'
     IMAGE = "${REGISTRY}/nokto/web"
     SITE_URL = 'https://thehot.vn'
+    // Umami analytics (docs/specs/004-analytics). Public values that end up in every page's HTML, not secrets;
+    // changing one needs a new build. Empty ID = no tracker and no Umami section on /privacy.
+    UMAMI_WEBSITE_ID = '' // set after Umami website is created
+    UMAMI_SRC = 'https://stats.thehot.vn/ht.js'
     VPS = '100.93.222.27' // qkenn-server on the tailnet; the deploy key only works from 100.64.0.0/10
   }
 
@@ -66,6 +70,8 @@ pipeline {
         sh '''
           docker build --target runner --pull --progress=plain \
             --build-arg NEXT_PUBLIC_SITE_URL="$SITE_URL" \
+            --build-arg NEXT_PUBLIC_UMAMI_WEBSITE_ID="$UMAMI_WEBSITE_ID" \
+            --build-arg NEXT_PUBLIC_UMAMI_SRC="$UMAMI_SRC" \
             --label org.opencontainers.image.revision="$GIT_COMMIT" \
             --label org.opencontainers.image.source=https://github.com/qkenn04/nokto-clone-v2 \
             --tag "$IMAGE:$GIT_COMMIT" .
@@ -75,7 +81,7 @@ pipeline {
 
     stage('Smoke test') {
       steps {
-        sh 'bash ci/smoke-test.sh "$IMAGE:$GIT_COMMIT" "$SITE_URL"'
+        sh 'bash ci/smoke-test.sh "$IMAGE:$GIT_COMMIT" "$SITE_URL" "$UMAMI_WEBSITE_ID"'
       }
     }
 

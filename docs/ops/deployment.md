@@ -50,7 +50,7 @@ Không có staging. Smoke test chạy trên chính image sẽ deploy, ngay trên
 
 - Mỗi commit trên `main` được build **một lần** thành image `runner`; image đã qua smoke test là image được push và deploy.
 - `docker build --pull` lấy lại image nền `node:24.14.1-slim` mỗi lần build; phụ thuộc npm ghim bằng `package-lock.json` (`npm ci`).
-- `NEXT_PUBLIC_SITE_URL=https://thehot.vn` được truyền lúc build ([Cấu hình](../dev/configuration.md)).
+- `NEXT_PUBLIC_SITE_URL=https://thehot.vn` được truyền lúc build; `NEXT_PUBLIC_UMAMI_WEBSITE_ID` và `NEXT_PUBLIC_UMAMI_SRC` cũng vậy (từ `UMAMI_WEBSITE_ID`, `UMAMI_SRC` trong `Jenkinsfile`; ID để trống thì image không tải tracker Umami) ([Cấu hình](../dev/configuration.md)).
 - Deploy theo **tag commit SHA**, chưa theo digest; pipeline chưa ký image, chưa tạo SBOM ([CI/CD core, mục 0](ci-cd-core.md#0-áp-dụng-ở-dự-án-này)).
 - Sau mỗi build, Jenkins xoá image khỏi Docker của máy CI (đã nằm trong Harbor) và dọn build cache cũ hơn 7 ngày.
 
@@ -62,8 +62,8 @@ Một pipeline duy nhất trong `Jenkinsfile`, chạy trên agent nhãn `docker`
 |---|---|---|
 | Sitemap dates | `bash ci/sitemap-lastmod.sh`: tính `lastmod` từ lịch sử git, ghi `src/generated/sitemap-lastmod.json` ([ADR 0004](../adr/0004-automate-sitemap-from-page-config-and-git.md)) | Dừng; VPS không bị đụng |
 | Check | `docker build --target check`: lint, typecheck, `check:sitemap` | Như trên |
-| Build | `docker build --target runner --pull` với `NEXT_PUBLIC_SITE_URL` và nhãn OCI | Như trên |
-| Smoke test | `ci/smoke-test.sh "$IMAGE:$GIT_COMMIT" "$SITE_URL"` ([Kiểm thử, mục 3](../dev/testing.md#3-smoke-test-kiểm-gì)) | Như trên |
+| Build | `docker build --target runner --pull` với `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_UMAMI_WEBSITE_ID`, `NEXT_PUBLIC_UMAMI_SRC` và nhãn OCI | Như trên |
+| Smoke test | `ci/smoke-test.sh "$IMAGE:$GIT_COMMIT" "$SITE_URL" "$UMAMI_WEBSITE_ID"` ([Kiểm thử, mục 3](../dev/testing.md#3-smoke-test-kiểm-gì)) | Như trên |
 | Push | Đăng nhập Harbor bằng tài khoản chỉ dùng để push, push image, đăng xuất | Như trên |
 | Deploy | SSH tới VPS bằng khoá chỉ chạy được lệnh deploy, host key ghim: `deploy <commit sha>` | Script trên VPS tự quay về image trước; Discord báo "Deploy THẤT BẠI — VPS đã tự quay về bản cũ" |
 
