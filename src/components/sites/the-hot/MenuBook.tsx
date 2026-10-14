@@ -21,14 +21,16 @@ import {
   type KeyboardEvent,
   type PointerEvent,
 } from "react";
+import type { MenuGroupId } from "../nokto/menu/data";
+import { MenuTabs } from "../nokto/menu/MenuTabs";
 import { MenuViewSwitcher } from "../nokto/menu/MenuViewSwitcher";
 import { EASE_CINEMA } from "../nokto/motion";
-import { trackAttrs } from "@/lib/analytics";
+import { track, trackAttrs } from "@/lib/analytics";
 import { site } from "../nokto/site";
 import { ButtonLink, Heading, Section, Stack, Text, cx } from "../nokto/ui";
 import styles from "./MenuBook.module.css";
 import { clamp01, foldGradientCss, foldLeaf, liftAt, mirrorCss, polygonCss, type Corner } from "./menuBookFold";
-import { MENU_IMAGE_BASE, menuPages } from "./menuPages";
+import { menuBooks, menuPageSrc, type MenuBookData, type MenuPage } from "./menuPages";
 
 const PAGE_SIZES = "(max-width: 640px) calc(100vw - 64px), (max-width: 1024px) 45vw, 500px";
 
@@ -44,7 +46,9 @@ const EASE_GLIDE = [0.22, 0.7, 0.26, 1] as const;
 const SPRING_RELEASE: ValueAnimationTransition<number> = { type: "spring", visualDuration: 0.5, bounce: 0 };
 const SPRING_PEEK: ValueAnimationTransition<number> = { type: "spring", stiffness: 280, damping: 30 };
 
-const LAST_PAGE = menuPages.length - 1;
+/** The one tab panel: only the selected book is mounted, so both tabs control the same element. */
+const PANEL_ID = "menu-book-panel";
+const TAB_ID_PREFIX = "menu-book-tab";
 
 type Direction = 1 | -1;
 type Goal = "to" | "from";
@@ -78,14 +82,6 @@ type Drag = {
   holdLift: number;
 };
 
-function clampIndex(index: number) {
-  return Math.max(0, Math.min(LAST_PAGE, index));
-}
-
-function pageSrc(index: number) {
-  return `${MENU_IMAGE_BASE}/${menuPages[index].file}`;
-}
-
 /** Resolves once the image has loaded and decoded, so a leaf never turns onto an empty page. */
 function whenDecoded(image: HTMLImageElement) {
   const loaded = image.complete
@@ -114,8 +110,9 @@ function stackShadow(leaves: number) {
   return [...edges, "0 1.5rem 3rem rgb(0 0 0 / 0.25)"].join(", ");
 }
 
-function PageSelect({ id, currentIndex, onChange }: {
+function PageSelect({ id, pages, currentIndex, onChange }: {
   id: string;
+  pages: readonly MenuPage[];
   currentIndex: number;
   onChange: (index: number) => void;
 }) {
@@ -123,15 +120,23 @@ function PageSelect({ id, currentIndex, onChange }: {
     <div className={styles.pageSelect}>
       <label htmlFor={id} className="sr-only">Chọn trang menu</label>
       <select id={id} value={currentIndex} onChange={(event) => onChange(Number(event.target.value))}>
-        {menuPages.map((page, index) => <option key={page.file} value={index}>{page.label}</option>)}
+        {pages.map((page, index) => <option key={page.file} value={index}>{page.label}</option>)}
       </select>
       <ChevronDown aria-hidden size={16} strokeWidth={1.5} />
     </div>
   );
 }
 
-export function MenuBook() {
+/**
+ * One book of the menu: the page turner, its controls and the zoom dialog. MenuBook mounts a fresh one (keyed by the
+ * book's id) when the reader switches tabs, so every book starts at its first page with no turn in flight.
+ */
+function FlipBook({ book, preloadFirst }: { book: MenuBookData; preloadFirst: boolean }) {
   const reduce = useReducedMotion() ?? false;
+  const { pages } = book;
+  const lastPage = pages.length - 1;
+  const clampIndex = (index: number) => Math.max(0, Math.min(lastPage, index));
+  const pageSrc = (index: number) => menuPageSrc(book, pages[index]);
   const [view, setView] = useState<View>({ page: 0, turn: null });
   const [target, setTarget] = useState(0);
   const [zoomed, setZoomed] = useState(false);
@@ -162,11 +167,11 @@ export function MenuBook() {
   const leafIndex = turnPages ? Math.min(turnPages.from, turnPages.to) : page;
   const underIndex = turnPages ? Math.max(turnPages.from, turnPages.to) : null;
   const sheetPages = [...new Set([page - 1, page, page + 1, leafIndex, underIndex ?? -1])]
-    .filter((index) => index >= 0 && index <= LAST_PAGE)
+    .filter((index) => index >= 0 && index <= lastPage)
     .sort((a, b) => a - b);
   const preloadPages = [...new Set([page - 2, page + 2, target - 1, target, target + 1])]
-    .filter((index) => index >= 0 && index <= LAST_PAGE && !sheetPages.includes(index));
-  const shownPage = menuPages[target];
+    .filter((index) => index >= 0 && index <= lastPage && !sheetPages.includes(index));
+  const shownPage = pages[target];
 
   /** Draws the current fold: clips the leaf, mirrors its back over the fold, and moves the shading with it. */
   const paint = () => {
@@ -358,7 +363,7 @@ export function MenuBook() {
     const reach = width * 0.32;
     const toNext = Math.hypot(width - x, height - y);
     const toPrev = Math.hypot(x, height - y);
-    const dir: Direction | null = pageRef.current < LAST_PAGE && toNext < reach ? 1 : pageRef.current > 0 && toPrev < reach ? -1 : null;
+    const dir: Direction | null = pageRef.current < lastPage && toNext < reach ? 1 : pageRef.current > 0 && toPrev < reach ? -1 : null;
     if (current && dir !== current.dir) {
       if (current.heading !== "from") settle(current, "from", SPRING_PEEK);
       return;
@@ -429,7 +434,7 @@ export function MenuBook() {
       if (current && current.mode !== "peek") return;
       const dir: Direction = dx < 0 ? 1 : -1;
       const from = pageRef.current;
-      if (from + dir < 0 || from + dir > LAST_PAGE) return;
+      if (from + dir < 0 || from + dir > lastPage) return;
       const corner: Corner = drag.startY - drag.top < drag.height / 2 ? "top" : "bottom";
       const turn = current && current.dir === dir ? current : beginTurn(from, from + dir, "drag", corner);
       stopLeaf();
@@ -496,7 +501,7 @@ export function MenuBook() {
       requestStep(event.key === "ArrowRight" ? 1 : -1);
     } else if (event.key === "Home" || event.key === "End") {
       event.preventDefault();
-      requestPage(event.key === "Home" ? 0 : LAST_PAGE, true);
+      requestPage(event.key === "Home" ? 0 : lastPage, true);
     }
   };
 
@@ -534,6 +539,12 @@ export function MenuBook() {
     return () => observer.disconnect();
   }, []);
 
+  // Switching tabs unmounts this book: leave no leaf animating behind it.
+  useEffect(() => () => {
+    progress.stop();
+    liftOffset.stop();
+  }, [progress, liftOffset]);
+
   useEffect(() => {
     // One paint per frame however many values changed in it.
     const paintFrame = () => onPaint();
@@ -553,141 +564,116 @@ export function MenuBook() {
     </button>
   );
   const nextButton = (
-    <button type="button" className={styles.control} onClick={() => requestStep(1)} disabled={target === LAST_PAGE} aria-label="Trang sau">
+    <button type="button" className={styles.control} onClick={() => requestStep(1)} disabled={target === lastPage} aria-label="Trang sau">
       <ChevronRight aria-hidden size={20} strokeWidth={1.5} />
     </button>
   );
 
   return (
-    <Section className={styles.menuPage} padY="none" relative aria-labelledby="hot-menu-title">
-      <div className={styles.layout}>
-        <motion.header className={styles.intro} initial={reduce ? { opacity: 0 } : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease: EASE_CINEMA }}>
-          <Stack gap={4} className="sm:gap-6">
-            <Text variant="label" tone="muted">Menu nhậu — The Hot</Text>
-            <Heading as="h1" level="h1" id="hot-menu-title" balance={false}>
-              <span className="block">Lật menu.</span>
-              <span className="block text-accent">Chốt món.</span>
-            </Heading>
-            <Text variant="body" tone="muted" measure="comfort">Mồi bén, bia lạnh — đủ gu cho cả hội.</Text>
-            <MenuViewSwitcher active="book" />
-            <div className={styles.introNote}>
-              <Text variant="small" tone="muted">Mồi từ 39K · Bia từ 19K*</Text>
-              <ButtonLink href={site.cta.href} variant="link" {...trackAttrs("booking_cta_click", { location: "menu_top" })}>Chốt bàn cho hội mình →</ButtonLink>
-            </div>
-          </Stack>
-        </motion.header>
+    <>
+      <div role="tabpanel" id={PANEL_ID} aria-labelledby={`${TAB_ID_PREFIX}-${book.id}`} onKeyDown={handleReaderKey}>
+        <div className={styles.toolbar}>
+          <PageSelect id="menu-page" pages={pages} currentIndex={target} onChange={(index) => requestPage(index, true)} />
+          <button type="button" className={styles.expandButton} onClick={openReader} aria-label="Phóng lớn menu" aria-haspopup="dialog">
+            <Maximize2 aria-hidden size={17} strokeWidth={1.5} />
+            <span>Phóng lớn</span>
+          </button>
+        </div>
 
-        <motion.div className={styles.bookArea} onKeyDown={handleReaderKey} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.7, delay: 0.15, ease: EASE_CINEMA }}>
-          <div className={styles.toolbar}>
-            <PageSelect id="menu-page" currentIndex={target} onChange={(index) => requestPage(index, true)} />
-            <button type="button" className={styles.expandButton} onClick={openReader} aria-label="Phóng lớn menu" aria-haspopup="dialog">
-              <Maximize2 aria-hidden size={17} strokeWidth={1.5} />
-              <span>Phóng lớn</span>
-            </button>
-          </div>
-
-          <figure className={styles.bookShell}>
-            <div
-              ref={stageRef}
-              className={styles.paperStage}
-              style={{ boxShadow: stackShadow(LAST_PAGE - page) }}
-              role="region"
-              aria-label="Menu ảnh lật sách"
-              aria-describedby="menu-book-hint"
-              tabIndex={0}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") {
-                  event.preventDefault();
-                  requestStep(1);
-                }
-              }}
-              onClick={(event) => {
-                if (performance.now() < suppressClickUntil.current) return;
-                const bounds = event.currentTarget.getBoundingClientRect();
-                requestStep(event.clientX - bounds.left > bounds.width / 2 ? 1 : -1);
-              }}
-              onPointerDown={handlePointerDown}
-              onPointerMove={handlePointerMove}
-              onPointerUp={handlePointerUp}
-              onPointerCancel={handlePointerCancel}
-              onPointerLeave={(event) => {
-                if (event.pointerType === "mouse" && !dragRef.current) closePeek();
-              }}
-            >
-              {sheetPages.map((index) => (
-                <div
-                  key={menuPages[index].file}
-                  ref={(node) => {
-                    if (node) sheetsRef.current.set(index, node);
-                    return () => {
-                      sheetsRef.current.delete(index);
-                    };
-                  }}
-                  className={styles.sheet}
-                  style={{ zIndex: index === leafIndex ? 4 : index === underIndex ? 2 : 1 }}
-                  aria-hidden={index === page ? undefined : true}
-                >
-                  <Image
-                    src={pageSrc(index)}
-                    alt={index === page ? menuPages[index].alt : ""}
-                    width={1414}
-                    height={2000}
-                    sizes={PAGE_SIZES}
-                    preload={index === 0}
-                    loading={index === 0 ? undefined : "eager"}
-                    draggable={false}
-                    className={styles.paperImage}
-                  />
-                </div>
-              ))}
-              <div ref={underShadowRef} className={styles.underShadow} aria-hidden />
-              <div ref={flapWrapRef} className={styles.flapWrap} aria-hidden>
-                <div ref={flapRef} className={styles.flap}>
-                  {turnPages ? (
-                    <Image key={menuPages[leafIndex].file} src={pageSrc(leafIndex)} alt="" width={1414} height={2000} sizes={PAGE_SIZES} loading="eager" draggable={false} className={styles.flapPrint} />
-                  ) : null}
-                  <div ref={flapShadeRef} className={styles.flapShade} />
-                </div>
+        <figure className={styles.bookShell}>
+          <div
+            ref={stageRef}
+            className={styles.paperStage}
+            style={{ boxShadow: stackShadow(lastPage - page) }}
+            role="region"
+            aria-label={`Menu ảnh lật sách: ${book.label}`}
+            aria-describedby="menu-book-hint"
+            tabIndex={0}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                requestStep(1);
+              }
+            }}
+            onClick={(event) => {
+              if (performance.now() < suppressClickUntil.current) return;
+              const bounds = event.currentTarget.getBoundingClientRect();
+              requestStep(event.clientX - bounds.left > bounds.width / 2 ? 1 : -1);
+            }}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerCancel}
+            onPointerLeave={(event) => {
+              if (event.pointerType === "mouse" && !dragRef.current) closePeek();
+            }}
+          >
+            {sheetPages.map((index) => (
+              <div
+                key={pages[index].file}
+                ref={(node) => {
+                  if (node) sheetsRef.current.set(index, node);
+                  return () => {
+                    sheetsRef.current.delete(index);
+                  };
+                }}
+                className={styles.sheet}
+                style={{ zIndex: index === leafIndex ? 4 : index === underIndex ? 2 : 1 }}
+                aria-hidden={index === page ? undefined : true}
+              >
+                <Image
+                  src={pageSrc(index)}
+                  alt={index === page ? pages[index].alt : ""}
+                  width={1414}
+                  height={2000}
+                  sizes={PAGE_SIZES}
+                  preload={preloadFirst && index === 0}
+                  loading={preloadFirst && index === 0 ? undefined : "eager"}
+                  draggable={false}
+                  className={styles.paperImage}
+                />
               </div>
-              <span className={styles.gutter} aria-hidden />
+            ))}
+            <div ref={underShadowRef} className={styles.underShadow} aria-hidden />
+            <div ref={flapWrapRef} className={styles.flapWrap} aria-hidden>
+              <div ref={flapRef} className={styles.flap}>
+                {turnPages ? (
+                  <Image key={pages[leafIndex].file} src={pageSrc(leafIndex)} alt="" width={1414} height={2000} sizes={PAGE_SIZES} loading="eager" draggable={false} className={styles.flapPrint} />
+                ) : null}
+                <div ref={flapShadeRef} className={styles.flapShade} />
+              </div>
             </div>
-            <div className={styles.preload} aria-hidden>
-              {preloadPages.map((index) => (
-                <Image key={menuPages[index].file} src={pageSrc(index)} alt="" width={1414} height={2000} sizes={PAGE_SIZES} loading="eager" />
-              ))}
-            </div>
-            <figcaption className={styles.bookCaption}>
-              {previousButton}
-              <span className={styles.pageStatus} aria-live="polite" aria-atomic="true">
-                <span className={styles.captionTitle}>{shownPage.label.split(" · ")[0]}</span>
-                <span className="type-label text-muted">{String(target + 1).padStart(2, "0")} / {String(menuPages.length).padStart(2, "0")}</span>
-              </span>
-              {nextButton}
-            </figcaption>
-          </figure>
-          <div className={styles.progress} aria-hidden>
-            {menuPages.map((menuPage, index) => <span key={menuPage.file} className={index <= target ? styles.progressRead : undefined} />)}
+            <span className={styles.gutter} aria-hidden />
           </div>
-          <p id="menu-book-hint" className={styles.hint}>
-            Vuốt ngang hoặc chạm mép trang để lật.
-            <span className="sr-only"> Dùng phím ← → khi chọn menu. Home về trang đầu, End đến trang cuối.</span>
-          </p>
-        </motion.div>
+          <div className={styles.preload} aria-hidden>
+            {preloadPages.map((index) => (
+              <Image key={pages[index].file} src={pageSrc(index)} alt="" width={1414} height={2000} sizes={PAGE_SIZES} loading="eager" />
+            ))}
+          </div>
+          <figcaption className={styles.bookCaption}>
+            {previousButton}
+            <span className={styles.pageStatus} aria-live="polite" aria-atomic="true">
+              <span className={styles.captionTitle}>{shownPage.label.split(" · ")[0]}</span>
+              <span className="type-label text-muted">{String(target + 1).padStart(2, "0")} / {String(pages.length).padStart(2, "0")}</span>
+            </span>
+            {nextButton}
+          </figcaption>
+        </figure>
+        <div className={styles.progress} aria-hidden>
+          {pages.map((menuPage, index) => <span key={menuPage.file} className={index <= target ? styles.progressRead : undefined} />)}
+        </div>
+        <p id="menu-book-hint" className={styles.hint}>
+          Vuốt ngang hoặc chạm mép trang để lật.
+          <span className="sr-only"> Dùng phím ← → khi chọn menu. Home về trang đầu, End đến trang cuối.</span>
+        </p>
       </div>
 
-      <div className={styles.closing}>
-        <Stack gap={2}>
-          <Text variant="small" tone="muted">Giá VNĐ, đã gồm VAT. * {site.beerOffer}</Text>
-          <Text variant="small" tone="subtle">Món đang có và ưu đãi hôm bạn ghé? Nhắn The Hot để hỏi nhé.</Text>
-        </Stack>
-        <ButtonLink href={site.cta.href} className="shrink-0 whitespace-nowrap" {...trackAttrs("booking_cta_click", { location: "menu_bottom" })}>Chốt bàn</ButtonLink>
-      </div>
-
+      {/* Outside the tab panel, so a key pressed in the dialog is handled once, by the dialog. */}
       <dialog ref={dialogRef} className={styles.readerDialog} aria-labelledby="menu-reader-title" onKeyDown={handleReaderKey} onClose={() => setZoomed(false)} data-lenis-prevent>
         <div className={styles.dialogLayout}>
           <header className={styles.dialogHeader}>
             <div>
-              <p className="type-label text-muted">The Hot · Menu lật sách</p>
+              <p className="type-label text-muted">The Hot · {book.label}</p>
               <h2 id="menu-reader-title" className={styles.dialogTitle}>{shownPage.label.split(" · ")[0]}</h2>
             </div>
             <div className={styles.dialogActions}>
@@ -709,11 +695,62 @@ export function MenuBook() {
           </div>
           <footer className={styles.dialogFooter}>
             {previousButton}
-            <PageSelect id="menu-page-fullscreen" currentIndex={target} onChange={(index) => requestPage(index, true)} />
+            <PageSelect id="menu-page-fullscreen" pages={pages} currentIndex={target} onChange={(index) => requestPage(index, true)} />
             {nextButton}
           </footer>
         </div>
       </dialog>
+    </>
+  );
+}
+
+const bookTabs = menuBooks.map(({ id, label, summary }) => ({ id, label, summary }));
+
+export function MenuBook() {
+  const reduce = useReducedMotion() ?? false;
+  const [bookId, setBookId] = useState<MenuGroupId>(menuBooks[0].id);
+  const book = menuBooks.find((candidate) => candidate.id === bookId) ?? menuBooks[0];
+
+  const selectBook = (id: MenuGroupId) => {
+    if (id === bookId) return;
+    setBookId(id);
+    track("menu_tab_select", { tab: id, mode: "book" });
+  };
+
+  return (
+    <Section className={styles.menuPage} padY="none" relative aria-labelledby="hot-menu-title">
+      <div className={styles.layout}>
+        <motion.header className={styles.intro} initial={reduce ? { opacity: 0 } : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease: EASE_CINEMA }}>
+          <Stack gap={4} className="sm:gap-6">
+            <Text variant="label" tone="muted">Menu nhậu — The Hot</Text>
+            <Heading as="h1" level="h1" id="hot-menu-title" balance={false}>
+              <span className="block">Lật menu.</span>
+              <span className="block text-accent">Chốt món.</span>
+            </Heading>
+            <Text variant="body" tone="muted" measure="comfort">Mồi bén, bia lạnh — đủ gu cho cả hội.</Text>
+            <MenuViewSwitcher active="book" />
+            <div className={styles.introNote}>
+              <Text variant="small" tone="muted">Mồi từ 39K · Bia từ 19K*</Text>
+              <ButtonLink href={site.cta.href} variant="link" {...trackAttrs("booking_cta_click", { location: "menu_top" })}>Chốt bàn cho hội mình →</ButtonLink>
+            </div>
+          </Stack>
+        </motion.header>
+
+        <motion.div className={styles.bookArea} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.7, delay: 0.15, ease: EASE_CINEMA }}>
+          <div className={styles.tabs}>
+            <MenuTabs label="Chọn menu" tabs={bookTabs} active={book.id} onSelect={selectBook} idPrefix={TAB_ID_PREFIX} controls={() => PANEL_ID} />
+          </div>
+          <FlipBook key={book.id} book={book} preloadFirst={book.id === menuBooks[0].id} />
+        </motion.div>
+      </div>
+
+      <div className={styles.closing}>
+        <Stack gap={2}>
+          <Text variant="small" tone="muted">Giá VNĐ, đã gồm VAT. * {site.beerOffer}</Text>
+          <Text variant="small" tone="subtle">Món đang có và ưu đãi hôm bạn ghé? Nhắn The Hot để hỏi nhé.</Text>
+        </Stack>
+        <ButtonLink href={site.cta.href} className="shrink-0 whitespace-nowrap" {...trackAttrs("booking_cta_click", { location: "menu_bottom" })}>Chốt bàn</ButtonLink>
+      </div>
     </Section>
   );
 }
