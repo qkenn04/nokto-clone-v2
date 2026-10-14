@@ -5,6 +5,9 @@ import { HeroVideo } from "@/components/sites/the-hot/HeroVideo";
 import { HomeGallery } from "@/components/sites/the-hot/home/HomeGallery";
 import { EventTimeline } from "@/components/sites/the-hot/home/EventTimeline";
 import { heroVideo } from "@/components/sites/the-hot/videos";
+import { homeEventsJsonLd } from "@/seo/structured-data";
+
+const eventsJsonLd = homeEventsJsonLd();
 
 // Video fills the mobile hero; desktop uses the intro and video side by side.
 export default function HomePage() {
@@ -28,6 +31,8 @@ export default function HomePage() {
       <HomeGallery />
       <EventTimeline />
       <SiteFooter />
+      {/* The events in <EventTimeline />; the restaurant and website are in the root layout's JSON-LD. */}
+      {eventsJsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: eventsJsonLd }} />}
     </main>
   );
 }

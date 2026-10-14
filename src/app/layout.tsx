@@ -8,6 +8,7 @@ import { SmoothScroll } from "@/components/sites/nokto/chrome/SmoothScroll";
 import { FloatingContact } from "@/components/sites/the-hot/FloatingContact";
 import { site } from "@/components/sites/nokto/site";
 import { brandName, homeTitle } from "@/seo/page-meta";
+import { siteJsonLd } from "@/seo/structured-data";
 import "./globals.css";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
@@ -30,29 +31,6 @@ export const viewport: Viewport = {
   colorScheme: "dark",
 };
 
-const restaurantSchema = {
-  "@context": "https://schema.org",
-  "@type": "Restaurant",
-  "@id": `${siteUrl}/#restaurant`,
-  name: site.name,
-  description: site.schemaDescription,
-  url: siteUrl,
-  image: `${siteUrl}/opengraph-image.png`,
-  address: {
-    "@type": "PostalAddress",
-    streetAddress: site.address.street,
-    addressLocality: site.address.city,
-    addressRegion: site.address.region,
-    addressCountry: site.address.country,
-  },
-  servesCuisine: site.cuisine,
-  telephone: site.phoneHref.slice(4),
-  sameAs: [site.socialHref],
-  hasMenu: `${siteUrl}/menu`,
-  currenciesAccepted: "VND",
-  acceptsReservations: "True",
-};
-
 // The beer-fill splash plays on every full page load and is the first thing painted: it is the first content in the
 // body and shows by default, so nothing has to run before it appears. This script runs just before it is parsed and
 // holds its intro ("wait") until the splash has been through a frame, since that first frame lays out the whole page
@@ -70,10 +48,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="vi">
       <body>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(restaurantSchema) }}
-        />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: siteJsonLd() }} />
         {/* Marked by the script below before first paint; not <html>, whose attributes React resets in dev. */}
         <div className="contents" data-splash-root="" suppressHydrationWarning>
           <script dangerouslySetInnerHTML={{ __html: SPLASH_SCRIPT }} />
