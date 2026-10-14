@@ -26,7 +26,7 @@ npm ci
 Before opening a PR, make sure the project is green:
 
 ```bash
-npm run check   # lint + typecheck + build
+npm run check   # lint + typecheck + sitemap check + build
 ```
 
 ## Source-of-truth files
