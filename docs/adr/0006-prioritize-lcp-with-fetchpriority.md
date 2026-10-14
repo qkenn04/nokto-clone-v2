@@ -80,10 +80,7 @@ Font:
 
 - ADR: [0003](0003-allow-search-indexing.md), [0008](0008-compress-hero-video-without-trimming.md)
 - PERF-01 ở [yêu cầu phi chức năng](../product/nfr.md#2-hiệu-năng-core-web-vitals-trên-điện-thoại)
-<!-- check-links: off -->
-<!-- Link tới docs/plan/ và docs/specs/ (viết ở nhánh khác). Bỏ cặp marker này khi hai nhánh đã merge. -->
 - Spec: [003 Hiệu năng](../specs/003-performance/)
-<!-- check-links: on -->
 
 ## Nguồn/bằng chứng
 

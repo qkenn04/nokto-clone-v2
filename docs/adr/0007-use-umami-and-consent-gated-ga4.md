@@ -70,10 +70,7 @@ Chấp nhận (chưa triển khai, tính tới 2026-10-14).
 ## Liên quan
 
 - PRIV-02, PRIV-03, PRIV-04 ở [yêu cầu phi chức năng](../product/nfr.md#4-riêng-tư); T04, L7 ở [mô hình đe doạ](../security/threat-model.md); biến dự kiến ở [Cấu hình, mục 2.4](../dev/configuration.md#24-dự-kiến-chưa-có-trong-code)
-<!-- check-links: off -->
-<!-- Link tới docs/plan/ và docs/specs/ (viết ở nhánh khác). Bỏ cặp marker này khi hai nhánh đã merge. -->
 - Spec: [004 Analytics](../specs/004-analytics/)
-<!-- check-links: on -->
 
 ## Nguồn/bằng chứng
 

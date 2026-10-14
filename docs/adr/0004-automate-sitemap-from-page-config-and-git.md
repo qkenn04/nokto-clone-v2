@@ -74,10 +74,7 @@ Quy tắc rút ra:
 
 - ADR: [0003 Cho Google index](0003-allow-search-indexing.md)
 - [Mô hình dữ liệu nội dung, mục 5.5](../architecture/data-model.md#55-cấu-hình-sitemap-seositemap-pagesjson), bất biến I-03, I-04, I-05
-<!-- check-links: off -->
-<!-- Link tới docs/plan/ và docs/specs/ (viết ở nhánh khác). Bỏ cặp marker này khi hai nhánh đã merge. -->
 - Spec: [001 Sitemap tự động](../specs/001-sitemap-automation/)
-<!-- check-links: on -->
 
 ## Nguồn/bằng chứng
 

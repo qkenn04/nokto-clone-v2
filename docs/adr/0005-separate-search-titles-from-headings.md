@@ -69,10 +69,7 @@ Chấp nhận.
 ## Liên quan
 
 - [Mô hình dữ liệu nội dung, mục 5.6](../architecture/data-model.md#56-tiêu-đề-và-mô-tả-cho-tìm-kiếm-srcseopage-metats), bất biến I-09
-<!-- check-links: off -->
-<!-- Link tới docs/plan/ và docs/specs/ (viết ở nhánh khác). Bỏ cặp marker này khi hai nhánh đã merge. -->
 - Spec: [002 SEO trên trang](../specs/002-onpage-seo/)
-<!-- check-links: on -->
 
 ## Nguồn/bằng chứng
 

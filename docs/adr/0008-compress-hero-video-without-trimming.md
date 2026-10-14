@@ -66,10 +66,7 @@
 
 - ADR: [0006 Ưu tiên tải phần tử LCP](0006-prioritize-lcp-with-fetchpriority.md)
 - [Số đo hiệu năng, mục 4](../dev/perf.md#4-điểm-nóng-đã-biết)
-<!-- check-links: off -->
-<!-- Link tới docs/plan/ và docs/specs/ (viết ở nhánh khác). Bỏ cặp marker này khi hai nhánh đã merge. -->
 - Spec: [003 Hiệu năng](../specs/003-performance/)
-<!-- check-links: on -->
 
 ## Nguồn/bằng chứng
 

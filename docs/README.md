@@ -37,11 +37,8 @@ Tầng: **T1** bắt buộc · **T1\*** bắt buộc có điều kiện · **T2*
 
 Lộ trình, việc và tiến độ cấp dự án, cùng spec của từng tính năng, được viết trên một nhánh riêng:
 
-<!-- check-links: off -->
-<!-- Link tới docs/plan/ và docs/specs/ (viết ở nhánh khác). Bỏ cặp marker này khi hai nhánh đã merge. -->
 - Kế hoạch: [Lộ trình](plan/roadmap.md) · [Việc](plan/tasks.md) · [Tiến độ](plan/progress.md)
 - Spec: [001 Sitemap tự động](specs/001-sitemap-automation/) · [002 SEO trên trang](specs/002-onpage-seo/) · [003 Hiệu năng](specs/003-performance/) · [004 Analytics](specs/004-analytics/)
-<!-- check-links: on -->
 
 Trạng thái dự án (mốc nào xong, việc nào đang làm) chỉ ghi ở `docs/plan/progress.md`, không chép vào các file khác.
 

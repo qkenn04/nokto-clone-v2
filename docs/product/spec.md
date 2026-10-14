@@ -66,11 +66,8 @@ Tính tới 2026-10-14:
 
 Spec của từng tính năng:
 
-<!-- check-links: off -->
-<!-- Link tới docs/plan/ và docs/specs/ (viết ở nhánh khác). Bỏ cặp marker này khi hai nhánh đã merge. -->
 - [001 Sitemap tự động](../specs/001-sitemap-automation/) · [002 SEO trên trang](../specs/002-onpage-seo/) · [003 Hiệu năng](../specs/003-performance/) · [004 Analytics](../specs/004-analytics/)
 - Thứ tự làm: [Lộ trình](../plan/roadmap.md); trạng thái: [Tiến độ](../plan/progress.md)
-<!-- check-links: on -->
 
 ## 7. Tiêu chí nghiệm thu cấp sản phẩm
 
