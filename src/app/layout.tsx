@@ -7,18 +7,22 @@ import { Preloader } from "@/components/sites/nokto/chrome/Preloader";
 import { SmoothScroll } from "@/components/sites/nokto/chrome/SmoothScroll";
 import { FloatingContact } from "@/components/sites/the-hot/FloatingContact";
 import { site } from "@/components/sites/nokto/site";
+import { brandName, homeTitle } from "@/seo/page-meta";
 import "./globals.css";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: { default: site.rootTitle, template: `%s — ${site.name} ${site.location}` },
+  title: { default: homeTitle, template: `%s — ${brandName}` },
   description: site.rootDescription,
   robots: { index: true, follow: true },
   alternates: { canonical: "/" },
+  // Shares of the home page keep the slogan title, not the search title above.
   openGraph: { title: site.rootTitle, description: site.rootDescription, url: "/", type: "website", locale: "vi_VN", siteName: site.name },
-  twitter: { card: "summary_large_image", title: site.rootTitle, description: site.rootDescription },
+  // No title or description here: Next.js copies them from each page's openGraph, so every Twitter card matches its
+  // Open Graph tags. A page-level `twitter` object would replace this one and lose the app/twitter-image.png card.
+  twitter: { card: "summary_large_image" },
 };
 
 export const viewport: Viewport = {

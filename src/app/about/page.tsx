@@ -8,19 +8,10 @@ import { AboutOpening } from "@/components/sites/nokto/about/AboutOpening";
 import { AboutQuote } from "@/components/sites/nokto/about/AboutQuote";
 import { FixedVideo } from "@/components/sites/nokto/chrome/FixedVideo";
 import { SiteFooter } from "@/components/sites/nokto/chrome/SiteFooter";
-import { site } from "@/components/sites/nokto/site";
 import { aboutVideo } from "@/components/sites/the-hot/videos";
+import { pageMetadata } from "@/seo/page-meta";
 
-const title = "Về The Hot";
-const description = "The Hot — quán nhậu của hội bạn ở Đà Lạt. Mồi bén, bia lạnh, nhạc lên tại 28 Sương Nguyệt Ánh, P. Lâm Viên.";
-
-export const metadata: Metadata = {
-  title,
-  description,
-  alternates: { canonical: "/about" },
-  // The layout's title template does not reach openGraph, so the full title is spelled out.
-  openGraph: { title: `${title} — ${site.name} ${site.location}`, description, url: "/about", type: "website" },
-};
+export const metadata: Metadata = pageMetadata("/about");
 
 export default function AboutPage() {
   return (
