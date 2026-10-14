@@ -1,43 +1,35 @@
 # Mô hình đe doạ
 
-> Trạng thái: Nháp · Cập nhật: 2026-10-14 · Liên quan: [Kiến trúc](../architecture/ARCHITECTURE.md), [Yêu cầu phi chức năng](../product/nfr.md), [Cấu hình](../dev/configuration.md), [Triển khai](../ops/deployment.md), [Runbook](../ops/runbooks/README.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-14 · Liên quan: [Kiến trúc](../architecture/ARCHITECTURE.md), [Yêu cầu phi chức năng](../product/nfr.md), [Cấu hình](../dev/configuration.md), [Triển khai](../ops/deployment.md), [Runbook](../ops/runbooks/README.md)
 
-<!--
-File này trả lời: bảo vệ cái gì, trước ai, qua đường nào, lớp nào chặn, và kiểm lớp đó bằng gì.
-Tầng T2 khi hệ thống có người dùng, dữ liệu riêng tư hoặc mở ra mạng: làm mục 0–3 và 5.
-Tầng T3 cho dự án lớn: làm đủ, rà theo STRIDE, có buổi rà bảo mật trước phát hành (mục 6).
-Công khai được: không bí mật, không IP, không chi tiết khai thác được của lỗ hổng chưa vá.
-Lớp bảo vệ chưa có phép kiểm thì coi như chưa có.
--->
+Bản ngắn (tầng T2) cho một site giới thiệu không có tài khoản và không nhận dữ liệu. Repo công khai: file này không ghi địa chỉ, tên bí mật hay chi tiết khai thác được; cấu hình bảo vệ phía máy chủ nằm ở `qkenn04/infra-qkenn`. Tính tới 2026-10-14.
 
 ## 0. Tóm tắt một trang
 
-| Chủ đề | Quyết định | Chi tiết |
+| Chủ đề | Hiện trạng | Chi tiết |
 |---|---|---|
-| Ai được vào phần quản trị | <…> | mục 4 |
-| Phiên và xác thực | <…> | mục 4 |
-| Dữ liệu đầu vào không tin cậy | <…> | mục 3.3 |
-| Bí mật | Sinh tại chỗ, giữ trong kho bí mật, không vào repo hay log | mục 5, [Cấu hình](../dev/configuration.md) |
-| Trước phát hành | Rà theo checklist; lỗi mức Cao trở lên phải sửa xong | mục 6 |
+| Tài khoản, phần quản trị | Không có trên site | NG3 ở [đặc tả](../product/spec.md#5-không-làm) |
+| Dữ liệu khách | Form đặt bàn chỉ giữ dữ liệu trong trình duyệt, không gửi, không lưu | T04, PRIV-01 |
+| Bên thứ ba chạy trên trang | Cloudflare Web Analytics (beacon do Cloudflare tự chèn, đang chạy). Dự kiến: Umami (không cookie) và GA4 chỉ sau khi khách đồng ý | T04, [ADR 0007](../adr/0007-use-umami-and-consent-gated-ga4.md) |
+| Đường giao hàng | Jenkins chỉ bind bí mật trong stage cần dùng; khoá deploy chỉ chạy được một lệnh; host key được ghim | T05, mục 4 |
+| Header bảo mật | Thiếu HSTS, CSP, `X-Frame-Options`, COOP (PageSpeed 2026-10-14) | T03, việc cần làm |
 
 ## 1. Nguyên tắc
 
-<!-- Ví dụ thường gặp; giữ cái đúng với dự án. -->
-
-1. **Nhiều lớp độc lập.** Không lớp nào là lớp duy nhất; mỗi lớp giả định lớp ngoài có thể đã hỏng.
-2. **Hỏng thì đóng.** Thiếu cấu hình bảo mật là lỗi khởi động, không "bỏ qua êm".
-3. **Quyền tối thiểu.** Tiến trình, token, khoá chỉ có đúng quyền cần dùng.
-4. **Thứ không cần thì không có.** Không mở endpoint, cổng, định dạng upload "để sau dùng".
-5. **Kiểm bằng test, không bằng lời hứa.**
+1. **Thứ không cần thì không có:** không backend, không form gửi đi, không tài khoản. Mỗi thứ thêm vào (analytics, form thật) cần ADR và cập nhật file này.
+2. **Repo công khai là giả định mặc định:** mọi thứ trong repo, kể cả `Jenkinsfile`, coi như kẻ tấn công đã đọc.
+3. **Khách được biết ai nhận dữ liệu của họ:** mọi bên thứ ba chạy trên trang được liệt kê ở `/privacy`.
+4. **Lớp bảo vệ chưa có cách kiểm thì coi như chưa có.**
 
 ## 2. Tài sản cần bảo vệ
 
 | # | Tài sản | Vì sao quan trọng | Nằm ở đâu | Lớp bảo vệ chính |
 |---|---|---|---|---|
-| TS1 | *Ví dụ:* tài khoản quản trị | Chiếm được là làm được mọi thứ | Cơ sở dữ liệu | Mật khẩu băm + 2FA + giới hạn thử |
-| TS2 | *Ví dụ:* dữ liệu cá nhân người dùng | Rò rỉ gây hại cho người dùng và trách nhiệm pháp lý | Cơ sở dữ liệu, bản sao lưu | Phân quyền, mã hoá bản sao lưu |
-| TS3 | *Ví dụ:* bí mật vận hành | Mở khoá các tài sản khác | Kho bí mật, biến môi trường | mục 5 |
-| TS4 | *Ví dụ:* đường deploy | Chạy code tuỳ ý trên máy chủ | CI, khoá deploy | Khoá chỉ chạy một lệnh, ghim host key |
+| TS1 | Đường deploy (Jenkins, quyền push registry, khoá deploy) | Chiếm được là chạy được code tuỳ ý trên production | Máy CI, Jenkins Credentials | L4 |
+| TS2 | Nội dung và uy tín của site | Trang bị sửa, hoặc giờ, hotline, giá sai làm khách mất lòng tin và gọi nhầm | Repo, image trên VPS | L1, review, chủ quán duyệt |
+| TS3 | Domain `thehot.vn`, zone Cloudflare, tài khoản Google (Search Console, Business Profile) | Mất là mất cả site và hiện diện trên Google | Ngoài repo, chủ quán và chủ repo quản lý | Ngoài phạm vi repo `[CẦN XÁC NHẬN: tài khoản đã bật 2FA chưa]` |
+| TS4 | Dữ liệu khách nhập vào form; số liệu truy cập của khách | Dữ liệu cá nhân, trách nhiệm pháp lý | Trình duyệt của khách; công cụ analytics (dự kiến) | L1, L7 |
+| TS5 | Repo GitHub công khai | Nguồn của mọi build; secret lỡ commit thì lộ ngay | GitHub | Review, L8 (chưa có) |
 
 ## 3. Mô hình đe doạ
 
@@ -45,78 +37,95 @@ Lớp bảo vệ chưa có phép kiểm thì coi như chưa có.
 
 | Mã | Tác nhân | Khả năng | Mục tiêu thường gặp |
 |---|---|---|---|
-| A1 | Bot, scanner trên internet | Quét, dò mật khẩu phổ biến, khai thác lỗ hổng đại trà | Trang đăng nhập, file lộ (`.env`, `.git`) |
-| A2 | Kẻ tấn công có chủ đích | Đọc được repo công khai, phishing | Tài khoản quản trị, đường deploy |
-| A3 | Chuỗi cung ứng | Gói phụ thuộc, image, action CI bị chèn mã | Build, runtime |
-| A4 | Thao tác nhầm (người hoặc agent AI) | Có quyền trong phiên làm việc | Ghi nhầm vào môi trường thật, in bí mật ra màn hình |
-| A5 | Sự cố không do người | Hết đĩa, mất máy chủ | Dữ liệu, tính sẵn sàng |
+| A1 | Bot, scanner trên internet | Quét, khai thác lỗ hổng đại trà | Lỗ hổng Next.js, file lộ |
+| A2 | Kẻ tấn công có chủ đích | Đọc repo công khai (kể cả `Jenkinsfile`), phishing | Đường deploy, tài khoản Cloudflare và Google |
+| A3 | Chuỗi cung ứng | Gói npm, image Node, plugin Jenkins bị chèn mã hoặc có lỗ hổng | Build, runtime |
+| A4 | Thao tác nhầm (người hoặc agent AI) | Có quyền trong phiên làm việc | Commit secret, sửa sai thông tin quán, thêm script theo dõi mà quên `/privacy` |
+| A5 | Sự cố không do người | Máy CI tắt đột ngột, VPS ngừng | Tính sẵn sàng, khả năng deploy |
 
 ### 3.2 Ranh giới tin cậy
 
 ```mermaid
 flowchart LR
   subgraph NET["Internet (không tin)"]
-    user["Người dùng"]
+    guest["Khách"]
     attacker["Kẻ tấn công"]
   end
-  subgraph EDGE["Lớp biên"]
-    proxy["Reverse proxy / CDN"]
+  subgraph EDGE["Cloudflare"]
+    cf["Proxy, TLS, Always Use HTTPS"]
   end
-  subgraph HOST["Máy chủ"]
-    app["Ứng dụng<br/>(không chạy root)"]
-    db[("Cơ sở dữ liệu<br/>mạng nội bộ")]
+  subgraph VPS["VPS"]
+    nginx["nginx"]
+    app["Container Next.js<br/>(user node)"]
+    deploy["Script deploy<br/>(forced command)"]
   end
-  ci["CI"]
-  user --> proxy
-  attacker --> proxy
-  proxy -->|"chỉ loopback"| app
-  app --> db
-  ci -->|"khoá deploy, một lệnh"| HOST
+  subgraph CI["Máy CI (mạng riêng)"]
+    jenkins["Jenkins"]
+    harbor[("Harbor")]
+  end
+  github["GitHub (công khai)"]
+  guest --> cf
+  attacker --> cf
+  cf --> nginx --> app
+  jenkins -->|"poll, chỉ đọc"| github
+  jenkins -->|"push image"| harbor
+  jenkins -->|"SSH, một lệnh"| deploy
+  deploy -->|"pull image"| harbor
 ```
 
 Ranh giới cần giữ:
 
-- **Internet → ứng dụng:** chỉ qua lớp biên; ứng dụng chỉ nghe `127.0.0.1`.
-- **Ứng dụng → dữ liệu:** <…>
-- **CI → máy chủ:** <…>
+- **Internet → ứng dụng:** chỉ qua Cloudflare và nginx; container không mở cổng ra Internet (cấu hình ở repo infra).
+- **CI → VPS:** chỉ một lệnh deploy nhận commit SHA; không shell. Host key của VPS được ghim trong Jenkins.
+- **GitHub → CI:** Jenkins chỉ build nhánh `main` đã qua review; PR từ bên ngoài không được build tự động.
 
 ### 3.3 Bảng đe doạ
 
-<!-- Rà theo STRIDE: giả mạo (Spoofing), sửa trái phép (Tampering), chối bỏ (Repudiation), lộ thông tin (Information disclosure), từ chối dịch vụ (Denial of service), leo quyền (Elevation of privilege). Mốc là mốc mà lớp chặn phải có và đã được kiểm. -->
-
-| # | Đe doạ | Đường vào | Hậu quả | Lớp chặn | Kiểm bằng | Mốc |
+| # | Đe doạ | Đường vào | Hậu quả | Lớp chặn | Kiểm bằng | Trạng thái |
 |---|---|---|---|---|---|---|
-| T01 | *Ví dụ:* dò mật khẩu quản trị | A1 → trang đăng nhập | Chiếm TS1 | Giới hạn tần suất; khoá sau N lần sai; 2FA | Test tích hợp | M# |
-| T02 | *Ví dụ:* XSS lưu trữ qua nội dung người dùng | A2 → trường văn bản | Chiếm phiên | Escape theo ngữ cảnh; CSP không cho script nội dòng | Test với chuỗi độc hại | M# |
-| T03 | *Ví dụ:* lộ bí mật qua log | A4 → log CI, log ứng dụng | Mất TS3 | Logger che trường nhạy cảm; quét secret trong CI | Test logger; CI | M# |
-| T04 | *Ví dụ:* gói phụ thuộc độc | A3 | Chạy mã khi build | Lockfile; ghim phiên bản; review cập nhật | CI | M# |
-| T05 | <…> | <…> | <…> | <…> | <…> | <…> |
+| T01 | Lộ secret qua repo công khai | A4 → commit | Mất TS1 | Ứng dụng không dùng secret; secret CI chỉ nằm trong Jenkins Credentials | Review PR | Một phần: chưa có quét secret tự động (L8) |
+| T02 | Gói npm, image nền hoặc plugin có mã độc hay lỗ hổng | A3 → build, runtime | Chạy mã lúc build hoặc trong container | `package-lock.json` + `npm ci`; image Node ghim tag; container chạy user `node`; build trong Docker riêng của máy CI | — | Một phần: pipeline chưa quét và chặn theo lỗ hổng; image nền ghim tag, chưa ghim digest |
+| T03 | Nhúng site vào iframe (clickjacking), hạ cấp HTTPS lần đầu truy cập | A1, A2 → trình duyệt khách | Lừa khách bấm, nghe lén lần truy cập HTTP đầu | Always Use HTTPS (Cloudflare) | `curl -sI https://thehot.vn/` | Chưa đủ: thiếu HSTS, `X-Frame-Options`/`frame-ancestors`, CSP |
+| T04 | Script bên thứ ba nhận dữ liệu khách ngoài điều `/privacy` mô tả, hoặc trước khi khách đồng ý | A4, A3 → thêm script | Vi phạm riêng tư, rủi ro pháp lý | GA4 chỉ tải sau đồng ý; chỉ gửi tham số trong danh sách cho phép; `/privacy` liệt kê bên thứ ba | DevTools Network và Cookies | Chưa đạt: beacon Cloudflare Web Analytics chưa có trong `/privacy` |
+| T05 | Dùng quyền Jenkins hoặc khoá deploy để chạy lệnh tuỳ ý trên VPS | A2 → máy CI, khoá deploy | Chiếm TS1, sửa site | Forced command; khoá chỉ dùng được từ mạng riêng; host key ghim; Jenkins không mở ra Internet | Cấu hình ở repo infra | Có |
+| T06 | Thông tin quán sai trên site (sửa nhầm, hoặc lệch giữa các chỗ) | A4 → PR | Khách đến sai giờ, gọi nhầm số | Một nguồn `site.ts` (I-01); chủ quán duyệt; review | Kiểm tay, Rich Results Test | Một phần: còn chỗ gõ lại (I-01), giờ lệch Google Maps |
+| T07 | Site hoặc khả năng deploy ngừng do sự cố hạ tầng | A5 | Khách không vào được; không sửa được site | Tự rollback khi healthcheck lỗi; VPS giữ image cũ; lỗi CI không chạm VPS | [Runbook 001](../ops/runbooks/001-jenkins-git-cache-corrupted.md) | Có |
+| T08 | JSON-LD chèn chuỗi chứa `</script>` làm vỡ trang hoặc chèn script | A4 → dữ liệu | XSS | Dữ liệu JSON-LD là hằng số trong repo; nếu sau này lấy dữ liệu từ ngoài thì phải escape `<` trước khi nhúng | Review | Có (với dữ liệu hiện tại) |
 
 ## 4. Lớp bảo vệ
 
 | # | Lớp | Chặn đe doạ | Làm ở đâu | Trạng thái |
 |---|---|---|---|---|
-| L1 | <…> | T01 | <…> | Có / Chưa có / Đề xuất |
+| L1 | Không tài khoản, không backend, form không gửi dữ liệu | T04, T08 và cả nhóm đe doạ đăng nhập, injection | Thiết kế ([đặc tả](../product/spec.md)) | Có |
+| L2 | Container chạy user không phải root, có healthcheck | T02 | `Dockerfile` | Có |
+| L3 | Cloudflare proxy, Always Use HTTPS; nginx dùng chứng chỉ Origin CA | T03 | Cloudflare, repo infra | Có `[CẦN XÁC NHẬN: chế độ Full (strict)]` |
+| L4 | Bí mật CI bind theo stage, đăng xuất registry sau push, forced command, host key ghim | T01, T05 | `Jenkinsfile`, repo infra | Có |
+| L5 | Lockfile, `npm ci`, image Node ghim phiên bản | T02 | `package-lock.json`, `Dockerfile` | Có |
+| L6 | Header bảo mật HSTS, `X-Frame-Options` hoặc CSP `frame-ancestors`, `X-Content-Type-Options` | T03 | Cloudflare hoặc nginx (repo infra) | Chưa có |
+| L7 | GA4 sau đồng ý, danh sách tham số cho phép, `/privacy` đầy đủ | T04 | Code site (dự kiến), `legal/content.ts` | Đề xuất ([ADR 0007](../adr/0007-use-umami-and-consent-gated-ga4.md)) |
+| L8 | Quét secret cho repo công khai | T01 | CI hoặc GitHub | Chưa có |
+| L9 | Quét lỗ hổng phụ thuộc và image, có ngưỡng chặn | T02 | Pipeline | Chưa có trong `Jenkinsfile` |
 
 ## 5. Bí mật
 
-Danh mục bí mật, nơi giữ và cách xoay vòng: [Cấu hình, mục 5](../dev/configuration.md#5-bí-mật-nơi-giữ-xoay-vòng-thu-hồi). Quy tắc khi làm việc với agent AI: không dán giá trị bí mật vào hội thoại; xem tên biến thay vì giá trị.
+Ứng dụng không có bí mật. Bí mật của đường giao hàng: [Cấu hình, mục 5](../dev/configuration.md#5-bí-mật-nơi-giữ-xoay-vòng-thu-hồi). Khi làm việc với agent AI: không dán giá trị bí mật vào hội thoại; không đưa địa chỉ máy chủ, tên bí mật hay đường dẫn trên máy chủ vào repo này.
 
-## 6. Rà bảo mật trước phát hành
+## 6. Việc cần làm
 
-- [ ] Mọi đe doạ mức Cao trở lên trong mục 3.3 có lớp chặn đã kiểm.
-- [ ] Không có bí mật trong repo và lịch sử git (công cụ quét).
-- [ ] Header bảo mật (CSP, HSTS, chống nhúng khung) đã kiểm bằng lệnh thật.
-- [ ] Phụ thuộc không có lỗ hổng mức Cao đã biết chưa xử lý.
-- [ ] Đã diễn tập khôi phục từ bản sao lưu.
-- [ ] Có người thứ hai (hoặc agent kiểm độc lập) rà lại các thay đổi nhạy cảm.
+- [ ] L6: thêm HSTS (Cloudflare Edge Certificates hoặc nginx), `X-Frame-Options: DENY` hoặc CSP `frame-ancestors 'none'`, `X-Content-Type-Options: nosniff`. Làm ở `qkenn04/infra-qkenn`; kiểm bằng `curl -sI https://thehot.vn/`.
+- [ ] T04: ghi Cloudflare Web Analytics vào `/privacy`, hoặc tắt nếu chọn chỉ dùng Umami ([ADR 0007](../adr/0007-use-umami-and-consent-gated-ga4.md)); sửa mục "Tùy chọn hiển thị" của `/privacy` (code không còn ghi nhớ gì trong tab).
+- [ ] L8: chọn và bật quét secret.
+- [ ] L9: quyết định ngưỡng chặn theo kết quả quét lỗ hổng image.
 
 ## 7. Rủi ro đã chấp nhận
 
 | Rủi ro | Vì sao chấp nhận | Người chấp nhận | Xem lại khi |
 |---|---|---|---|
-| <…> | <…> | <…> | <…> |
+| Dùng ảnh nền `hero-backdrop.jpg` và vài SVG của template NOKTO trên site công khai, đã index | Chưa có ảnh thay; chủ quán chọn giữ giao diện hiện tại | Chủ quán ([ADR 0003](../adr/0003-allow-search-indexing.md)) | Có ảnh của quán hoặc phương án gradient được duyệt |
+| Một VPS, không bản dự phòng | Site giới thiệu, chi phí thấp | `[CẦN XÁC NHẬN: chủ repo và chủ quán]` | Khi có yêu cầu sẵn sàng cao hơn (AVAIL-01) |
+| Repo công khai, `Jenkinsfile` lộ tên máy CI trong mạng riêng | Repo được chọn để công khai (2026-10-10); máy CI và VPS chỉ nhận kết nối deploy từ mạng riêng | Chủ repo chọn công khai; việc chấp nhận phần lộ trong `Jenkinsfile`: `[CẦN XÁC NHẬN]` | Khi đổi kiến trúc mạng |
 
 ## 8. Câu hỏi mở
 
-- [CẦN XÁC NHẬN: <câu hỏi>]
+- [CẦN XÁC NHẬN: tài khoản Cloudflare, Google, GitHub của quán và chủ repo đã bật xác thực 2 lớp chưa]
+- [CẦN XÁC NHẬN: giữ hay tắt Cloudflare Web Analytics khi đã có Umami]

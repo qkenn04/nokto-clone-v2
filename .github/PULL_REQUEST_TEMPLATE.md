@@ -39,7 +39,7 @@
 ## Mọi PR có sửa tài liệu
 
 - [ ] Ngày `Cập nhật:` ở dòng metadata của file đã sửa nội dung là hôm nay
-- [ ] `python3 scripts/check-links.py .` không báo lỗi
+- [ ] `python3 scripts/check-links.py . --exclude CONTRIBUTING.md --exclude SECURITY.md` không báo lỗi
 - [ ] Không secret, token, IP, hostname nội bộ, đường dẫn trên máy chủ (repo này công khai; chi tiết hạ tầng nằm ở `qkenn04/infra-qkenn`)
 - [ ] Chỗ chưa chắc ghi `[CẦN XÁC NHẬN: …]`; thông tin kinh doanh chưa chốt ghi "Chưa xác định — cần chủ quán xác nhận"; ước lượng ghi "ước lượng thô"
 - [ ] File mới đã được link từ `docs/README.md` hoặc mục lục của thư mục chứa nó

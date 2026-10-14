@@ -1,167 +1,62 @@
-# CI/CD Runtime Adapter: VPS + Docker Compose
-> Trạng thái: Nháp · Cập nhật: 2026-10-14 · Liên quan: [Core policy](../ci-cd-core.md)
+# CI/CD runtime: VPS + Docker Compose
 
-File này mô tả cách chạy artifact container trên VPS bằng Docker Compose và reverse proxy. Nó bổ sung cho [core policy](../ci-cd-core.md) và provider adapter.
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-14 · Liên quan: [Chính sách CI/CD](../ci-cd-core.md), [Jenkins + Harbor](../providers/jenkins-registry.md), [Triển khai](../deployment.md), [Kiến trúc](../../architecture/ARCHITECTURE.md)
 
-## 1. Khi profile này phù hợp
+Site chạy thành một container trên một VPS, quản lý bằng Docker Compose, sau nginx và Cloudflare. File này ghi cách runtime đó đáp ứng [chính sách CI/CD](../ci-cd-core.md). Compose stack, script deploy, cấu hình nginx và bố cục thư mục trên VPS nằm ở `qkenn04/infra-qkenn` (`stacks/`, `nginx/`), không ghi lại ở repo công khai này. Tính tới 2026-10-14.
 
-Phù hợp khi:
+## 1. Vì sao profile này phù hợp
 
-- Ứng dụng có ít service hoặc một monolith.
-- Lưu lượng chưa cần autoscaling phức tạp.
-- Team có thể quản lý OS, Docker, firewall và backup.
-- Chấp nhận một VPS là điểm lỗi chung, hoặc đã có kế hoạch nhiều host.
+- Một ứng dụng, không cơ sở dữ liệu, không worker, không upload: không cần điều phối nhiều service.
+- Lưu lượng của một quán, không cần autoscaling.
+- Chấp nhận một VPS là điểm lỗi chung ([mô hình đe doạ, mục 7](../../security/threat-model.md#7-rủi-ro-đã-chấp-nhận)).
 
-Không tự động có high availability chỉ vì dùng Docker Compose.
-
-## 2. Kiến trúc minh họa
+## 2. Kiến trúc
 
 ```text
-Internet
-  ↓
-Reverse proxy
-  ├── app-blue  :3001  (đang phục vụ)
-  └── app-green :3002  (candidate)
-        ↓
-    PostgreSQL / managed database
+Internet → Cloudflare → nginx (VPS, TLS Origin CA) → container Next.js (chỉ nghe trong máy)
 ```
 
-Chỉ reverse proxy nhận traffic public. Candidate không mở cổng trực tiếp ra Internet.
+Chỉ nginx nhận traffic từ ngoài, và chỉ từ Cloudflare. Không có blue-green: bản mới thay bản cũ trong cùng một service.
 
-## 3. Server layout
-
-Ví dụ:
+## 3. Luồng deploy
 
 ```text
-/opt/app/
-├── releases/
-│   ├── current.json
-│   └── previous.json
-├── compose/
-│   ├── blue.yml
-│   └── green.yml
-├── deploy/
-│   ├── deploy-release.sh
-│   ├── rollback.sh
-│   └── readiness.sh
-└── secrets/
-    └── production.env
+Jenkins gọi "deploy <commit sha>" qua SSH (forced command)
+→ khoá chống chạy chồng
+→ kéo image nokto/web:<sha> từ Harbor
+→ chạy container mới
+→ đợi Docker HEALTHCHECK
+→ khoẻ: giữ, dọn image cũ (giữ 3 bản gần nhất)
+→ không khoẻ: chạy lại image trước, báo lỗi về Jenkins
 ```
 
-Thư mục secrets phải có owner, permission và backup policy phù hợp. Không commit file secret vào repository.
+Không build trên VPS, không dùng tag `latest`, không có migration.
 
-## 4. Deploy flow
+## 4. Health check
 
-```text
-Acquire lock
-→ verify release manifest và signature
-→ pull đúng digest
-→ kiểm tra backup/recovery point
-→ chạy migration có lock
-→ start candidate
-→ readiness
-→ internal functional test
-→ chuyển reverse proxy
-→ smoke test qua domain public
-→ quan sát metric
-→ ghi nhận thành công hoặc rollback
-```
-
-Không dùng tag `latest`, không build trên production và không chạy migration đồng thời từ mọi app instance.
-
-## 5. Blue-green trên một VPS
-
-| Container | Vai trò |
+| Loại | Ở đây |
 |---|---|
-| Blue | Phiên bản đang phục vụ |
-| Green | Phiên bản candidate |
+| Liveness/readiness | `HEALTHCHECK` trong `Dockerfile`: mỗi 30 s, `node -e "fetch('http://127.0.0.1:3000/')"` phải trả mã 2xx; khởi động cho phép 30 s, 3 lần lỗi liên tiếp là không khoẻ |
+| Smoke test trước deploy | `ci/smoke-test.sh` trên máy CI, gọi mọi trang và kiểm sitemap ([Kiểm thử](../../dev/testing.md#3-smoke-test-kiểm-gì)) |
+| Kiểm qua domain thật | Tay, sau deploy ([Triển khai, mục 6.3](../deployment.md#63-kiểm-sau-deploy)) |
 
-Điều kiện:
+## 5. SSH và bí mật
 
-- Host đủ CPU, memory và disk cho hai phiên bản.
-- Session/upload không phụ thuộc filesystem tạm của container.
-- Worker/cron có cơ chế tránh chạy trùng.
-- WebSocket và long-running request có kế hoạch drain.
-- Database schema tương thích với cả bản cũ và bản mới trong thời gian rollback.
+- Jenkins SSH bằng khoá chỉ chạy được lệnh deploy (forced command), chỉ dùng được từ mạng riêng; host key của VPS được ghim.
+- Lệnh deploy đăng nhập bằng `root` (thấy trong `Jenkinsfile`) nhưng bị giới hạn ở forced command. Cân nhắc user deploy riêng hoặc `PermitRootLogin forced-commands-only` ở repo infra.
+- Container không nhận bí mật nào.
 
-Sau khi candidate pass:
+## 6. Sao lưu và khôi phục
 
-1. Reload reverse proxy sang candidate.
-2. Smoke test qua domain thật.
-3. Giữ bản cũ trong thời gian quan sát.
-4. Chỉ dừng bản cũ sau khi release ổn định.
+Không có dữ liệu riêng trên VPS cần sao lưu cho site này: nội dung nằm trong git, image nằm trong Harbor. Mất VPS thì dựng lại stack và nginx theo repo infra rồi deploy lại commit mới nhất. `[CẦN XÁC NHẬN: đã diễn tập dựng lại stack từ repo infra chưa, mất bao lâu]`
 
-## 6. Lock và chống deploy cũ
+## 7. Checklist runtime
 
-Lock phải bao phủ migration, start container, đổi traffic và rollback.
-
-Một VPS có thể dùng lock file hoặc `flock`; nhiều host cần deployment controller hoặc distributed lock. Concurrency ở CI không thay thế lock trên server.
-
-Trong lock cần kiểm tra release còn là release được phép phát hành. Release cũ hoàn thành sau release mới không được tự ý ghi đè production.
-
-## 7. Health checks
-
-- **Liveness**: process còn chạy không?
-- **Readiness**: instance đã sẵn sàng phục vụ với dependency cần thiết chưa?
-- **Smoke test**: thao tác chính có hoạt động qua domain thật không?
-
-Readiness nên nhẹ, có timeout và kiểm tra dependency thiết yếu. Smoke test phải assert nội dung/schema hoặc hành vi quan trọng, không chỉ kiểm tra HTTP 200.
-
-Ví dụ:
-
-```bash
-curl --fail --silent --show-error --max-time 10 \
-  http://127.0.0.1:3002/readyz
-
-# Đây chỉ là kiểm tra kết nối qua domain; smoke test thực tế phải assert hành vi.
-curl --fail --silent --show-error --max-time 10 \
-  https://app.example.com/api/health
-```
-
-## 8. Migration và rollback
-
-Migration production phải:
-
-- Đã chạy thử trên staging.
-- Có version và migration history.
-- Có lock.
-- Có backup/PITR hoặc recovery point phù hợp.
-- Có kế hoạch partial failure.
-- Không yêu cầu rollback database mù quáng sau mọi lỗi HTTP.
-
-Nếu schema không tương thích, chỉ rollback container là chưa đủ. Cần kế hoạch dữ liệu riêng.
-
-## 9. SSH, credentials và runtime secrets
-
-- Deploy bằng user riêng, không dùng root nếu không cần.
-- Xác minh host key.
-- Giới hạn quyền deploy user.
-- Không in secret ra log.
-- Cấp database/API secret tại runtime.
-- Rotate SSH key và token định kỳ.
-- Giới hạn ai có quyền sử dụng Docker trên host vì quyền Docker gần tương đương quyền root.
-
-## 10. Backup và disaster recovery
-
-Backup cần bao gồm:
-
-- Database.
-- File upload/object storage metadata.
-- Cấu hình reverse proxy và runtime.
-- Release manifest và artifact reference.
-- Hạ tầng hoặc script tạo lại server.
-
-Phải thử restore trong môi trường cách ly. Ghi thời gian thực tế và so sánh với RPO/RTO. Không coi “backup job chạy thành công” là bằng chứng restore được.
-
-## 11. Runtime checklist
-
-- [ ] Server có deploy user, SSH host verification và firewall.
-- [ ] Image được pull bằng digest và verify trước khi chạy.
-- [ ] Secrets nằm ngoài image và có permission phù hợp.
-- [ ] Có lock cho deploy/migration/rollback.
-- [ ] Candidate không mở public port.
-- [ ] Readiness và smoke test có timeout.
-- [ ] Reverse proxy có cơ chế chuyển traffic và reload an toàn.
-- [ ] Giữ bản trước để rollback trong thời gian quan sát.
-- [ ] Worker, cron, session, upload và WebSocket có kế hoạch riêng.
-- [ ] Backup đã restore thử; RPO/RTO được kiểm chứng.
+- [x] Deploy qua SSH có kiểm host key; khoá deploy bị giới hạn một lệnh.
+- [ ] Image được kéo theo digest và được xác minh trước khi chạy. (Đang kéo theo tag commit SHA.)
+- [x] Không có bí mật trong image.
+- [x] Có khoá cho deploy và rollback.
+- [x] Container không mở cổng ra Internet.
+- [x] Healthcheck có timeout.
+- [x] Giữ bản trước để rollback (3 image).
+- [ ] Rollback và dựng lại VPS đã được diễn tập. (`[CẦN XÁC NHẬN]`)

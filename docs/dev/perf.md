@@ -1,45 +1,57 @@
 # Hiệu năng: số đo
 
-> Trạng thái: Nháp · Cập nhật: 2026-10-14 · Liên quan: [Yêu cầu phi chức năng](../product/nfr.md), [Kiểm thử](testing.md), [Tiến độ](../plan/progress.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-14 · Liên quan: [Yêu cầu phi chức năng](../product/nfr.md), [Kiểm thử](testing.md), [ADR 0006](../adr/0006-prioritize-lcp-with-fetchpriority.md), [ADR 0008](../adr/0008-compress-hero-video-without-trimming.md)
 
-<!--
-File này chỉ chứa số ĐÃ ĐO, kèm cách đo đủ để người khác lặp lại. Ngân sách (mục tiêu) nằm ở product/nfr.md;
-ước lượng không có chỗ ở đây. Tạo file khi có lần đo đầu tiên.
-Mỗi số đo ghi: ngày, commit, máy hoặc môi trường, dữ liệu, lệnh.
--->
+Chỉ chứa số **đã đo**, kèm cách đo. Ngân sách (mục tiêu) nằm ở [yêu cầu phi chức năng](../product/nfr.md#2-hiệu-năng-core-web-vitals-trên-điện-thoại). Kế hoạch tối ưu chi tiết thuộc spec `003-performance`.
 
 ## 1. Cách đo
 
-| Chỉ số (mã NFR) | Công cụ | Môi trường đo | Dữ liệu | Lệnh tái lập |
-|---|---|---|---|---|
-| PERF-01 | <…> | <máy, số CPU, RAM; mạng> | <kích thước dữ liệu mẫu> | `<lệnh>` |
+| Chỉ số (mã NFR) | Công cụ | Môi trường đo | Lệnh tái lập |
+|---|---|---|---|
+| PERF-01 LCP, PERF-02 CLS, PERF-03 TBT, PERF-04 điểm Performance; Speed Index, FCP | PageSpeed Insights (Lighthouse giả lập) | Chế độ Mobile: Moto G Power, Slow 4G | https://pagespeed.web.dev → `https://thehot.vn` → Mobile |
+| PERF-03 INP, LCP và CLS của khách thật | Cloudflare Web Analytics (Core Web Vitals); Search Console → Core Web Vitals khi đủ lượt truy cập | Khách thật | Cloudflare dashboard → Analytics & Logs → Web Analytics |
+| Dung lượng file | `ls -l`, DevTools → Network | Máy dev | `du -h public/videos/*` |
 
-Điều kiện chung: <khởi động nóng hay lạnh; số lần lặp; lấy trung vị hay p95; bỏ lần đầu>.
+Điều kiện chung: chạy PageSpeed 3 lần, lấy trung vị (lần đo mốc dưới đây là một lần chạy). Ghi kèm commit đang chạy trên production lúc đo. Máy dev chưa chạy được Lighthouse (Chrome chạy ngầm thiếu thư viện hệ thống) và PageSpeed API hết lượt miễn phí, nên đo qua giao diện web.
 
 ## 2. Kết quả mới nhất so với ngân sách
 
 | Mã | Chỉ số | Ngân sách | Đo được | Ngày | Commit | Đạt |
 |---|---|---|---|---|---|---|
-| PERF-01 | <…> | <…> | <…> | YYYY-MM-DD | `<sha7>` | có / không |
-
-Cập nhật cột "Trạng thái" tương ứng ở [yêu cầu phi chức năng](../product/nfr.md) sau mỗi lần đo.
+| PERF-01 | LCP (Mobile, lab) | < 2,5 s | 2,9 s | 2026-10-14 | `7af5058` | không |
+| PERF-02 | CLS | < 0,1 | 0 | 2026-10-14 | `7af5058` | có |
+| PERF-03 | TBT (thay INP khi chưa có field data) | < 200 ms | 40 ms | 2026-10-14 | `7af5058` | có |
+| PERF-04 | Điểm Performance (Mobile) | Không thấp hơn lần trước | 90 | 2026-10-14 | `7af5058` | mốc |
 
 ## 3. Lịch sử đo
 
-| Ngày | Commit | Mã | Giá trị | Ghi chú (thay đổi gì trước lần đo này) |
-|---|---|---|---|---|
-| YYYY-MM-DD | `<sha7>` | PERF-01 | <…> | <…> |
+| Ngày | Commit | Trang, thiết bị | Performance | LCP | CLS | TBT | Speed Index | Phần tử LCP | Ghi chú |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-10-14 16:41 | `7af5058` | `/`, Mobile | 90 | 2,9 s | 0 | 40 ms | 5,6 s | Ảnh nền template `hero-backdrop.jpg` trong màn hình chờ | Mốc. FCP 1,7 s; Accessibility 100, Best Practices 96, SEO 100. LCP gồm TTFB 150 ms, chờ bắt đầu tải 550 ms, tải 710 ms, render 90 ms. Chẩn đoán: preload ảnh LCP không có `fetchpriority=high` |
+| Chưa đo | `90f1882` (gồm PR #4, deploy ở build #16) | `/`, Mobile | Chưa đo | Chưa đo | Chưa đo | Chưa đo | Chưa đo | Chưa đo | Lần đo sau PR #4 ([ADR 0006](../adr/0006-prioritize-lcp-with-fetchpriority.md)): điền khi đo |
+| Chưa đo | | `/`, Desktop | | | | | | | Mốc Desktop chưa đo |
+| Chưa đo | | `/menu`, Mobile | | | | | | | Mốc `/menu` chưa đo |
+
+Cập nhật cột "Trạng thái" ở [yêu cầu phi chức năng](../product/nfr.md) sau mỗi lần đo.
 
 ## 4. Điểm nóng đã biết
 
+Tính tới 2026-10-14.
+
 | Chỗ | Triệu chứng | Đo bằng | Việc liên quan |
 |---|---|---|---|
-| <…> | <…> | <…> | TK## |
+| Ảnh nền trong màn hình chờ (`Backdrop` trong `Preloader`) | Là phần tử LCP; file chỉ khoảng 17 KB (WebP w=640 q=55) nhưng chờ 550 ms mới bắt đầu tải | PageSpeed, mục LCP breakdown | PR #4: `fetchPriority="high"` ([ADR 0006](../adr/0006-prioritize-lcp-with-fetchpriority.md)) |
+| Logo `logo.png` | PNG 640×479, 88,8 KB, tải nguyên bản (`unoptimized`, có preload) cho ô hiển thị khoảng 86 px trên điện thoại | `ls -l`; tải thử qua `/_next/image`: WebP w=128 10,9 KB, w=256 31,2 KB, w=384 57,8 KB, w=640 111,7 KB | PR #4: next/image với `sizes` đúng; điện thoại DPR 1,75 tải w=256 |
+| Video hero `public/videos/main.mp4` | 83,7 MB, 103 s, 1080×1920, H.264 kèm track âm thanh, khoảng 6,5 Mbps, không faststart (`moov` ở cuối file); tự phát cả trên điện thoại | `ffprobe`, thứ tự box MP4 | [ADR 0008](../adr/0008-compress-hero-video-without-trimming.md) (Đề xuất). PageSpeed không bắt lỗi vì `preload="metadata"`, nhưng khách vẫn tốn dữ liệu |
+| Video about và kitchen | about 11,5 MB (H.264) / 8,2 MB (AV1), 53 s; kitchen 9,1 / 5,1 MB, 22 s; đã faststart | `ffprobe` | Đã có bản AV1, chỉ tải trên màn hình lớn và khi không bật giảm chuyển động |
+| Font | Ngoài 5 file được preload, CSS còn tải Be Vietnam Pro 500 và 600 (3 subset) khoảng 110 KiB; subset `latin-ext` tải vì ký tự tiếng Việt nằm ở cả hai unicode-range | PageSpeed | Không đổi ở PR #4 (mục 5) |
+| Cache | File trong `public/` trả `Cache-Control: public, max-age=0` nên Cloudflare hỏi lại máy chủ mỗi lần; `/_next/image` không được Cloudflare cache (`DYNAMIC`); bộ nhớ ảnh đã tối ưu mất sau mỗi lần deploy | `curl -sI`, header `cf-cache-status` | Spec `003-performance` (cấu hình cache ở nginx và Cloudflare thuộc repo infra) |
+| Màn hình chờ | Giữ tối đa 6 s; chữ hero vào bằng hiệu ứng từ trong suốt | Speed Index 5,6 s | Cần duyệt thiết kế; spec `003-performance` |
 
 ## 5. Thử nghiệm tối ưu
 
-<!-- Giả thuyết → thay đổi → số trước / sau → giữ hay bỏ. Giữ cả thử nghiệm thất bại để không làm lại. -->
-
 | Ngày | Giả thuyết | Thay đổi | Trước | Sau | Kết luận |
 |---|---|---|---|---|---|
-| YYYY-MM-DD | <…> | <…> | <…> | <…> | Giữ / Bỏ |
+| 2026-10-14 | LCP chậm vì ảnh LCP được tải ở mức ưu tiên thấp, không phải vì file nặng | `Backdrop` dùng `loading="eager"` + `fetchPriority="high"` thay `preload` (PR #4, `3469ca1`) | LCP 2,9 s; chờ tải 550 ms | Chưa đo | Giữ (đã merge); xác nhận khi đo |
+| 2026-10-14 | Logo tải to hơn cần ở mọi trang và tranh băng thông với ảnh LCP | Bỏ `unoptimized`, thêm `sizes` theo kích thước hiển thị, `fetchPriority="low"`, không preload (PR #4, `aff2609`, `9308df6`) | 88,8 KB PNG mỗi trang | 31,2 KB WebP (đo file, điện thoại DPR 1,75) | Giữ |
+| 2026-10-14 | Bỏ subset font `latin-ext` để giảm byte | Phân tích (không merge): gỡ chồng lấn unicode-range giữa `latin-ext` và `vietnamese` | — | Sẽ lệch kerning khoảng 83 chỗ (thay đổi nhìn thấy được) | Bỏ; chỉ làm lại khi có duyệt thiết kế. Weight 500, 600 có dùng thật |

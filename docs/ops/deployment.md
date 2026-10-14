@@ -1,121 +1,136 @@
 # Triển khai
 
-> Trạng thái: Nháp · Cập nhật: 2026-10-14 · Liên quan: [Cấu hình](../dev/configuration.md), [Runbook](runbooks/README.md), [Postmortem](postmortems/README.md), [Mục lục ADR](../adr/README.md), [Lộ trình](../plan/roadmap.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-14 · Liên quan: [Kiến trúc](../architecture/ARCHITECTURE.md), [Cấu hình](../dev/configuration.md), [Kiểm thử](../dev/testing.md), [Runbook](runbooks/README.md), [Postmortem](postmortems/README.md), [CI/CD core](ci-cd-core.md)
 
-<!--
-File này trả lời: code đi từ commit tới môi trường thật như thế nào, chạy ở đâu, và lùi lại bằng cách nào.
-Ghi lệnh và tên thật (project, dịch vụ, cổng loopback) nhưng KHÔNG ghi bí mật, IP công khai, hostname nội bộ.
-Tình huống sự cố cụ thể để ở runbooks/; file này mô tả đường đi bình thường và các kiểu rollback.
-Kiến trúc tổng quan: docs/architecture/ARCHITECTURE.md (nếu có). Mô hình đe doạ: docs/security/threat-model.md (nếu có).
--->
+Code đi từ một PR tới https://thehot.vn thế nào, kiểm sau deploy ra sao, và lùi lại bằng cách nào. Repo công khai: file này mô tả ở mức `Jenkinsfile` đã thể hiện. Script deploy trên VPS, compose stack, cấu hình nginx, cài đặt Jenkins và Harbor, quy trình quản trị nằm ở repo riêng `qkenn04/infra-qkenn`. Tính tới 2026-10-14.
 
 ## 0. Tóm tắt một trang
 
 | Câu hỏi | Trả lời |
 |---|---|
-| Artifact là gì | <image container theo digest, gói hoặc binary theo checksum; kèm mã commit để truy vết> |
-| Ai kích hoạt deploy | <push nhánh chính, tag, bấm tay> |
-| Chạy ở đâu | <nơi chạy, mô tả chung> |
-| Deploy mất bao lâu | <…> (tính tới YYYY-MM-DD) |
-| Lùi lại thế nào | mục 7 |
-| Bí mật nằm ở đâu | [Cấu hình, mục 5](../dev/configuration.md#5-bí-mật-nơi-giữ-xoay-vòng-thu-hồi) |
+| Artifact là gì | Image Docker `nokto/web:<commit sha đầy đủ>` trong Harbor, gắn nhãn OCI `org.opencontainers.image.revision` (commit) và `source` (URL repo) |
+| Ai kích hoạt deploy | Merge (hoặc push) vào `main`. Jenkins poll GitHub mỗi 5 phút; không có bước duyệt tay |
+| Chạy ở đâu | Một container trên VPS, sau nginx và Cloudflare ([Kiến trúc](../architecture/ARCHITECTURE.md)) |
+| Deploy mất bao lâu | Khoảng 10 phút từ lúc merge tới khi lên production (ước lượng thô: poll tối đa 5 phút cộng pipeline khoảng 7 phút) |
+| Lùi lại thế nào | Mục 7 |
+| Bí mật nằm ở đâu | Jenkins Credentials; [Cấu hình, mục 5](../dev/configuration.md#5-bí-mật-nơi-giữ-xoay-vòng-thu-hồi) |
+| Biết kết quả ở đâu | Thông báo Discord sau mỗi build; lịch sử build trong Jenkins |
 
 ## 1. Bức tranh tổng thể
 
+Sơ đồ đầy đủ (kèm đường lỗi): [Kiến trúc, mục 4.2](../architecture/ARCHITECTURE.md#42-đưa-một-thay-đổi-lên-production).
+
 ```mermaid
 flowchart LR
-  dev["Commit / PR"] --> ci["CI<br/>lint, test, build"]
-  ci --> art[("Artifact bất biến<br/>digest hoặc checksum")]
-  art --> stage["Staging<br/>kiểm cùng artifact"]
-  stage --> deploy["Bước deploy<br/>xác minh, migrate, khởi động"]
-  deploy --> run["Môi trường thật"]
-  deploy -->|"kiểm sức khoẻ lỗi"| rollback["Đánh giá rollback<br/>và xác nhận phục hồi"]
+  pr["PR merge vào main"] --> jenkins["Jenkins<br/>Sitemap dates, Check, Build, Smoke test"]
+  jenkins --> harbor[("Harbor<br/>nokto/web:commit-sha")]
+  harbor --> deploy["Script deploy trên VPS<br/>pull, healthcheck"]
+  deploy --> run["https://thehot.vn"]
+  deploy -->|"không khoẻ"| back["Tự quay về image trước"]
 ```
 
 ## 2. Thành phần chạy ở đâu
 
-| Thành phần | Chạy ở đâu | Quản lý bằng | Cổng (loopback) | Log ở đâu |
-|---|---|---|---|---|
-| *Ví dụ:* ứng dụng | <container, dịch vụ hệ thống> | <compose, systemd, nền tảng> | `127.0.0.1:3000` | <…> |
-| *Ví dụ:* cơ sở dữ liệu | <…> | <…> | không mở ra ngoài | <…> |
+| Thành phần | Chạy ở đâu | Quản lý bằng | Log ở đâu |
+|---|---|---|---|
+| Ứng dụng web | Container trên VPS | Compose stack và script deploy (repo infra) | Log container trên VPS |
+| nginx | VPS | Cấu hình trong repo infra | Log nginx trên VPS |
+| Jenkins, Harbor | Máy CI | Cấu hình trong repo infra (`ci/`) | Lịch sử build trong Jenkins |
 
 ## 3. Môi trường
 
-| Môi trường | Kích hoạt | Tên project / dịch vụ | Dữ liệu | Ai truy cập |
-|---|---|---|---|---|
-| dev | Tay, trên máy | `<tên>-dev` | Mẫu | Người phát triển |
-| staging (nếu có) | <sau build, trước prod> | `<tên>-staging` | Dữ liệu thử | <…> |
-| prod | <…> | `<tên>` | Thật | <…> |
+| Môi trường | Kích hoạt | Dữ liệu | Ai truy cập |
+|---|---|---|---|
+| dev | Tay, trên máy (`npm run dev` hoặc `docker compose up`) | Nội dung trong repo | Người phát triển |
+| prod | Tự động sau khi commit lên `main` | Nội dung trong repo | Khách |
 
-Quy tắc: mỗi môi trường có tên project, thư mục, cơ sở dữ liệu riêng và tường minh; script không dựa vào giá trị mặc định. Thử script deploy trong thư mục tạm hoặc container, không bao giờ trên thư mục thật.
+Không có staging. Smoke test chạy trên chính image sẽ deploy, ngay trên máy CI, là lớp kiểm cuối trước production.
 
 ## 4. Build và artifact
 
-- Ghi mã commit đầy đủ để truy vết, và ghi digest/checksum bất biến để xác định chính xác artifact. Container deploy bằng registry digest; không dùng nhãn trôi như `latest`.
-- Phụ thuộc và image nền ghim phiên bản (lockfile, digest).
-- Build một lần, kiểm chính artifact đó trên staging rồi promote nguyên artifact sang production (nếu dự án có staging). Không rebuild trong bước promote.
-- Ghi nơi lưu release manifest, kết quả test/scan và quy tắc xác minh chữ ký hoặc provenance nếu áp dụng.
-- Lệnh build: `<lệnh>`.
+- Mỗi commit trên `main` được build **một lần** thành image `runner`; image đã qua smoke test là image được push và deploy.
+- `docker build --pull` lấy lại image nền `node:24.14.1-slim` mỗi lần build; phụ thuộc npm ghim bằng `package-lock.json` (`npm ci`).
+- `NEXT_PUBLIC_SITE_URL=https://thehot.vn` được truyền lúc build ([Cấu hình](../dev/configuration.md)).
+- Deploy theo **tag commit SHA**, chưa theo digest; pipeline chưa ký image, chưa tạo SBOM ([CI/CD core, mục 0](ci-cd-core.md#0-áp-dụng-ở-dự-án-này)).
+- Sau mỗi build, Jenkins xoá image khỏi Docker của máy CI (đã nằm trong Harbor) và dọn build cache cũ hơn 7 ngày.
 
 ## 5. CI
 
-| Job | Chạy khi | Làm gì | Chặn merge |
-|---|---|---|---|
-| quality | Mỗi PR | Lint, kiểu, test, kiểm link tài liệu | Có |
-| build | Nhánh chính | Build artifact, kiểm và đẩy lên kho | — |
-| staging (nếu có) | Sau build | Deploy và smoke test đúng artifact | — |
-| deploy | Sau khi đủ điều kiện promote | Mục 6 | — |
+Một pipeline duy nhất trong `Jenkinsfile`, chạy trên agent nhãn `docker`. Không chạy song song (`disableConcurrentBuilds`), timeout 30 phút, giữ lịch sử 20 build.
 
-Biến và bí mật của CI (chỉ tên): `<TÊN_BÍ_MẬT>`, … ([cấu hình](../dev/configuration.md)).
+| Stage | Làm gì | Hỏng thì |
+|---|---|---|
+| Sitemap dates | `bash ci/sitemap-lastmod.sh`: tính `lastmod` từ lịch sử git, ghi `src/generated/sitemap-lastmod.json` ([ADR 0004](../adr/0004-automate-sitemap-from-page-config-and-git.md)) | Dừng; VPS không bị đụng |
+| Check | `docker build --target check`: lint, typecheck, `check:sitemap` | Như trên |
+| Build | `docker build --target runner --pull` với `NEXT_PUBLIC_SITE_URL` và nhãn OCI | Như trên |
+| Smoke test | `ci/smoke-test.sh "$IMAGE:$GIT_COMMIT" "$SITE_URL"` ([Kiểm thử, mục 3](../dev/testing.md#3-smoke-test-kiểm-gì)) | Như trên |
+| Push | Đăng nhập Harbor bằng tài khoản chỉ dùng để push, push image, đăng xuất | Như trên |
+| Deploy | SSH tới VPS bằng khoá chỉ chạy được lệnh deploy, host key ghim: `deploy <commit sha>` | Script trên VPS tự quay về image trước; Discord báo "Deploy THẤT BẠI — VPS đã tự quay về bản cũ" |
+
+Thông báo Discord: thành công; "Build THẤT BẠI — VPS không bị đụng" khi hỏng trước stage Deploy; "Deploy THẤT BẠI" khi hỏng từ stage Deploy trở đi.
 
 ## 6. Deploy
 
 ### 6.1 Trình tự
 
-1. <xác minh release manifest, nguồn và digest/checksum của artifact đã kiểm thử>
-2. <kiểm quyền promote và chống deploy release cũ; lấy lock nếu cần>
-3. <kiểm backup hoặc recovery point trước migration rủi ro>
-4. <chạy migration có lock và phương án xử lý lỗi dở dang>
-5. <khởi động bản mới, kiểm readiness rồi chuyển traffic>
-6. <smoke test qua đường người dùng, theo dõi metric trong N phút>
-7. <nếu lỗi, đánh giá điều kiện rollback ở mục 7 rồi lùi hoặc xử lý sự cố>
-8. <ghi kết quả: commit, digest/checksum, người duyệt, thời gian, `RESULT=…`>
+1. PR được review và merge vào `main` trên GitHub.
+2. Trong vòng 5 phút, Jenkins thấy commit mới và chạy pipeline (mục 5).
+3. Stage Deploy gọi lệnh deploy trên VPS với commit SHA.
+4. Script deploy trên VPS kéo image `nokto/web:<sha>` từ Harbor, thay container, đợi healthcheck (`HEALTHCHECK` trong `Dockerfile` gọi `/`).
+5. Container mới khoẻ: xong; VPS giữ 3 image gần nhất để lùi tay. Không khoẻ: script tự chạy lại image trước và báo lỗi về Jenkins.
+6. Kiểm sau deploy (mục 6.3).
 
 ### 6.2 Các bước và cách hỏng
 
 | Bước | Hỏng thì | Hệ thống làm gì | Người làm gì |
 |---|---|---|---|
-| Kéo artifact | Không tải được | Dừng, giữ bản cũ | Xem [runbook](runbooks/README.md) |
-| Migration | Lỗi SQL | Dừng chuyển traffic; giữ bản cũ nếu schema còn tương thích | Làm theo runbook khôi phục dữ liệu |
-| Kiểm sức khoẻ | Không đạt | Lùi artifact chỉ khi đã xác nhận cấu hình và dữ liệu tương thích; sau đó kiểm lại | Nếu không thể lùi an toàn, xử lý theo runbook sự cố |
+| Checkout trên Jenkins | Lỗi git (ví dụ object rỗng sau khi máy CI tắt đột ngột) | Build dừng trước mọi stage; VPS không bị đụng | [Runbook 001](runbooks/001-jenkins-git-cache-corrupted.md) |
+| Sitemap dates, Check, Build, Smoke test | Lỗi lint, kiểu, sitemap, build hoặc smoke test | Dừng; VPS không bị đụng | Sửa bằng PR mới |
+| Push | Harbor không chạy, sai quyền | Dừng; VPS không bị đụng | Kiểm Harbor trên máy CI (repo infra) |
+| Deploy, healthcheck | Container mới không khoẻ | Tự quay về image trước | Xem log container (repo infra), sửa bằng PR |
+
+### 6.3 Kiểm sau deploy
+
+Từ máy cá nhân, không từ VPS:
+
+```bash
+# Trang chủ trả 200, không có X-Robots-Tag
+curl -sI https://thehot.vn/ | head -n 20
+
+# Sitemap có đủ trang và ngày mới
+curl -s https://thehot.vn/sitemap.xml | grep -o '<loc>[^<]*</loc>\|<lastmod>[^<]*</lastmod>'
+
+# Tên miền cũ vẫn chuyển hướng 301, giữ đường dẫn
+curl -sI https://thehot.k2-tech.dev/menu | grep -i '^location'
+```
+
+- Nếu PR đổi trang hoặc nội dung: Search Console → URL Inspection → Request indexing cho trang đó; Search Console → Sitemaps xem "Last read".
+- Nếu PR nhằm vào hiệu năng: PageSpeed Mobile 3 lần, ghi vào [dev/perf.md](../dev/perf.md).
+- Nếu PR đổi tiêu đề, mô tả, ảnh chia sẻ: Facebook Sharing Debugger → Scrape Again.
 
 ## 7. Rollback
 
-| Kiểu | Khi nào | Cách làm | Thời gian mục tiêu |
+| Kiểu | Khi nào | Cách làm | Thời gian |
 |---|---|---|---|
-| Lùi artifact | Bản mới lỗi; artifact cũ còn lưu, cấu hình và schema tương thích | `<lệnh rollback> <digest/checksum bản trước>` rồi kiểm readiness, smoke test và metric | <theo OPS ở yêu cầu phi chức năng> |
-| Khôi phục dữ liệu | Migration hỏng dữ liệu | Runbook khôi phục | Theo AVAIL (RTO) ở yêu cầu phi chức năng |
-| Tắt cờ tính năng | Tính năng mới lỗi | <cách tắt> | <…> |
+| Tự động khi deploy | Container mới không qua healthcheck | Script deploy tự chạy lại image trước | Vài giây đến vài phút (ước lượng thô) |
+| Revert PR | Bản mới chạy được nhưng sai (giao diện, nội dung, SEO) | Trên GitHub: Revert PR → merge PR revert; Jenkins build và deploy như mọi commit | Khoảng 10 phút (ước lượng thô) |
+| Lùi image tay trên VPS | Cần lùi ngay, không chờ pipeline, hoặc máy CI đang hỏng | VPS giữ 3 image gần nhất; thao tác theo tài liệu của stack trong `qkenn04/infra-qkenn` | Vài phút (ước lượng thô) |
 
-Chỉ tự động rollback khi các điều kiện ở bảng đã được kiểm trước và thao tác lùi đã được thử. Sau migration phá vỡ tương thích hoặc lỗi dữ liệu, cần kế hoạch khôi phục riêng; chạy lại container cũ chưa chứng minh dịch vụ đã phục hồi.
+Site không có cơ sở dữ liệu hay migration nên lùi image không cần khôi phục dữ liệu. Sau khi lùi tay trên VPS, commit trên `main` vẫn là bản lỗi: phải revert trên GitHub, nếu không lần deploy tiếp theo sẽ đưa bản lỗi trở lại.
 
 ## 8. Cài đặt lần đầu
 
-```bash
-# Ví dụ: các bước dựng môi trường thật lần đầu (thay bằng lệnh thật, không dán bí mật vào đây)
-# 1. Tạo thư mục và quyền
-# 2. Tạo file cấu hình từ .env.example; sinh bí mật ngay trên máy đích
-# 3. Deploy lần đầu và kiểm sức khoẻ
-# 4. Bật sao lưu và khôi phục thử
-```
+Dựng máy CI (Jenkins, Harbor), job Jenkins, stack trên VPS, vhost nginx và khoá deploy: theo `qkenn04/infra-qkenn` (`ci/`, `stacks/`). Không có bước cài đặt nào nằm trong repo này.
 
-## 9. Điều kiện xong phần vận hành theo mốc
+## 9. Điều kiện vận hành
 
-| Mốc | Điều kiện |
+| Điều kiện | Trạng thái (2026-10-14) |
 |---|---|
-| M0 | Deploy và rollback chạy thật một lần; sao lưu và khôi phục thử thành công |
-| <…> | <…> |
+| Deploy tự động sau merge chạy thật | Có (build #16 deploy `90f1882`) |
+| Tự rollback khi healthcheck lỗi đã được thử | `[CẦN XÁC NHẬN: đã diễn tập chưa]` |
+| Lùi image tay trên VPS đã được diễn tập | `[CẦN XÁC NHẬN: đã diễn tập chưa]` |
 
 ## 10. Câu hỏi mở
 
-- [CẦN XÁC NHẬN: <câu hỏi>]
+- [CẦN XÁC NHẬN: có muốn thêm bước duyệt tay trước stage Deploy không]
+- [CẦN XÁC NHẬN: có build và kiểm PR trước khi merge (status check trên GitHub) không]

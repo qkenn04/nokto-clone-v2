@@ -2,10 +2,7 @@
 
 > Trạng thái: Đang áp dụng · Cập nhật: 2026-10-14 · Liên quan: [Mẫu postmortem](000-template.md), [Runbook](../runbooks/README.md), [Triển khai](../deployment.md)
 
-<!--
-Tầng T1*: bắt buộc sau mỗi sự cố P1 hoặc P2 (mức độ định nghĩa ở runbooks/README.md).
-Tinh thần không đổ lỗi: hỏi "hệ thống nào đã cho phép lỗi này xảy ra", không hỏi "ai làm sai".
--->
+Bắt buộc sau mỗi sự cố P1 hoặc P2 (mức độ định nghĩa ở [mục lục runbook](../runbooks/README.md#21-mức-độ)). Tinh thần không đổ lỗi: hỏi "hệ thống nào đã cho phép lỗi này xảy ra", không hỏi "ai làm sai".
 
 ## 1. Khi nào viết
 
@@ -28,6 +25,7 @@ Tinh thần không đổ lỗi: hỏi "hệ thống nào đã cho phép lỗi n�
 | Số | Ngày | Tóm tắt | Mức | Thời gian ảnh hưởng | Việc còn mở |
 |---|---|---|---|---|---|
 | [000](000-template.md) | — | Mẫu | — | — | — |
+| Chưa viết | 2026-10-14 | WSL của máy CI khởi động lại không sạch lúc 18:21 (UTC+7); cache git của Jenkins có object rỗng, build #13–#15 hỏng ở checkout. Xử lý theo [runbook 001](../runbooks/001-jenkins-git-cache-corrupted.md); build #16 deploy `90f1882` | P2 | Không deploy được từ 18:21 tới build #16 (giờ xong: `[CẦN XÁC NHẬN]`); site đang chạy không bị ảnh hưởng | Viết postmortem (hạn theo quy ước: 2026-10-21); chọn biện pháp phòng ngừa ở runbook 001, mục "Sau đó" |
 
 ## 4. Cách viết
 

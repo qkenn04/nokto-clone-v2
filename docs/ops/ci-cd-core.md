@@ -1,7 +1,27 @@
-# CI/CD Core Template
-> Trạng thái: Nháp · Cập nhật: 2026-10-14
+# Chính sách CI/CD
 
-Phần này chứa các nguyên tắc và policy không phụ thuộc GitHub, GitLab, Jenkins, Docker Compose hay Kubernetes. Điền điều kiện, owner và bằng chứng theo dự án trước khi áp dụng.
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-14 · Liên quan: [Triển khai](deployment.md), [Jenkins + registry](providers/jenkins-registry.md), [VPS + Docker Compose](runtimes/vps-docker-compose.md), [Mô hình đe doạ](../security/threat-model.md)
+
+File gồm hai phần: mục 0 là hiện trạng của dự án so với chính sách (nguồn sự thật cho câu hỏi "pipeline đang thiếu gì"); mục 1–15 là chính sách chung lấy từ docs-template, không phụ thuộc GitHub, Jenkins hay Docker Compose, dùng làm đích khi cải tiến pipeline. Cách làm cụ thể: [Triển khai](deployment.md).
+
+## 0. Áp dụng ở dự án này
+
+Tính tới 2026-10-14, theo `Jenkinsfile`, `Dockerfile`, `ci/` và tài liệu trong repo infra.
+
+| Chính sách | Hiện trạng | Khoảng cách, việc cần làm |
+|---|---|---|
+| Review thay đổi (mục 4) | Thay đổi đi qua PR vào `main` trên GitHub | `[CẦN XÁC NHẬN: nhánh main đã bật branch protection, bắt buộc review chưa]`. Không có status check: PR không được build trước khi merge |
+| Kiểm lại commit sau merge (mục 4, 5) | Mỗi commit trên `main` chạy lại lint, typecheck, guard sitemap, build, smoke test | Không có unit test, test tích hợp, quét secret, quét phụ thuộc |
+| Build một lần, artifact bất biến (mục 6) | Build một lần mỗi commit; image đã smoke test là image được deploy; tag = commit SHA đầy đủ | Deploy theo tag, chưa theo digest. `[CẦN XÁC NHẬN: Harbor đã bật tag immutability cho project chưa]` |
+| Chuỗi cung ứng (mục 7) | Lockfile + `npm ci`; image nền ghim tag và `--pull` mỗi build; nhãn OCI `revision`, `source` | Chưa có SBOM, chữ ký, provenance; pipeline không chặn theo kết quả quét lỗ hổng; image nền chưa ghim digest |
+| Bí mật (mục 8) | Ứng dụng không có bí mật lúc chạy; bí mật CI trong Jenkins Credentials, bind theo stage; không có job PR nào chạm bí mật | — |
+| Môi trường và promotion (mục 9) | Chỉ có production | Không có staging; smoke test trên máy CI thay cho bước kiểm trên staging |
+| Migration (mục 10) | Không áp dụng: không có cơ sở dữ liệu | — |
+| Rollout, rollback (mục 11) | Thay container, đợi healthcheck, tự quay về image trước khi lỗi; VPS giữ 3 image gần nhất | Không có blue-green: có thể có vài giây lỗi 502 khi đổi container (ước lượng thô). `[CẦN XÁC NHẬN: đã diễn tập rollback tự động và lùi tay chưa]` |
+| Khoá deploy (mục 11) | `disableConcurrentBuilds` trên Jenkins; script deploy trên VPS có khoá chống chạy chồng (repo infra) | Chưa có kiểm "release cũ không ghi đè release mới" ngoài thứ tự build của Jenkins |
+| Quan sát, audit (mục 12) | Thông báo Discord mỗi build; Jenkins giữ 20 build; Cloudflare Web Analytics | Chưa có release manifest; `[CẦN XÁC NHẬN: có monitor uptime cho thehot.vn chưa]` |
+| Khôi phục thảm hoạ (mục 13) | Nội dung nằm trong git; image trong Harbor và trên VPS; máy chủ dựng lại theo repo infra | RTO chưa chốt (AVAIL ở [yêu cầu phi chức năng](../product/nfr.md)) |
+| DORA (mục 14) | Có dữ liệu thô: commit, thời điểm build và kết quả trong Jenkins | Chưa tính |
 
 ## 1. CI/CD là gì?
 
@@ -85,11 +105,7 @@ Các định danh cần phân biệt:
 | Artifact tag | Tìm kiếm và truy vết |
 | Artifact digest | Cố định chính xác nội dung để deploy |
 
-Deploy dùng digest đầy đủ, ví dụ:
-
-```text
-registry.example.com/app@sha256:<FULL_DIGEST>
-```
+Deploy dùng digest đầy đủ: tên image, `@sha256:` và 64 ký tự hex do registry trả về sau khi push (ví dụ `nokto/web@sha256:` + digest), thay vì tag như `nokto/web:<commit sha>`. Dự án này hiện deploy theo tag (mục 0).
 
 ## 7. Security supply chain
 
@@ -237,14 +253,16 @@ Release event cần có timestamp cho commit, build, test, staging, approval, pr
 
 ## 15. Core checklist
 
+Trạng thái ở dự án này (2026-10-14); lý do từng mục ở mục 0.
+
 - [ ] Source review và required checks hoạt động.
-- [ ] Commit sau merge được kiểm tra lại.
-- [ ] Artifact được build một lần và deploy bằng digest.
+- [x] Commit sau merge được kiểm tra lại.
+- [ ] Artifact được build một lần và deploy bằng digest. (Build một lần: có; deploy bằng digest: chưa.)
 - [ ] Scan, SBOM, signature/provenance có policy.
-- [ ] Staging và production dùng cùng artifact.
-- [ ] Secrets tách theo environment và không nằm trong source/image.
-- [ ] Migration có version, lock và tương thích ngược.
-- [ ] Deployment lock và chặn release lỗi thời.
-- [ ] Readiness, smoke test và rollback đã được kiểm thử.
+- [ ] Staging và production dùng cùng artifact. (Không có staging.)
+- [x] Secrets tách theo environment và không nằm trong source/image.
+- [x] Migration có version, lock và tương thích ngược. (Không áp dụng: không có cơ sở dữ liệu.)
+- [ ] Deployment lock và chặn release lỗi thời. (Có khoá; chưa chặn release lỗi thời.)
+- [ ] Readiness, smoke test và rollback đã được kiểm thử. (Smoke test: có; diễn tập rollback: chưa xác nhận.)
 - [ ] Monitoring, audit, backup, restore drill và RPO/RTO được định nghĩa.
 - [ ] Có đủ event để tính 5 DORA metrics.

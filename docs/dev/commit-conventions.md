@@ -1,12 +1,10 @@
 # Quy ước commit
 
-> Trạng thái: Đề xuất · Cập nhật: 2026-10-14
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-14 · Liên quan: [Tài liệu](../README.md), [Kiểm thử](testing.md), [Triển khai](../ops/deployment.md)
 
 ## 1. Mục đích
 
-Commit message mô tả mục đích thay đổi để người đọc có thể quét lịch sử, tìm commit liên quan và tự động tạo changelog hoặc release notes khi project cần.
-
-Dùng cấu trúc Conventional Commits:
+Commit message cho biết thay đổi nhằm việc gì, để người đọc quét lịch sử, tìm commit liên quan, và biết commit nào đã lên production (mọi commit trên `main` đều được deploy). Repo dùng cấu trúc Conventional Commits, viết bằng tiếng Anh:
 
 ```text
 <type>(<scope>)<breaking-marker>: <description>
@@ -16,90 +14,59 @@ Dùng cấu trúc Conventional Commits:
 <footer tùy chọn>
 ```
 
-`scope`, body và footer là tùy chọn. Dòng đầu phải có type, dấu `: ` và mô tả.
+`scope`, body và footer là tùy chọn. Dòng đầu phải có type, dấu `: ` và mô tả. `CONTRIBUTING.md` (kế thừa từ template upstream) ghi tiền tố là không bắt buộc; ở repo này thì bắt buộc, theo quy ước dưới đây.
 
 ## 2. Type
 
-| Type | Dùng khi |
-|---|---|
-| `feat` | Thêm khả năng mới cho người dùng hoặc API. |
-| `fix` | Sửa hành vi đang sai. |
-| `docs` | Chỉ thay đổi tài liệu. |
-| `refactor` | Tổ chức lại code mà không đổi hành vi bên ngoài. |
-| `test` | Thêm hoặc sửa test. |
-| `style` | Thay đổi hình thức code, không đổi logic; không dùng cho CSS hay giao diện. |
-| `perf` | Cải thiện hiệu năng. |
-| `build` | Thay đổi build system hoặc dependency phục vụ build. |
-| `ci` | Thay đổi cấu hình CI/CD. |
-| `chore` | Công việc bảo trì không phù hợp type cụ thể hơn. |
-| `revert` | Hoàn tác một thay đổi trước đó. |
+| Type | Dùng khi | Ví dụ trong repo |
+|---|---|---|
+| `feat` | Thêm khả năng mới mà khách hoặc máy tìm kiếm thấy | `feat(seo): keyword-focused page titles and descriptions` |
+| `fix` | Sửa hành vi đang sai | `fix(seo): give inner pages the shared share-card image` |
+| `perf` | Cải thiện hiệu năng, không đổi giao diện | `perf: load the splash backdrop with high fetch priority` |
+| `refactor` | Tổ chức lại code, không đổi hành vi | `refactor(seo): expose page image data for the image sitemap` |
+| `docs` | Chỉ thay đổi tài liệu | `docs: mention the sitemap check in contributing docs` |
+| `ci` | Thay đổi `Jenkinsfile`, `ci/`, cách deploy | `ci: build and deploy with Jenkins + Harbor` |
+| `build` | Thay đổi `Dockerfile`, phụ thuộc phục vụ build | |
+| `test` | Thêm hoặc sửa script kiểm (`ci/smoke-test.sh`, guard sitemap) | |
+| `style` | Định dạng code, không đổi logic; không dùng cho CSS hay giao diện | |
+| `chore` | Bảo trì không hợp type nào ở trên | `chore: start from AI Website Cloner Template v0.6.1 (ee3f5a2)` |
+| `revert` | Hoàn tác một commit | |
 
-Chọn type theo mục đích chính. Nếu một thay đổi chứa nhiều mục tiêu độc lập, tách commit khi hợp lý. Các type ngoài `feat`, `fix` là quy ước của project; chúng không tự quy định mức tăng phiên bản theo đặc tả Conventional Commits.
+Chọn type theo mục đích chính. Một thay đổi có nhiều mục tiêu độc lập thì tách commit (PR #4 tách ba commit `perf:` cho ảnh nền, logo, logo trong menu). Thay đổi giao diện mà khách thấy là `feat` hoặc `fix`, không phải `style`.
 
 ## 3. Scope
 
-Scope ngắn gọn, đặt trong ngoặc đơn, chỉ phần bị ảnh hưởng. Dùng tên ổn định có thật trong repo, chẳng hạn `web`, `api`, `auth`, `infra` hoặc `docs`.
+Scope ngắn, chỉ phần bị ảnh hưởng. Scope đang dùng hoặc nên dùng:
 
-```text
-feat(timesheet): add monthly closing summary
-fix(api): reject duplicate closing requests
-docs(infra): explain nginx rollback
-```
+| Scope | Phần |
+|---|---|
+| `seo` | Sitemap, metadata, JSON-LD, robots |
+| `menu`, `home`, `about`, `reservation`, `legal` | Một trang và module dữ liệu của nó |
+| `chrome` | Khung chung: menu điều hướng, màn hình chờ, footer, nút liên hệ |
+| `adr` | Một ADR (`docs(adr): add 0009 …`) |
 
-Bỏ scope nếu thay đổi áp dụng toàn repo hoặc scope không giúp người đọc hiểu thêm:
-
-```text
-chore: update dependency lockfile
-```
+Bỏ scope khi thay đổi áp dụng toàn repo hoặc scope không giúp người đọc hiểu thêm.
 
 ## 4. Mô tả
 
-- Viết ngắn, cụ thể và bằng tiếng Anh để lịch sử nhiều repo nhất quán.
-- Mô tả thay đổi, không chỉ ghi tên file hay trạng thái chung chung.
-- Không kết thúc mô tả bằng dấu chấm.
-- Ưu tiên động từ rõ như `add`, `prevent`, `remove`, `document`, `update`.
-
-```text
-fix(web): prevent banner from covering the dialog
-```
-
-Tránh `update`, `fix stuff`, `misc changes` vì chúng không nói người đọc cần biết điều gì.
+- Tiếng Anh, ngắn, cụ thể; động từ ở thể mệnh lệnh (`add`, `prevent`, `serve`, `reuse`).
+- Không kết thúc bằng dấu chấm.
+- Không dùng `update`, `fix stuff`, `misc changes`.
+- Thông tin tiếng Việt (tên món, câu chữ trên site) đặt trong body khi cần, không thay cho mô tả tiếng Anh.
 
 ## 5. Body và footer
 
-Thêm body khi tiêu đề không giải thích lý do, cách làm hoặc hệ quả. Để một dòng trống sau tiêu đề.
+Thêm body khi tiêu đề không giải thích lý do, cách làm hoặc hệ quả; để một dòng trống sau tiêu đề. Body tốt trong repo này nói rõ số đo trước và sau (ví dụ `aff2609`: 88,8 KB PNG → 31,2 KB WebP) và hành vi không đổi ("No visual change").
 
-```text
-fix(api): reject closing dates outside the active month
-
-The previous validation accepted dates from a different payroll period.
-Validate the requested date before saving the closing record.
-```
-
-Footer có thể liên kết issue hoặc ghi thông tin máy đọc được:
-
-```text
-Refs: #123
-Reviewed-by: reviewer-name
-```
+Footer cho thông tin máy đọc được: `Refs: #12`, và trailer `Co-Authored-By:` khi commit được viết cùng agent AI.
 
 ## 6. Breaking change
 
-Breaking change làm người dùng, API client hoặc quy trình triển khai phải sửa cách sử dụng. Đánh dấu bằng `!` ngay trước `:` hoặc bằng footer `BREAKING CHANGE:`.
-
-```text
-feat(api)!: require employeeId in closing requests
-
-BREAKING CHANGE: clients must include employeeId in the request body.
-```
-
-Có thể dùng `!` mà không có footer nếu mô tả dòng đầu giải thích rõ thay đổi. Không đánh dấu breaking change chỉ vì code nội bộ được refactor.
+Breaking change ở site này là thay đổi làm hỏng thứ bên ngoài đang dựa vào: URL công khai (link đã chia sẻ, đã được index), build arg mà `Jenkinsfile` truyền, giao kèo với script deploy ở repo infra. Đánh dấu bằng `!` trước `:` hoặc footer `BREAKING CHANGE:`, và nói cách chuyển (ví dụ chuyển hướng 301 cho URL cũ).
 
 ## 7. Kiểm tra và ngoại lệ
 
-Review commit để kiểm tra type, scope, mô tả và ghi chú breaking change. Chỉ ghi rằng format được kiểm tự động khi repo thực sự cấu hình commitlint, hook hoặc CI gate. Nếu chưa có, đây là quy ước review.
-
-Conventional Commits không định nghĩa một quy tắc riêng cho revert. Project có thể dùng `revert:` và footer tham chiếu commit bị hoàn tác.
+Không có commitlint hay hook: đây là quy ước kiểm khi review PR. Merge PR trên GitHub tạo commit `Merge pull request #N from …`; tiêu đề PR cũng theo quy ước này. Một số commit cũ (trước 2026-10-14) có mô tả tiếng Việt; không sửa lịch sử.
 
 ## 8. Tham khảo
 

@@ -1,72 +1,68 @@
-# CI/CD Provider Adapter: Jenkins + Container Registry
+# CI/CD provider: Jenkins + Harbor
 
-> Trạng thái: Nháp · Cập nhật: 2026-10-14 · Liên quan: [Core policy](../ci-cd-core.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-14 · Liên quan: [Chính sách CI/CD](../ci-cd-core.md), [Triển khai](../deployment.md), [VPS + Docker Compose](../runtimes/vps-docker-compose.md)
 
-Áp dụng [core policy](../ci-cd-core.md) bằng Jenkins Pipeline và một container registry. Chọn runtime adapter riêng; điền cấu hình Jenkins, plugin và lệnh thật của dự án trước khi sử dụng.
+Áp dụng [chính sách CI/CD](../ci-cd-core.md) bằng Jenkins Pipeline (`Jenkinsfile` ở gốc repo) và registry Harbor, cả hai chạy trên máy CI riêng. Cài đặt Jenkins (JCasC, plugin, job), Harbor và tài khoản robot nằm ở `qkenn04/infra-qkenn` (`ci/`). Tính tới 2026-10-14.
 
-## 1. Mapping
+## 1. Ánh xạ khái niệm
 
-| Core concept | Jenkins |
-|---|---|
-| Change review | Branch/MR hoặc PR rules ở hệ quản lý Git; Jenkins báo status check |
-| CI runner | Agent theo label và vùng tin cậy |
-| Artifact registry | Registry riêng; publish và deploy theo digest |
-| Environment gate | `input` hoặc approval qua hệ thống quản lý release |
-| Credentials | Jenkins Credentials và binding theo stage |
-| Deployment lock | Lockable Resources hoặc controller tương đương, cộng lock tại runtime |
-| Evidence | Build record, test report, release manifest, signature/provenance |
+| Khái niệm chung | Jenkins nói chung | Ở dự án này |
+|---|---|---|
+| Review thay đổi | Quy tắc PR ở Git host; Jenkins báo status check | PR trên GitHub; Jenkins không báo status check cho PR |
+| Runner | Agent theo nhãn và vùng tin cậy | Agent nhãn `docker`, Docker riêng cho build |
+| Kích hoạt | Webhook hoặc poll | `pollSCM('H/5 * * * *')` trên nhánh `main` |
+| Registry | Registry riêng; publish và deploy theo digest | Harbor, image `nokto/web:<commit sha>`; deploy theo tag |
+| Cổng duyệt production | `input` hoặc hệ thống quản lý release | Không có: commit trên `main` tự deploy |
+| Bí mật | Jenkins Credentials, bind theo stage | `withCredentials` chỉ trong stage Push, Deploy và khối thông báo |
+| Khoá deploy | Lockable Resources hoặc tương đương, cộng khoá ở runtime | `disableConcurrentBuilds()`; khoá trong script deploy trên VPS |
+| Bằng chứng | Build record, test report, manifest | Log build Jenkins (giữ 20 build), thông báo Discord |
 
-## 2. Phân tách pipeline
+## 2. Pipeline
 
 ```text
-PR/MR: source checks → test; không bind credential publish/deploy
-Commit đã merge: test lại → build một lần → test image → scan/SBOM
-→ push registry → lấy registry digest → sign/attest → release manifest
-→ staging deploy/verify → approval → production deploy/observe
+main (sau merge) → Sitemap dates → Check → Build (một lần) → Smoke test image
+→ Push Harbor → Deploy (SSH, forced command) → healthcheck trên VPS, lỗi thì quay về image trước
 ```
 
-Jenkins không thay thế branch protection ở Git host. Cấu hình webhook/status check, owner review cho `Jenkinsfile`, Dockerfile, migration và hạ tầng. Không chạy mã PR không tin cậy trên agent có quyền đọc production credentials hoặc Docker socket dùng chung với production job.
+Chi tiết từng stage: [Triển khai, mục 5](../deployment.md#5-ci). Không chạy mã của PR chưa merge trên agent có quyền push registry hay deploy (hiện PR không được build).
 
-## 3. Agent và credentials
+## 3. Agent và bí mật
 
-| Stage | Agent/credential |
-|---|---|
-| PR test | Agent cách ly, chỉ đọc source và dependency cần thiết |
-| Build/publish | Agent build riêng; registry write credential chỉ bind trong stage publish |
-| Staging | Identity deploy staging và registry read |
-| Production | Identity deploy production và registry read, sau approval |
+| Stage | Agent | Bí mật được bind |
+|---|---|---|
+| Sitemap dates, Check, Build, Smoke test | Agent `docker` | Không |
+| Push | Agent `docker` | Tài khoản robot chỉ có quyền push, đăng xuất trong `post { always }` |
+| Deploy | Agent `docker` | Khoá SSH chỉ chạy được lệnh deploy; file host key đã ghim (`StrictHostKeyChecking=yes`, không bao giờ tắt) |
+| Thông báo (`post`) | Agent `docker` | URL webhook Discord |
 
-Ưu tiên agent tạm thời, workspace sạch và token ngắn hạn nếu nền tảng hỗ trợ. Không in giá trị credential vào log, environment dump hoặc artifact. Nếu dùng Docker Pipeline, kiểm plugin cần thiết và quyền Docker trên agent; quyền Docker gần tương đương quyền root trên host.
+Tên credential, cách xoay vòng và quyền của tài khoản robot: repo infra. Agent `docker` dùng một Docker daemon riêng của Jenkins (chú thích đầu `Jenkinsfile`), không dùng chung Docker với việc khác; quyền Docker vẫn gần tương đương root trong môi trường build đó, nên chỉ code đã merge vào `main` được chạy ở đây.
 
-## 4. Release job contract
+## 4. Hợp đồng của job
 
-1. Checkout đúng commit đã merge và cài dependency theo lockfile.
-2. Chạy source tests; build image một lần, test chính image đó, scan và tạo SBOM.
-3. Push image, lấy digest từ registry, ký/attest theo policy và tạo manifest chứa commit, digest, kết quả test, migration version.
-4. Lưu manifest cùng build record với retention phù hợp; deploy job chỉ nhận release từ manifest đã xác minh.
-5. Promote cùng digest qua staging và production, không rebuild theo environment.
+1. Checkout đúng commit trên `main` với **lịch sử đầy đủ** (không shallow clone): stage Sitemap dates cần `git log` ([ADR 0004](../../adr/0004-automate-sitemap-from-page-config-and-git.md)).
+2. Agent có `git`, `jq`, `bash`, `docker`.
+3. Build image một lần, smoke test chính image đó, push với tag là `$GIT_COMMIT`.
+4. Gọi deploy với đúng `$GIT_COMMIT`; script trên VPS kéo đúng tag đó.
+5. Dọn image khỏi Docker của máy CI sau build và dọn build cache cũ hơn 7 ngày (`post { cleanup }`).
 
-Không dùng `BUILD_NUMBER`, image ID cục bộ hoặc tag mutable làm định danh deploy. Registry credential dùng để push có thể khác credential chỉ đọc dùng để pull.
+## 5. Duyệt, khoá và phục hồi
 
-## 5. Approval, lock và phục hồi
+- Không có bước duyệt tay; merge vào `main` là quyết định deploy.
+- Build không chạy chồng (`disableConcurrentBuilds`); timeout 30 phút.
+- Máy CI hoặc Jenkins khởi động lại giữa build: build dở bị huỷ, VPS chỉ bị đụng nếu đã tới stage Deploy. Cache git của Jenkins có thể hỏng sau khi máy tắt đột ngột: [runbook 001](../runbooks/001-jenkins-git-cache-corrupted.md).
 
-- Approval production phải ghi người duyệt, thời điểm, release ID và digest được duyệt. Với bước `input`, giới hạn người được bấm và timeout chờ.
-- Khoá production deployment và rollback bằng resource duy nhất; nếu không có Lockable Resources, dùng cơ chế serialization tương đương.
-- Runtime lock vẫn cần thiết để bao phủ thao tác ngoài Jenkins, migration và đổi traffic.
-- Trong lock, kiểm release còn hợp lệ; job cũ được resume sau restart không được ghi đè release mới.
-- Khi agent hoặc controller mất kết nối, đọc trạng thái remote và release manifest trước khi chạy lại; không giả định stage thất bại đồng nghĩa host chưa đổi.
-
-## 6. Điều cần điền cho dự án
+## 6. Thông tin của dự án
 
 | Mục | Giá trị |
 |---|---|
-| Git rules và status check bắt buộc | <…> |
-| Agent label và vùng tin cậy | <…> |
-| Plugin, Jenkinsfile và owner review | <…> |
-| Registry, credential IDs và retention | <…> |
-| Lệnh test/build/scan/sign/verify | <…> |
-| Manifest store và audit record | <…> |
-| Người approve, timeout và deployment lock | <…> |
-| Smoke test và runbook rollback | <…> |
+| Quy tắc Git và status check | PR vào `main`; không có status check từ Jenkins. `[CẦN XÁC NHẬN: branch protection]` |
+| Agent và vùng tin cậy | Agent nhãn `docker` trên máy CI, trong mạng riêng |
+| `Jenkinsfile`, người review | `Jenkinsfile`, `Dockerfile`, `ci/` đi qua PR như code |
+| Registry và lưu giữ | Harbor trên máy CI, project `nokto`, repository `web`; chính sách giữ image ở repo infra |
+| Lệnh kiểm, build | `bash ci/sitemap-lastmod.sh`; `docker build --target check`; `docker build --target runner --pull`; `ci/smoke-test.sh` |
+| Quét, ký, xác minh | Chưa có trong pipeline ([chính sách, mục 0](../ci-cd-core.md#0-áp-dụng-ở-dự-án-này)) |
+| Lưu bằng chứng | Log build Jenkins (20 build gần nhất), thông báo Discord |
+| Người duyệt, khoá deploy | Không duyệt tay; `disableConcurrentBuilds` và khoá trên VPS |
+| Smoke test và rollback | `ci/smoke-test.sh`; rollback ở [Triển khai, mục 7](../deployment.md#7-rollback) |
 
-Tài liệu tham khảo: [Pipeline syntax](https://www.jenkins.io/doc/book/pipeline/syntax/), [Docker với Pipeline](https://www.jenkins.io/doc/book/pipeline/docker/), [Credentials](https://www.jenkins.io/doc/book/using/using-credentials/), [Lockable Resources](https://www.jenkins.io/doc/pipeline/steps/lockable-resources/).
+Tài liệu tham khảo: [Pipeline syntax](https://www.jenkins.io/doc/book/pipeline/syntax/), [Credentials](https://www.jenkins.io/doc/book/using/using-credentials/), [Docker với Pipeline](https://www.jenkins.io/doc/book/pipeline/docker/).

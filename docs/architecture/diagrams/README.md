@@ -1,72 +1,28 @@
 # Sơ đồ
 
-> Trạng thái: Nháp · Cập nhật: 2026-10-14 · Liên quan: [Kiến trúc](../ARCHITECTURE.md), [Tài liệu](../../README.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-14 · Liên quan: [Kiến trúc](../ARCHITECTURE.md), [Mô hình dữ liệu nội dung](../data-model.md), [Tài liệu](../../README.md)
 
-<!--
-Thư mục này chứa sơ đồ dùng chung cho nhiều tài liệu, và quy ước vẽ.
-Sơ đồ chỉ dùng trong một tài liệu thì để ngay trong tài liệu đó.
-Sơ đồ trình bày (ảnh, HTML xuất từ công cụ vẽ) cho bài viết hay slide có thể để ở đây, nhưng nguồn chỉnh sửa được
-(Mermaid) vẫn là bản gốc cho tài liệu.
--->
+Quy ước vẽ và mục lục sơ đồ của dự án. Sơ đồ chỉ dùng trong một tài liệu thì để ngay trong tài liệu đó; thư mục này chỉ chứa sơ đồ dùng chung (hiện chưa có).
 
 ## 1. Quy ước
 
-- **Mermaid trong Markdown** là mặc định: sửa được bằng tay, review được trong diff, GitHub hiển thị trực tiếp.
-- **Theo mức C4:** mức 1 ngữ cảnh (hệ thống và thế giới xung quanh), mức 2 thành phần (container: thứ chạy riêng hoặc lưu dữ liệu riêng), mức 3 bên trong một thành phần (chỉ khi cần). Mức 4 (code) không vẽ.
-- **Mỗi sơ đồ một câu hỏi.** Tiêu đề nói sơ đồ trả lời câu hỏi gì; có dòng "tính tới YYYY-MM-DD".
-- **Nhãn trên mũi tên** ghi hành động hoặc giao thức ("gọi HTTPS", "ghi file"); hướng mũi tên là hướng của lời gọi.
-- **Đặt tên file** `NN-<name>.md` (hai chữ số, tiếng Anh, kebab-case), ví dụ `01-context.md`, `02-containers.md`.
-- **Công khai được:** không IP, hostname nội bộ, tên tài khoản, đường dẫn máy chủ thật.
+- **Mermaid trong Markdown** là bản gốc: sửa được bằng tay, review được trong diff, GitHub hiển thị trực tiếp.
+- **Theo mức C4:** mức 1 ngữ cảnh, mức 2 thành phần (thứ chạy riêng hoặc lưu dữ liệu riêng), mức 3 chỉ khi cần. Không vẽ mức 4 (code). Dùng `flowchart` kèm nhãn `[Người]`, `[Container: …]`, `[Hệ thống ngoài]`; cú pháp `C4Context` của Mermaid còn thử nghiệm.
+- **Mỗi sơ đồ một câu hỏi,** có dòng "tính tới YYYY-MM-DD" ở tài liệu chứa nó.
+- **Nhãn trên mũi tên** ghi hành động hoặc giao thức; hướng mũi tên là hướng của lời gọi.
+- **Không dùng `;` và `#`** trong chữ của sơ đồ Mermaid (là ký tự đặc biệt của cú pháp).
+- **Công khai được:** không IP, hostname nội bộ, cổng nội bộ, tên tài khoản, đường dẫn trên máy chủ. Repo này công khai.
+- **Sơ đồ trình bày** (HTML xuất từ Archify) để ở `docs/archify/`; khi lệch với Mermaid thì Mermaid đúng.
 
 ## 2. Mục lục
 
-| File | Mức | Trả lời câu hỏi | Cập nhật |
+| Sơ đồ | Mức | Trả lời câu hỏi | Cập nhật |
 |---|---|---|---|
-| *(chưa có)* | | | |
-
-## 3. Ví dụ: sơ đồ ngữ cảnh kiểu C4 (mức 1)
-
-*Ví dụ: một ứng dụng đặt lịch hẹn. Thay bằng hệ thống của dự án.*
-
-```mermaid
-flowchart TB
-  customer(["Khách hàng<br/>[Người]<br/>Đặt, đổi, huỷ lịch hẹn"])
-  staff(["Nhân viên<br/>[Người]<br/>Xem và xác nhận lịch"])
-  booking["Hệ thống đặt lịch<br/>[Hệ thống đang mô tả]<br/>Quản lý lịch hẹn và nhắc lịch"]
-  mail["Dịch vụ gửi thư<br/>[Hệ thống ngoài]<br/>Gửi thư xác nhận"]
-  pay["Cổng thanh toán<br/>[Hệ thống ngoài]<br/>Thu tiền đặt cọc"]
-
-  customer -->|"Đặt lịch qua web (HTTPS)"| booking
-  staff -->|"Xem lịch (HTTPS)"| booking
-  booking -->|"Gửi xác nhận (API)"| mail
-  booking -->|"Tạo giao dịch (API)"| pay
-
-  classDef person fill:#08427b,stroke:#052e56,color:#ffffff
-  classDef system fill:#1168bd,stroke:#0b4884,color:#ffffff
-  classDef external fill:#999999,stroke:#6b6b6b,color:#ffffff
-  class customer,staff person
-  class booking system
-  class mail,pay external
-```
-
-## 4. Ví dụ: sơ đồ thành phần kiểu C4 (mức 2)
-
-```mermaid
-flowchart LR
-  customer(["Khách hàng"])
-  subgraph booking["Hệ thống đặt lịch"]
-    web["Web app<br/>[Container: SPA]<br/>Giao diện đặt lịch"]
-    api["API<br/>[Container: dịch vụ HTTP]<br/>Nghiệp vụ, xác thực"]
-    worker["Worker<br/>[Container: tiến trình nền]<br/>Gửi nhắc lịch"]
-    db[("Cơ sở dữ liệu<br/>[Container: SQL]<br/>Lịch hẹn, khách hàng")]
-  end
-  mail["Dịch vụ gửi thư<br/>[Hệ thống ngoài]"]
-
-  customer -->|"HTTPS"| web
-  web -->|"JSON/HTTPS"| api
-  api -->|"SQL"| db
-  worker -->|"đọc lịch sắp tới"| db
-  worker -->|"API"| mail
-```
-
-Mermaid có cú pháp C4 riêng (`C4Context`, `C4Container`) nhưng vẫn là tính năng thử nghiệm và hiển thị chưa ổn định; dùng `flowchart` như trên kèm nhãn `[Người]`, `[Container: …]`, `[Hệ thống ngoài]` cho chắc.
+| [Ngữ cảnh](../ARCHITECTURE.md#2-sơ-đồ-ngữ-cảnh-c4-mức-1) | C4-1 | Site nói chuyện với ai? | 2026-10-14 |
+| [Thành phần](../ARCHITECTURE.md#3-thành-phần-c4-mức-2) | C4-2 | Cái gì chạy ở đâu, gọi nhau thế nào? | 2026-10-14 |
+| [Khách mở một trang](../ARCHITECTURE.md#41-khách-mở-một-trang) | Luồng | Request đi qua những lớp nào? | 2026-10-14 |
+| [Đưa thay đổi lên production](../ARCHITECTURE.md#42-đưa-một-thay-đổi-lên-production) | Luồng | Pipeline gồm những stage nào, hỏng thì sao? | 2026-10-14 |
+| [Ai đọc gì](../data-model.md#3-ai-đọc-gì) | Dữ liệu | Module dữ liệu nào nuôi trang, metadata, sitemap? | 2026-10-14 |
+| [Vòng đời sự kiện](../data-model.md#8-vòng-đời-trạng-thái-sự-kiện) | Trạng thái | Sự kiện chuyển trạng thái thế nào? | 2026-10-14 |
+| [Kiến trúc (Archify, HTML)](../../archify/nokto-architecture.html) | Trình bày | Bản vẽ trình bày của hệ thống | 2026-10-13, còn ghi domain cũ và `noindex` |
+| [CI/CD (Archify, HTML)](../../archify/nokto-cicd.html) | Trình bày | Bản vẽ trình bày của pipeline và đường lỗi | 2026-10-13 |

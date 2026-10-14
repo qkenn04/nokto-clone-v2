@@ -1,68 +1,94 @@
 # Kiểm thử
 
-> Trạng thái: Nháp · Cập nhật: 2026-10-14 · Liên quan: [Đặc tả sản phẩm](../product/spec.md), [Yêu cầu phi chức năng](../product/nfr.md), [Cấu hình](configuration.md), [Kiến trúc](../architecture/ARCHITECTURE.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-14 · Liên quan: [Đặc tả sản phẩm](../product/spec.md), [Yêu cầu phi chức năng](../product/nfr.md), [Cấu hình](configuration.md), [Số đo hiệu năng](perf.md), [Triển khai](../ops/deployment.md)
 
-<!--
-File này trả lời: test những gì, ở tầng nào, chạy bằng lệnh gì, và tiêu chí nghiệm thu nào được test nào bảo vệ.
-Ghi lệnh chạy được thật (copy-paste từ gốc repo). Test không bao giờ chạy vào dữ liệu hay thư mục của môi trường thật.
--->
+Site không có unit test hay test trình duyệt tự động. Lớp bảo vệ là các bước kiểm tĩnh (lint, typecheck, guard sitemap), build, và **smoke test trên chính image sẽ được deploy**. Hiệu năng, SEO và giao diện được kiểm tay, có ghi lại. Tính tới 2026-10-14.
 
 ## 1. Chiến lược theo tầng
 
-<!-- Ký hiệu một chữ dùng trong cột "Loại test" của tiêu chí nghiệm thu ở mọi spec. -->
-
-| Tầng | Ký hiệu | Kiểm gì | Công cụ | Chạy ở đâu | Khi nào | Thời gian mục tiêu |
-|---|---|---|---|---|---|---|
-| Unit | U | Hàm, module, không I/O thật | <…> | Máy dev, CI | Mỗi lần lưu, mỗi PR | < 1 phút |
-| Tích hợp | I | Module + cơ sở dữ liệu tạm, thư mục tạm | <…> | CI | Mỗi PR | < 5 phút |
-| Đầu cuối | E | Luồng người dùng trên bản build | <…> | CI | Mỗi PR hoặc trước phát hành | < 10 phút |
-| Hợp đồng API | C | Hình dạng request, response, mã lỗi | <…> | CI | Mỗi PR | |
-| Kiểm tay | M | Điều chưa tự động được; ghi lại người kiểm, ngày, kết quả | Checklist mục 6 | Môi trường thật hoặc staging | Trước phát hành | |
+| Tầng | Ký hiệu | Kiểm gì | Công cụ | Chạy ở đâu | Khi nào |
+|---|---|---|---|---|---|
+| Tĩnh | S | Lỗi lint, kiểu TypeScript (strict), `seo/sitemap-pages.json` lệch với `src/app` | ESLint 9, `tsc --noEmit`, `seo/check-sitemap-pages.mjs` | Máy dev (`npm run check`); Jenkins stage Check (`docker build --target check`) | Trước khi mở PR; mỗi commit trên `main` |
+| Build | B | Next.js build được bản production | `next build` trong stage `builder` của `Dockerfile` | Máy dev; Jenkins stage Build | Như trên |
+| Smoke test image | E | Image khởi động và qua healthcheck; mọi trang trả đúng mã; `robots.txt` và `sitemap.xml` đúng | `ci/smoke-test.sh` | Jenkins stage Smoke test; máy dev có Docker | Mỗi commit trên `main`, trước khi push image |
+| Kiểm tay | M | Điều chưa tự động: hiệu năng, dữ liệu cấu trúc, ảnh chia sẻ, giao diện trên điện thoại | Checklist mục 6 | `https://thehot.vn` sau deploy, hoặc bản build trên máy | Khi PR chạm phần đó |
 
 ## 2. Lệnh
 
+Chạy từ gốc repo. Cần Node.js 24 trở lên (`.nvmrc`).
+
 | Việc | Lệnh |
 |---|---|
-| Chạy toàn bộ test | `<lệnh>` |
-| Chạy một file hoặc một test | `<lệnh>` |
-| Test tích hợp (cần dịch vụ phụ) | `<lệnh dựng dịch vụ tạm>` rồi `<lệnh test>` |
-| Đo độ phủ | `<lệnh>` |
-| Kiểm link tài liệu | `python3 scripts/check-links.py .` |
+| Cài phụ thuộc | `npm ci` |
+| Toàn bộ kiểm trên máy (lint, typecheck, guard sitemap, build) | `npm run check` |
+| Từng bước | `npm run lint` · `npm run typecheck` · `npm run check:sitemap` · `npm run build` |
+| Tính ngày sitemap như CI | `bash ci/sitemap-lastmod.sh` (cần `git`, `jq`, lịch sử git đầy đủ) |
+| Chạy lại đúng các bước Jenkins bằng Docker | xem khối lệnh dưới bảng |
+| Kiểm link tài liệu | `python3 scripts/check-links.py . --exclude CONTRIBUTING.md --exclude SECURITY.md` |
 
-## 3. Tiêu chí nghiệm thu và test
+```bash
+# Giống Jenkins: Sitemap dates → Check → Build → Smoke test
+bash ci/sitemap-lastmod.sh
+docker build --target check .
+docker build --target runner --build-arg NEXT_PUBLIC_SITE_URL=https://thehot.vn -t nokto:local .
+ci/smoke-test.sh nokto:local
+```
 
-<!-- Mỗi tiêu chí nghiệm thu (AC-NN cấp sản phẩm, NNN-AC-NN của spec) chỉ tới ít nhất một test hoặc một bước kiểm tay. Tiêu chí không có test là tiêu chí chưa được bảo vệ. -->
+`CONTRIBUTING.md` và `SECURITY.md` kế thừa từ template upstream và còn link tới mục không có trong `README.md` của repo này, nên được loại khỏi lệnh kiểm link cho tới khi hai file đó được viết lại.
 
-| Tiêu chí | Loại | Test | Ghi chú |
+## 3. Smoke test kiểm gì
+
+`ci/smoke-test.sh <image> [site-url]` (mặc định `https://thehot.vn`) chạy image trong một container tạm, rồi gọi từ bên trong container (image slim không có `curl`):
+
+1. Đợi Docker `HEALTHCHECK` báo `healthy` (tối đa 30 lần × 2 s); không khoẻ thì in 50 dòng log cuối và dừng.
+2. `/`, `/menu`, `/menu/list`, `/about`, `/reservation`, `/terms`, `/privacy`, `/sitemap.xml` trả 200; `/smoke-test-missing-page` trả 404.
+3. `robots.txt` chứa `<site-url>/sitemap.xml` (bắt lỗi quên build arg `NEXT_PUBLIC_SITE_URL`).
+4. `sitemap.xml` có ít nhất một `<url>` và số `<lastmod>` bằng số `<url>` (bắt lỗi build thiếu file ngày).
+5. Mọi `<loc>` và `<image:loc>` là URL tuyệt đối trên đúng origin của site, trả 200 khi gọi không theo chuyển hướng; ảnh có `content-type` bắt đầu bằng `image/`.
+
+Container tạm luôn bị xoá khi script kết thúc.
+
+## 4. Tiêu chí nghiệm thu và cách kiểm
+
+| Tiêu chí | Loại | Kiểm bằng | Ghi chú |
 |---|---|---|---|
-| AC-01 | I | `<đường dẫn test>` | |
-| `001-AC-01` | E | `<đường dẫn test>` | |
+| AC-01 (trang trả đúng mã) | E | `ci/smoke-test.sh`, bước 2 | Thêm route mới thì thêm vào danh sách trong script |
+| AC-02 (sitemap đúng, đủ ngày, URL sống) | S, E | `check-sitemap-pages.mjs`; smoke test bước 4–5 | |
+| AC-03 (index được) | M | `curl -sI https://thehot.vn/` không có `X-Robots-Tag`; xem nguồn: `<meta name="robots" content="index, follow">`, canonical | Header do nginx quyết định (repo infra) |
+| AC-04 (thông tin quán nhất quán) | M | Rich Results Test; so footer, `/terms`, Google Business Profile | Bất biến I-01, I-02 ở [mô hình dữ liệu](../architecture/data-model.md) |
+| AC-05 (nút liên hệ trên mọi trang) | M | Điện thoại thật, từng trang | |
+| AC-06 (form không gửi dữ liệu) | M | DevTools → Network khi bấm "Liên hệ chốt bàn": không có request mới chứa dữ liệu form | |
+| AC-07 (ngân sách hiệu năng) | M | PageSpeed Mobile, ghi vào [perf.md](perf.md) | |
 
-## 4. Dữ liệu test và môi trường
+## 5. Cổng chất lượng
 
-- Dữ liệu mẫu: <nằm ở đâu, sinh thế nào>. Không dùng bản sao dữ liệu thật có thông tin cá nhân.
-- Dịch vụ phụ cho test tích hợp: <cơ sở dữ liệu tạm, container dùng xong bỏ>; tên project và cổng riêng, không trùng môi trường khác.
-- Test ghi file chỉ ghi vào thư mục tạm và tự kiểm đường dẫn nằm trong thư mục tạm đó.
-- Thời gian và ngẫu nhiên: cố định đồng hồ và seed trong test.
+Jenkins chỉ build nhánh `main` (sau merge); PR không được build tự động. Vì vậy `npm run check` trên máy người làm là cổng trước merge, và các stage Jenkins là cổng trước deploy.
 
-## 5. Cổng chất lượng trong CI
-
-| Cổng | Chặn merge khi | Lệnh |
+| Cổng | Chặn deploy khi | Lệnh |
 |---|---|---|
-| Lint, kiểu | Có lỗi | `<lệnh>` |
-| Test U, I, C | Có test đỏ | `<lệnh>` |
-| Ngân sách hiệu năng | Vượt ngưỡng PERF ở [yêu cầu phi chức năng](../product/nfr.md) | `<lệnh>` |
-| Link tài liệu | Có link hỏng | `python3 scripts/check-links.py .` |
-| Quét secret | Có phát hiện | `<lệnh>` |
+| Sitemap dates | Shallow clone, đường dẫn trong cấu hình chưa có commit, thiếu `git`/`jq` | `bash ci/sitemap-lastmod.sh` |
+| Check | Lỗi lint, kiểu, guard sitemap | `docker build --target check .` |
+| Build | Next.js build lỗi | `docker build --target runner …` |
+| Smoke test | Mục 3 | `ci/smoke-test.sh` |
+| Link tài liệu | Chưa có trong CI (`.dockerignore` loại `docs/`); chạy tay | lệnh ở mục 2 |
+| Ngân sách hiệu năng, quét secret | Chưa có cổng tự động | — |
 
 ## 6. Kiểm tay (M)
 
-- [ ] <bước kiểm, kết quả mong đợi>
+Sau deploy một PR chạm phần tương ứng:
+
+- [ ] Trang đã sửa hiện đúng trên `https://thehot.vn` ở điện thoại và máy tính.
+- [ ] Đổi trang hoặc nội dung: `curl -s https://thehot.vn/sitemap.xml` có trang và ngày đúng.
+- [ ] Đổi tiêu đề, mô tả, ảnh chia sẻ: xem nguồn trang; Facebook Sharing Debugger (https://developers.facebook.com/tools/debug/) → Scrape Again.
+- [ ] Đổi JSON-LD hoặc thông tin quán: https://search.google.com/test/rich-results.
+- [ ] Đổi phần ảnh hưởng tải trang: PageSpeed Mobile 3 lần, ghi trung vị vào [perf.md](perf.md).
+- [ ] Đổi trang mới hoặc URL: Search Console → URL Inspection → Request indexing.
 
 ## 7. Nợ test
 
-<!-- Phần chưa có test mà biết là cần; mỗi mục có lý do và kế hoạch. -->
-
 | Phần | Vì sao chưa có | Kế hoạch |
 |---|---|---|
-| <…> | <…> | TK## hoặc spec `NNN` |
+| Logic trạng thái sự kiện (`getEventStatus`, `filterEvents`) | Chưa có bộ chạy unit test trong repo | Thêm khi sự kiện có lịch thật và logic phức tạp hơn `[CẦN XÁC NHẬN: chọn công cụ test]` |
+| Luồng trên trình duyệt (form đặt bàn, menu lật, nút liên hệ) | Chưa có test trình duyệt | Kiểm tay (mục 6) |
+| Ngân sách hiệu năng tự động | PageSpeed API giới hạn lượt; máy dev chưa chạy được Lighthouse | Spec hiệu năng `003-performance` |
+| Quét secret | Chưa cài công cụ | `[CẦN XÁC NHẬN: chọn công cụ quét secret cho repo công khai]` |
