@@ -10,7 +10,7 @@ import { EASE_CINEMA } from "../motion";
 import { site } from "../site";
 import { Stack } from "../ui";
 import { Backdrop } from "./Backdrop";
-import { BrandMark } from "./BrandMark";
+import { BrandMark, LOGO_SIZES } from "./BrandMark";
 import { InfoItem } from "./SiteFooter";
 
 type NavItemProps = {
@@ -33,7 +33,15 @@ function NavLogo({ isActive }: { isActive: boolean }) {
           : "opacity-0 group-hover:opacity-100 motion-safe:scale-90 motion-safe:-rotate-6 motion-safe:group-hover:scale-100 motion-safe:group-hover:rotate-0"
       }`}
     >
-      <Image src={site.logo.src} alt="" width={site.logo.width} height={site.logo.height} unoptimized className="block h-full w-auto" />
+      <Image
+        src={site.logo.src}
+        alt=""
+        width={site.logo.width}
+        height={site.logo.height}
+        sizes={LOGO_SIZES}
+        style={{ aspectRatio: `${site.logo.width} / ${site.logo.height}` }}
+        className="block h-full w-auto"
+      />
     </span>
   );
 }
@@ -249,7 +257,7 @@ export function PersistentChrome() {
   return (
     <>
       <SiteNavigation />
-      {!isHome && <Backdrop preload />}
+      {!isHome && <Backdrop priority />}
       {!isHome && <FixedBrand />}
     </>
   );

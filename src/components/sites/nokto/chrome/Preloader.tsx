@@ -149,7 +149,7 @@ export function Preloader() {
           </div>
         </div>
       </div>
-      <Backdrop position="absolute" preload />
+      <Backdrop position="absolute" priority />
       <BeerFill />
     </div>
   );
