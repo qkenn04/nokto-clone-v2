@@ -95,7 +95,7 @@ Cache git của controller (dùng cho lightweight checkout để đọc `Jenkins
 | 4 | Cân nhắc chuyển CI sang một máy luôn bật thay cho WSL trên máy để bàn; quyết định (chuyển hay giữ) ghi thành ADR | phòng ngừa | `[CẦN XÁC NHẬN]` | `[CẦN XÁC NHẬN]` | Mở | — |
 | 5 | Viết runbook cho lỗi cache git của Jenkins | giảm nhẹ | Người vận hành | 2026-10-14 | Xong | [Runbook 001](../runbooks/001-jenkins-git-cache-corrupted.md) |
 
-Khuyến nghị cân nhắc sau (không phải việc cần làm của postmortem này): bật branch protection cho `main` (bắt buộc PR, và bắt buộc build xanh nếu sau này PR được build). Chủ repo cho là chưa cần ở thời điểm 2026-10-15; xem [CONTRIBUTING.md](../../../CONTRIBUTING.md).
+Khuyến nghị cân nhắc sau (không phải việc cần làm của postmortem này): bật branch protection cho `main` (bắt buộc PR, và bắt buộc build xanh nếu sau này PR được build). Chủ repo cho là chưa cần ở thời điểm 2026-10-15; xem [CONTRIBUTING.md](../../../CONTRIBUTING.md#protecting-main).
 
 ## 7. Bài học
 
