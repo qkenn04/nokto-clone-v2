@@ -15,12 +15,12 @@ export const pageMeta = {
   "/menu": {
     title: "Menu",
     description:
-      "Menu nhậu The Hot Beer Garden Đà Lạt: món ăn từ 39K, giá đã gồm VAT. Bia ưu đãi từ 19K, Chủ nhật đến thứ Năm. Lật menu, chốt món rồi đặt bàn.",
+      "Menu The Hot Beer Garden Đà Lạt: mồi từ 39K, combo cho 4 và 6 người kèm bia, lẩu, mẹt, rượu và tháp bia. Giá đã gồm VAT. Lật menu, chốt món rồi đặt bàn.",
   },
   "/menu/list": {
     title: "Bảng giá món nhậu & bia",
     description:
-      "Bảng giá món nhậu The Hot Đà Lạt: món ăn chơi, salad, gà, mực, heo, bò từ 39.000₫, giá đã gồm VAT. Bia ưu đãi Chủ nhật đến thứ Năm.",
+      "Bảng giá The Hot Đà Lạt: mồi từ 39.000₫, combo cho 4 và 6 người kèm bia Tiger, lẩu, mẹt, món heo, bò, gà, tôm, rượu và vang. Giá đã gồm VAT.",
   },
   "/about": {
     title: "Beer garden chill cho hội bạn",
