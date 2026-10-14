@@ -47,3 +47,7 @@ next-env.d.ts
 
 # Local temp files
 temp/
+
+# Raw video sources: .mov masters and *.orig.* originals (web encodes live next to them in public/videos)
+public/videos/*.mov
+public/videos/*.orig.*

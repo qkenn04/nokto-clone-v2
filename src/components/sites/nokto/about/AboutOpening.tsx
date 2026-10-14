@@ -17,7 +17,7 @@ export function AboutOpening() {
       <Fragment key={tick}>
         <motion.div
           {...fadeUp(reduce, 12, 0.1)}
-          className="absolute left-8 top-24 sm:left-12 sm:top-28 md:left-16 md:top-32 lg:left-20 lg:top-36 xl:left-24 xl:top-40"
+          className="absolute left-8 top-32 sm:left-12 sm:top-40 md:left-16 md:top-44 lg:left-20 lg:top-48 xl:left-24 xl:top-52"
         >
           <Text variant="label" tone="muted">
             {about.chapter}

@@ -6,10 +6,10 @@ import { AboutGallery } from "@/components/sites/nokto/about/AboutGallery";
 import { AboutNumbers } from "@/components/sites/nokto/about/AboutNumbers";
 import { AboutOpening } from "@/components/sites/nokto/about/AboutOpening";
 import { AboutQuote } from "@/components/sites/nokto/about/AboutQuote";
-import { about } from "@/components/sites/nokto/about/content";
-import { FixedPhoto } from "@/components/sites/nokto/chrome/FixedPhoto";
+import { FixedVideo } from "@/components/sites/nokto/chrome/FixedVideo";
 import { SiteFooter } from "@/components/sites/nokto/chrome/SiteFooter";
 import { site } from "@/components/sites/nokto/site";
+import { aboutVideo } from "@/components/sites/the-hot/videos";
 
 const title = "Về The Hot";
 const description = "The Hot — quán nhậu của hội bạn ở Đà Lạt. Mồi bén, bia lạnh, nhạc lên tại 28 Sương Nguyệt Ánh, P. Lâm Viên.";
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <main id="main-content" className="relative w-full">
-      <FixedPhoto src={about.heroImage.src} />
+      <FixedVideo {...aboutVideo} />
       <div className="relative z-10 lg:w-1/2">
         <AboutOpening />
         <AboutBody />

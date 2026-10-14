@@ -1,0 +1,150 @@
+.shell {
+  position: fixed;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.75rem;
+  pointer-events: none;
+}
+
+.bubbles {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem;
+  border: 1px solid #4a3e33;
+  border-radius: 999px;
+  background: rgb(26 24 22 / 0.88);
+  box-shadow: 0 0.75rem 1.75rem rgb(0 0 0 / 0.22);
+  backdrop-filter: blur(12px);
+}
+
+.bubble,
+.bookingCta {
+  pointer-events: auto;
+}
+
+.bubble {
+  display: inline-flex;
+  width: 2.5rem;
+  height: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  color: #b5afa8;
+  text-decoration: none;
+  transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease, transform 0.25s var(--ease-cinema);
+}
+
+.bubble:hover,
+.bubble:focus-visible {
+  border-color: #615144;
+  background: #2a2520;
+  color: var(--color-accent);
+}
+
+.bubbleLabel {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.messenger {
+  background: transparent;
+}
+
+.facebook {
+  background: transparent;
+}
+
+.zalo {
+  background: transparent;
+}
+
+.phone {
+  background: transparent;
+}
+
+.zaloMark {
+  display: inline-flex;
+  width: 1.25rem;
+  height: 1.25rem;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid currentColor;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.facebookMark {
+  font-family: Arial, sans-serif;
+  font-size: 1.65rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.bookingCta {
+  display: inline-flex;
+  min-height: 3rem;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.75rem 1.1rem;
+  border: 1px solid var(--color-accent);
+  border-radius: 999px;
+  background: var(--color-accent);
+  color: var(--color-accent-foreground);
+  box-shadow: 0 0.7rem 1.5rem rgb(0 0 0 / 0.3);
+  font-size: var(--text-small);
+  font-weight: 700;
+  letter-spacing: var(--tracking-label);
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease, transform 0.25s var(--ease-cinema);
+}
+
+.bookingCta:hover,
+.bookingCta:focus-visible {
+  border-color: var(--hot-coral, #ff815f);
+  background: var(--hot-coral, #ff815f);
+  transform: translateY(-3px);
+}
+
+.bookingCta:focus-visible,
+.bubble:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 4px;
+}
+
+@media (width < 40rem) {
+  .shell {
+    right: max(0.75rem, env(safe-area-inset-right));
+    bottom: max(0.75rem, env(safe-area-inset-bottom));
+  }
+
+  .bubble {
+    width: 2.35rem;
+    height: 2.35rem;
+  }
+
+  .bookingCta {
+    min-height: 2.75rem;
+    padding-inline: 0.9rem;
+    font-size: 0.6875rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bubble,
+  .bookingCta {
+    transition: none;
+  }
+}

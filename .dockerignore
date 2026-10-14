@@ -48,6 +48,10 @@ docker-compose.yml
 Jenkinsfile
 ci
 
+# Raw video sources: .mov masters and *.orig.* originals (only the web encodes are served)
+public/videos/*.mov
+public/videos/*.orig.*
+
 # Misc
 *.tsbuildinfo
 README.md

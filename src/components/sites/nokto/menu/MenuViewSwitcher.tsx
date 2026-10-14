@@ -3,8 +3,8 @@ import Link from "next/link";
 import { cx } from "../ui";
 
 const views = [
-  { value: "list", label: "Danh sách", href: "/menu", icon: List },
-  { value: "book", label: "Lật sách", href: "/the-hot/menu", icon: BookOpen },
+  { value: "book", label: "Lật sách", href: "/menu", icon: BookOpen },
+  { value: "list", label: "Danh sách", href: "/menu/list", icon: List },
 ] as const;
 
 /** Both menus belong to the same site and remain one click apart. */

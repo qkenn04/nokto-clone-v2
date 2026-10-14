@@ -27,7 +27,7 @@ export function MenuList() {
 
   return (
     <Section as="div" padY="none">
-      <Stack className="pt-28 sm:pt-32 md:pt-36 lg:pt-40">
+      <Stack className="pt-32 sm:pt-40 md:pt-44 lg:pt-48 xl:pt-52">
         <motion.header
           initial={reduce ? { opacity: 0 } : { opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}

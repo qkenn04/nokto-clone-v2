@@ -16,31 +16,29 @@ import { InfoItem } from "./SiteFooter";
 type NavItemProps = {
   label: string;
   href: string;
-  image: string;
-  imageWidth: number;
-  imageHeight: number;
   index: number;
   isActive: boolean;
   delay: number;
   reduce: boolean;
 };
 
-/** Hanko-style seal that fades in beside a hovered (or current) navigation item. */
-function NavSeal({ image, alt, width, height, isActive }: { image: string; alt: string; width: number; height: number; isActive: boolean }) {
+/** The Hot logo that fades in beside a hovered (or current) navigation item; decorative, the link text names it. */
+function NavLogo({ isActive }: { isActive: boolean }) {
   return (
     <span
       aria-hidden
-      className={`inline-flex h-[0.85em] shrink-0 items-center transition-opacity duration-500 ease-cinema ${
-        isActive ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+      className={`inline-flex h-[1em] shrink-0 translate-y-[0.03em] items-center transition-[opacity,scale,rotate] duration-500 ease-cinema ${
+        isActive
+          ? "opacity-100"
+          : "opacity-0 group-hover:opacity-100 motion-safe:scale-90 motion-safe:-rotate-6 motion-safe:group-hover:scale-100 motion-safe:group-hover:rotate-0"
       }`}
     >
-      <Image src={image} alt="" width={width} height={height} unoptimized className="block h-full w-auto" />
-      <span className="sr-only">{alt}</span>
+      <Image src={site.logo.src} alt="" width={site.logo.width} height={site.logo.height} unoptimized className="block h-full w-auto" />
     </span>
   );
 }
 
-function NavItem({ label, href, image, imageWidth, imageHeight, index, isActive, delay, reduce }: NavItemProps) {
+function NavItem({ label, href, index, isActive, delay, reduce }: NavItemProps) {
   return (
     <motion.li
       initial={reduce ? { opacity: 0 } : { opacity: 0, y: 16 }}
@@ -62,7 +60,7 @@ function NavItem({ label, href, image, imageWidth, imageHeight, index, isActive,
           }`}
         >
           <span>{label}</span>
-          <NavSeal image={image} alt={label} width={imageWidth} height={imageHeight} isActive={isActive} />
+          <NavLogo isActive={isActive} />
         </span>
       </Link>
     </motion.li>
@@ -205,7 +203,7 @@ function SiteNavigation() {
                       key={item.href}
                       {...item}
                       index={index + 1}
-                      isActive={pathname === item.href || pathname.startsWith(`${item.href}/`) || (item.href === "/menu" && pathname === "/the-hot/menu")}
+                      isActive={pathname === item.href || pathname.startsWith(`${item.href}/`)}
                       delay={0.1 + 0.08 * index}
                       reduce={reduce}
                     />
@@ -239,7 +237,7 @@ function FixedBrand() {
   const opacity = useTransform(scrollY, [0, 220], [1, 0], { clamp: true });
   return (
     <motion.div style={{ opacity }} className="section-pad section-pad-y fixed left-0 top-0 z-30">
-      <BrandMark size="compact" />
+      <BrandMark />
     </motion.div>
   );
 }

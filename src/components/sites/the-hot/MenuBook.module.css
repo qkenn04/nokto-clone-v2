@@ -6,7 +6,7 @@
 .layout {
   display: grid;
   gap: 2rem;
-  padding-block: 7rem 2.5rem;
+  padding-block: 8rem 2.5rem;
 }
 
 .intro {
@@ -114,32 +114,63 @@
   width: 100%;
   aspect-ratio: 1414 / 2000;
   overflow: hidden;
-  perspective: 1800px;
+  isolation: isolate;
   touch-action: pan-y pinch-zoom;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  box-shadow: 0 1.5rem 3rem rgb(0 0 0 / 0.25);
 }
 
-.paperBase,
-.paperTurn {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  transform-style: preserve-3d;
-  backface-visibility: hidden;
-}
-
-.paperTurn {
-  z-index: 2;
-}
-
-.paperTurn::after {
+/* Every page in reach stays mounted and painted under the current one, so a turn never waits on a blank sheet. */
+.sheet,
+.underShadow,
+.flapWrap,
+.flap,
+.flapShade,
+.gutter {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  content: "";
-  background: linear-gradient(90deg, rgb(0 0 0 / 0.2), transparent 16%, transparent 82%, rgb(0 0 0 / 0.12));
+}
+
+.sheet {
+  background: var(--color-surface);
+}
+
+.underShadow {
+  z-index: 3;
+  visibility: hidden;
+}
+
+.flapWrap {
+  z-index: 5;
+  visibility: hidden;
+}
+
+/* The back of the turning leaf: warm paper with the print faintly showing through, mirrored. */
+.flap {
+  transform-origin: 0 0;
+  overflow: hidden;
+  background: #f3ede2;
+}
+
+.flapPrint {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0.055;
+}
+
+/* Binding: the page dips into the spine on its left edge. */
+.gutter {
+  z-index: 6;
+  background: linear-gradient(90deg, rgb(0 0 0 / 0.2), rgb(0 0 0 / 0.07) 1.4%, rgb(0 0 0 / 0.02) 3.6%, transparent 6%);
+}
+
+.preload {
+  display: none;
 }
 
 .paperImage {
@@ -319,7 +350,7 @@
 
 @media (width >= 40rem) {
   .layout {
-    padding-top: 8rem;
+    padding-top: 10rem;
   }
 
   .closing {
@@ -334,12 +365,12 @@
     grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
     align-items: start;
     gap: clamp(2.5rem, 5vw, 5rem);
-    padding-block: 9rem 3rem;
+    padding-block: 11rem 3rem;
   }
 
   .intro {
     position: sticky;
-    top: 9rem;
+    top: 11rem;
   }
 
   .introNote {
@@ -365,11 +396,21 @@
 
 @media (width >= 64rem) {
   .layout {
-    padding-top: 10rem;
+    padding-top: 12rem;
   }
 
   .intro {
-    top: 10rem;
+    top: 12rem;
+  }
+}
+
+@media (width >= 80rem) {
+  .layout {
+    padding-top: 13rem;
+  }
+
+  .intro {
+    top: 13rem;
   }
 }
 
