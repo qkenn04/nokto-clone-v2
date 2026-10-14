@@ -87,9 +87,17 @@ Nếu job khác trên cùng Jenkins cũng hỏng cùng kiểu, lặp lại cho t
 - Ảnh hưởng: deploy của PR #4, #5, #6 bị trễ; site đang chạy không bị ảnh hưởng.
 - Dòng thời gian đầy đủ, nguyên nhân và việc cần làm: [postmortem 001](../postmortems/001-wsl-restart-corrupted-jenkins-git-cache.md).
 
+**2026-10-15 (giờ Việt Nam):**
+
+- 05:46: build #26 (merge PR #16) bắt đầu. 05:47: WSL của máy CI lại tự khởi động lại; build bị giết giữa stage Build (`wrapper script does not seem to be touching the log file`, `exit code -1`).
+- Kiểm nhanh theo runbook: cache của controller và workspace của job đều có 0 object rỗng, nên không phải xoá gì.
+- Chạy lại build (#27) thành công và deploy `06af464`. Ảnh hưởng: deploy trễ khoảng 40 phút; site đang chạy không bị ảnh hưởng.
+- Lần thứ hai trong hai ngày WSL tự tắt giữa lúc build: nguyên nhân vẫn chưa rõ ([postmortem 001, mục 6](../postmortems/001-wsl-restart-corrupted-jenkins-git-cache.md#6-việc-cần-làm)).
+
 ## Lịch sử thay đổi
 
 | Ngày | Thay đổi |
 |---|---|
 | 2026-10-14 | Tạo sau sự cố cùng ngày |
 | 2026-10-15 | Link tới postmortem 001; WSL tự tắt (chủ repo xác nhận); thông báo Discord chỉ có khi đã cấu hình webhook |
+| 2026-10-15 | Ghi lần WSL tự khởi động lại thứ hai (build #26), cache không hỏng |
