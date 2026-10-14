@@ -69,4 +69,4 @@ Tình trạng 2026-10-15 (ảnh chụp của chủ quán): tìm "the hot beer ga
 | 2026-10-15 | Bỏ nhãn minh hoạ sự kiện 16/10, 17/10; link Facebook, Messenger `thehot.dalat`; deploy | PR #8, `46025ad`, merge `ed262e4`, Jenkins build #17 |
 | 2026-10-15 | Mở PR #10: JSON-LD đợt 1 + `/favicon.ico`; validator.schema.org 0 lỗi, 0 cảnh báo; chờ duyệt | PR #10, `8d9ec01`, `6680248` |
 | 2026-10-15 | Ghi tình trạng tìm tên quán (`/about` #4) và việc cho chủ quán (TripAdvisor, tiểu sử mạng xã hội, giờ trên Google) | Ảnh chụp của chủ quán; mục Xếp hạng khi tìm tên quán |
-| 2026-10-15 | Menu Premium lên `/menu` (tab thứ hai, 12 trang ảnh có alt, sitemap ảnh thêm 12 mục) và `/menu/list` (104 món dạng chữ); đề xuất mô tả mới cho hai trang menu, chờ duyệt | Nhánh `feat/menu-premium` |
+| 2026-10-15 | Menu Premium lên `/menu` (tab thứ hai, 12 trang ảnh có alt, sitemap ảnh thêm 12 mục) và `/menu/list` (104 món dạng chữ); đề xuất mô tả mới cho hai trang menu, chờ duyệt | PR #15 (chờ duyệt) |

@@ -45,7 +45,7 @@ Người làm: **Chủ quán** (chủ quán hoặc người quản lý) · **Dev
 - [x] TK26 Sửa mục "Tùy chọn hiển thị" đang sai ở `/privacy` (nói về `sessionStorage` đã bỏ từ `d0a8e34`): gộp vào 003 phần E hoặc 004 PR A, tuỳ cái nào làm trước · [003-T51](../specs/003-performance/tasks.md), [004-T15](../specs/004-analytics/tasks.md) · PR #13 merge 2026-10-15
 - [x] TK27 Hạ tầng Umami (repo hạ tầng riêng, private), lấy Website ID (2026-10-15) · M4 · [004-T03](../specs/004-analytics/tasks.md)
 - [ ] TK28 Dọn tệp template NOKTO không còn dùng trong `public/sites/nokto/` · M2 · [002-T32](../specs/002-onpage-seo/tasks.md)
-- [ ] TK30 Menu Premium: tab thứ hai ở `/menu` (12 trang ảnh) và `/menu/list` (104 món kèm giá, tên tiếng Anh) · M2 · **PR chờ duyệt** (nhánh `feat/menu-premium`) · xong khi: merge, deploy; sau đó chủ quán trả lời Q16–Q24 và duyệt mô tả mới ([002-T16](../specs/002-onpage-seo/tasks.md))
+- [ ] TK30 Menu Premium: tab thứ hai ở `/menu` (12 trang ảnh) và `/menu/list` (104 món kèm giá, tên tiếng Anh) · M2 · **PR #15 chờ duyệt** · xong khi: merge, deploy; sau đó chủ quán trả lời Q16–Q24 và duyệt mô tả mới ([002-T16](../specs/002-onpage-seo/tasks.md))
 - [ ] TK29 Theo dõi kết quả tìm tên quán "the hot beer garden đà lạt": vị trí của `thehot.vn`, tiêu đề mới, biểu tượng The Hot thay quả địa cầu (dịch vụ favicon của Google đã trả logo từ 2026-10-15) · M2, M6 · [002-T60, 002-T63](../specs/002-onpage-seo/tasks.md)
 
 ### Để sau

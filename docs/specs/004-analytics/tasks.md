@@ -26,7 +26,7 @@ PR A (Umami) là PR #13, merge 2026-10-15. Website ID có từ 2026-10-15; track
 
 ## Sự kiện thêm sau PR A
 
-- [x] 004-T50 Sự kiện `menu_tab_select` (`tab`, `mode`) khi đổi tab menu "Món ăn chơi" / "Premium" ở sách lật và danh sách; thêm `tab` vào danh sách thuộc tính cho phép · AC: 004-AC-06 (trước deploy: trình duyệt headless với tracker giả) · PR menu Premium (nhánh `feat/menu-premium`, chờ duyệt)
+- [x] 004-T50 Sự kiện `menu_tab_select` (`tab`, `mode`) khi đổi tab menu "Món ăn chơi" / "Premium" ở sách lật và danh sách; thêm `tab` vào danh sách thuộc tính cho phép · AC: 004-AC-06 (trước deploy: trình duyệt headless với tracker giả) · PR #15 (chờ duyệt)
 
 ## GA4: chủ quán làm trên giao diện
 
