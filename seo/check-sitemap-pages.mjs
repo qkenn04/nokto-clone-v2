@@ -1,7 +1,7 @@
 // Fails when seo/sitemap-pages.json drifts from the real pages in src/app.
 // Runs in the Docker `check` stage (no .git there), so it only reads the working tree. Plain Node, no dependencies.
 import { existsSync, readdirSync, readFileSync } from "node:fs";
-import { isAbsolute, join, normalize } from "node:path";
+import { isAbsolute, join, normalize, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
@@ -20,6 +20,13 @@ function routeOf(file) {
 
 function isRepoPath(path) {
   return typeof path === "string" && path !== "" && !isAbsolute(path) && normalize(path).split(/[\\/]/)[0] !== "..";
+}
+
+/** True when a source is the page file itself or a folder that contains it. */
+function covers(source, file) {
+  if (!isRepoPath(source)) return false;
+  const rest = relative(normalize(source), file);
+  return rest === "" || (!isAbsolute(rest) && rest.split(/[\\/]/)[0] !== "..");
 }
 
 function fail() {
@@ -45,13 +52,14 @@ for (const [key, value] of Object.entries({ shared, exclude, dynamic })) {
 }
 if (errors.length > 0) fail();
 
-const routes = new Set(
-  readdirSync(join(root, appDir), { recursive: true })
-    .map((file) => String(file).replaceAll("\\", "/"))
-    .filter((file) => /(^|\/)page\.(tsx|ts|jsx|js|mdx)$/.test(file))
-    .map(routeOf)
-    .filter((route) => route !== null),
-);
+/** Route -> the page files under src/app that render it. */
+const pageFiles = new Map();
+for (const file of readdirSync(join(root, appDir), { recursive: true }).map((file) => String(file).replaceAll("\\", "/"))) {
+  if (!/(^|\/)page\.(tsx|ts|jsx|js|mdx)$/.test(file)) continue;
+  const route = routeOf(file);
+  if (route !== null) pageFiles.set(route, [...(pageFiles.get(route) ?? []), `${appDir}/${file}`]);
+}
+const routes = new Set(pageFiles.keys());
 
 const listed = new Set();
 for (const page of pages) {
@@ -66,6 +74,13 @@ for (const page of pages) {
   else if (!routes.has(path)) errors.push(`pages: "${path}" has no matching page file in ${appDir} (page removed or renamed?).`);
   if (exclude.includes(path)) errors.push(`"${path}" is in both "pages" and "exclude"; keep it in one.`);
   if (!Array.isArray(page.sources) || page.sources.length === 0) errors.push(`pages: "${path}" needs a non-empty "sources" array.`);
+  else if (routes.has(path)) {
+    // The page file usually holds visible content too, and its commits must move the page's <lastmod>.
+    const files = pageFiles.get(path);
+    if (!files.some((file) => page.sources.some((source) => covers(source, file)))) {
+      errors.push(`pages: "${path}" sources do not include its page file; add "${files[0]}" (or a folder containing it) to its "sources".`);
+    }
+  }
 }
 
 const sources = [
@@ -94,5 +109,5 @@ for (const route of dynamic) {
 
 if (errors.length > 0) fail();
 console.log(
-  `sitemap-pages: OK, ${routes.size} routes = ${listed.size} in sitemap + ${exclude.length} excluded + ${dynamic.length} dynamic; all ${sources.length} source entries exist.`,
+  `sitemap-pages: OK, ${routes.size} routes = ${listed.size} in sitemap + ${exclude.length} excluded + ${dynamic.length} dynamic; all ${sources.length} source entries exist and every page lists its page file.`,
 );
