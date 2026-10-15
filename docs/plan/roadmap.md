@@ -90,7 +90,7 @@ Vì sao thứ tự này:
 
 ### M2 On-page và dữ liệu có cấu trúc
 
-**Trạng thái:** đang làm từ 2026-10-15: nhãn sự kiện 16/10, 17/10 đã gỡ (PR #8); JSON-LD đợt 1 và `/favicon.ico` ở PR #10, chờ duyệt; phần còn lại chờ câu trả lời và ảnh của chủ quán ([tiến độ](progress.md#theo-mốc)).
+**Trạng thái:** đang làm từ 2026-10-15: nhãn sự kiện 16/10, 17/10 đã gỡ (PR #8); JSON-LD đợt 1 và `/favicon.ico` lên production (PR #10, Jenkins build #20), Google đã đọc (Events PASS); phần còn lại chờ câu trả lời và ảnh của chủ quán ([tiến độ](progress.md#theo-mốc)).
 
 **Mục tiêu.** Google đọc được đầy đủ và đúng thông tin quán; trang có đủ chữ thật cho các từ khoá nhắm.
 

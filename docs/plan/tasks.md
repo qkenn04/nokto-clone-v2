@@ -2,7 +2,7 @@
 
 > Trạng thái: Đang áp dụng · Cập nhật: 2026-10-15 · Liên quan: [Lộ trình](roadmap.md), [Tiến độ](progress.md), [Mục lục spec](../specs/README.md)
 
-Mốc đang làm: đóng M1; M2, M3, M4 làm song song tuỳ việc nào gỡ chặn trước (2026-10-15: M2 có PR #10 chờ duyệt, M3 đã xong cache); chủ quán bắt đầu M5 ngay ([lộ trình](roadmap.md)). Việc chi tiết của từng tính năng nằm trong `tasks.md` của spec; ở đây chỉ trỏ tới.
+Mốc đang làm: đóng M1; M2, M3, M4 làm song song tuỳ việc nào gỡ chặn trước (2026-10-15: M2 đã có JSON-LD đợt 1 trên production, M3 đã xong cache và video hero); chủ quán bắt đầu M5 ngay ([lộ trình](roadmap.md)). Việc chi tiết của từng tính năng nằm trong `tasks.md` của spec; ở đây chỉ trỏ tới.
 
 Người làm: **Chủ quán** (chủ quán hoặc người quản lý) · **Dev** (code, CI; mọi thay đổi đi qua PR).
 
@@ -20,7 +20,7 @@ Người làm: **Chủ quán** (chủ quán hoặc người quản lý) · **Dev
 - [ ] TK08 Trả lời các câu hỏi ở mục [Câu hỏi chờ chủ quán](#câu-hỏi-chờ-chủ-quán) · chặn M2
 - [ ] TK15 TripAdvisor: nhận (claim) trang của quán rồi sửa danh mục (đang là Events/Attraction, cần nhà hàng hoặc quán bar), giờ mở cửa (đang 16:30, đúng là 17:30), ghim bản đồ (lệch khoảng 40 m), thêm website `https://thehot.vn` · M5 · [002-T62](../specs/002-onpage-seo/tasks.md) · gấp: AI Overview đọc giờ từ đây; trang này đứng thứ 2 khi tìm tên quán
 - [ ] TK16 Thêm `https://thehot.vn` vào tiểu sử Instagram, TikTok và mục Website của trang Facebook `thehot.dalat` (UTM theo [004 mục 4.2](../specs/004-analytics/spec.md#42-quy-ước-utm) nếu muốn đo) · M5 · [002-T61](../specs/002-onpage-seo/tasks.md) · vì: ba trang này đang đứng trên site khi tìm tên quán; link chính chủ từ đó trỏ về site giúp Google nhận site là website chính thức
-- [ ] TK17 Sau khi PR #10 lên production: Rich Results Test cho `https://thehot.vn/`, rồi Search Console → URL Inspection → `https://thehot.vn/` → Request indexing · M2 · [002-T26, 002-T27](../specs/002-onpage-seo/tasks.md)
+- [x] TK17 Sau khi PR #10 lên production: Rich Results Test cho `https://thehot.vn/`, rồi Search Console → URL Inspection → `https://thehot.vn/` → Request indexing · M2 · [002-T26, 002-T27](../specs/002-onpage-seo/tasks.md) · không cần làm tay nữa: Google crawl lại `/` lúc 2026-10-15 05:55 (giờ VN), sau khi JSON-LD lên; URL Inspection API: rich result Events PASS cho 3 sự kiện, chỉ cảnh báo thiếu `offers`, `performer` (không bắt buộc). Muốn xem phần Local business thì vẫn có thể chạy Rich Results Test tay
 - [x] TK18 Chọn cách xử lý âm thanh video hero: B1 chỉ faststart (giữ âm thanh trong file, khách vẫn chưa nghe được), B2 nút bật tiếng trên video, B3 nút "Xem video có tiếng" mở trình phát riêng · M3 · [Q15](#câu-hỏi-chờ-chủ-quán), [003-T35](../specs/003-performance/tasks.md) · chọn B1, 2026-10-15
 
 ### Tiếp theo
@@ -39,14 +39,14 @@ Người làm: **Chủ quán** (chủ quán hoặc người quản lý) · **Dev
 - [x] TK20 Gỡ nhãn minh hoạ cho sự kiện 16/10 (Friday on Fire) và 17/10 (Hot Saturday), đã được xác nhận là thật; đổi link Facebook và Messenger sang `thehot.dalat` · M2 · [002-T20](../specs/002-onpage-seo/tasks.md) · xong 2026-10-15: PR #8, `ed262e4`, Jenkins build #17
 - [ ] TK21 Đo lại PageSpeed sau PR #4 (cùng TK05), đo mốc còn thiếu (Desktop, `/menu`, MB trong 10 s đầu) · M1, M3 · [003-T03, 003-T14](../specs/003-performance/tasks.md)
 - [ ] TK22 Facebook Sharing Debugger: Scrape Again cho 7 URL · M1 · [002-T14](../specs/002-onpage-seo/tasks.md)
-- [ ] TK23 JSON-LD đợt 1 chỉ với thông tin đã xác nhận (`geo`, `sameAs`, `hasMap`, `WebSite`, `Event` cho sự kiện thật) và `/favicon.ico` · M2 · [002-T21, 002-T22, 002-T26](../specs/002-onpage-seo/tasks.md) · **PR #10 chờ duyệt** (validator.schema.org 0 lỗi, 0 cảnh báo) · xong khi: PR #10 merge, deploy, `/favicon.ico` trả 200
+- [x] TK23 JSON-LD đợt 1 chỉ với thông tin đã xác nhận (`geo`, `sameAs`, `hasMap`, `WebSite`, `Event` cho sự kiện thật) và `/favicon.ico` · M2 · [002-T21, 002-T22, 002-T26](../specs/002-onpage-seo/tasks.md) · xong: PR #10 merge `aafd52b`, Jenkins build #20 (2026-10-15); production có `Restaurant` + `BarOrPub` (geo, sameAs), `WebSite`, 3 `Event`; `/favicon.ico` trả 200 `image/x-icon`
 - [x] TK24 Header cache cho tệp `public/` ở reverse proxy · M3 · [003-T22](../specs/003-performance/tasks.md) · xong 2026-10-15: PR #7 của repo `qkenn04/infra-qkenn` (7 ngày); kèm PR #9 (`images.minimumCacheTTL` 7 ngày, build #19)
 - [x] TK25 Video hero bước nhanh: faststart, **giữ âm thanh** (`-map 0 -c copy`, mọi track giữ nguyên từng byte; cần `ffmpeg`); nếu chủ quán chọn B2 hoặc B3 thì thêm phần giao diện · M3 · [003-T30, 003-T31, 003-T36](../specs/003-performance/tasks.md) · gộp vào PR #16 (AV1 + 720p faststart, hoãn tải; chủ quán chọn B1), PR #16 merge 2026-10-15, deploy build #27
 - [x] TK26 Sửa mục "Tùy chọn hiển thị" đang sai ở `/privacy` (nói về `sessionStorage` đã bỏ từ `d0a8e34`): gộp vào 003 phần E hoặc 004 PR A, tuỳ cái nào làm trước · [003-T51](../specs/003-performance/tasks.md), [004-T15](../specs/004-analytics/tasks.md) · PR #13 merge 2026-10-15
 - [x] TK27 Hạ tầng Umami (repo hạ tầng riêng, private), lấy Website ID (2026-10-15) · M4 · [004-T03](../specs/004-analytics/tasks.md)
 - [ ] TK28 Dọn tệp template NOKTO không còn dùng trong `public/sites/nokto/` · M2 · [002-T32](../specs/002-onpage-seo/tasks.md)
 - [x] TK30 Menu Premium: tab thứ hai ở `/menu` (12 trang ảnh) và `/menu/list` (104 món kèm giá, tên tiếng Anh) · M2 · PR #15 merge 2026-10-15, deploy build #25; mô tả mới áp dụng 2026-10-15; còn chờ chủ quán trả lời Q16–Q24 ([002-T16](../specs/002-onpage-seo/tasks.md))
-- [ ] TK31 Báo máy tìm kiếm sau mỗi deploy: gửi lại sitemap cho Google (Search Console API), URL đổi qua IndexNow; `page-meta.ts` vào `shared` · M1 · [001-T50 đến T56](../specs/001-sitemap-automation/tasks.md), [ADR 0009](../adr/0009-notify-search-engines-after-deploy.md) · PR #18 chờ duyệt; áp credential (PR #10 của repo hạ tầng) trước khi merge · xong khi: log stage Notify search engines của lần deploy đầu có Google 2xx và IndexNow 200/202
+- [x] TK31 Báo máy tìm kiếm sau mỗi deploy: gửi lại sitemap cho Google (Search Console API), URL đổi qua IndexNow; `page-meta.ts` vào `shared` · M1 · [001-T50 đến T56](../specs/001-sitemap-automation/tasks.md), [ADR 0009](../adr/0009-notify-search-engines-after-deploy.md) · xong 2026-10-15: PR #18 merge `4a61480`, Jenkins build #29; credential ở PR #10 của repo hạ tầng (merge, đã áp lên Jenkins trước); lần chạy đầu: 6 trang đổi, Google HTTP 204, IndexNow 202 (lần đầu IndexNow còn xác minh khoá)
 - [ ] TK29 Theo dõi kết quả tìm tên quán "the hot beer garden đà lạt": vị trí của `thehot.vn`, tiêu đề mới, biểu tượng The Hot thay quả địa cầu (dịch vụ favicon của Google đã trả logo từ 2026-10-15) · M2, M6 · [002-T60, 002-T63](../specs/002-onpage-seo/tasks.md)
 
 ### Để sau
@@ -101,4 +101,7 @@ Danh sách đầy đủ cho analytics: [004 spec mục 12](../specs/004-analytic
 - [x] Chuyển ghi chú kế hoạch SEO, sitemap, tốc độ, analytics vào `docs/plan` và `docs/specs` (2026-10-14)
 - [x] Sự kiện 16/10, 17/10 bỏ nhãn minh hoạ; link Facebook, Messenger sang `thehot.dalat` · PR #8, `ed262e4`, Jenkins build #17 (2026-10-15)
 - [x] Bộ tài liệu dự án vào `main` · PR #7, merge `eee3c04` (2026-10-15)
+- [x] JSON-LD đợt 1 và `/favicon.ico` · PR #10, `aafd52b`, Jenkins build #20 (2026-10-15)
+- [x] Umami (PR #13, #14), menu Premium (PR #15), video hero AV1 (PR #16), mô tả menu (PR #17) · Jenkins build #23 đến #28 (2026-10-15)
+- [x] Báo máy tìm kiếm sau deploy · PR #18, `4a61480`, Jenkins build #29: Google HTTP 204, IndexNow 202 (2026-10-15)
 - [x] Cache: Cloudflare Browser Cache TTL + Cache Rule `/_next/image` (chủ quán); header 7 ngày cho `/videos`, `/images`, `/sites` (repo `qkenn04/infra-qkenn` PR #7); `images.minimumCacheTTL` 7 ngày (PR #9, `6c246e1`, Jenkins build #19); lần gọi thứ hai `cf-cache-status: HIT` (2026-10-15)

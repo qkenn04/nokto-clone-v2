@@ -23,13 +23,13 @@
 ## Phần C: JSON-LD
 
 - [x] 002-T20 Gỡ `illustrative: true` (nhãn "Chương trình minh hoạ" trên thẻ và chú thích lightbox) của sự kiện 16/10 và 17/10 trong `home/content.ts`; đổi `socialHref`, `messengerHref` sang `thehot.dalat` · `46025ad`, PR #8 (merge `ed262e4`), Jenkins build #17 · 2026-10-15. Alt poster vẫn ghi "ảnh minh hoạ chương trình …": để 002-T30
-- [ ] 002-T21 Thêm vào `site.ts`: toạ độ, `sameAs` (Instagram, TikTok, Facebook, Google kgmid, TripAdvisor), link bản đồ · xong khi: các giá trị khớp bảng ở spec phần C · **PR #10 chờ duyệt**
-- [ ] 002-T22 Module `src/seo/structured-data.ts`: `@graph` gồm `Restaurant`/`BarOrPub`, `WebSite`, `Event` (chỉ sự kiện thật, chỉ trên `/`) · AC: 002-AC-05, 002-AC-06 · **PR #10 chờ duyệt** (`8d9ec01`)
+- [x] 002-T21 Thêm vào `site.ts`: toạ độ, `sameAs` (Instagram, TikTok, Facebook, Google kgmid, TripAdvisor), link bản đồ · xong khi: các giá trị khớp bảng ở spec phần C · PR #10 (merge `aafd52b`, Jenkins build #20)
+- [x] 002-T22 Module `src/seo/structured-data.ts`: `@graph` gồm `Restaurant`/`BarOrPub`, `WebSite`, `Event` (chỉ sự kiện thật, chỉ trên `/`) · AC: 002-AC-05, 002-AC-06 · PR #10 (`8d9ec01`, merge `aafd52b`, Jenkins build #20)
 - [ ] 002-T23 Thêm giờ đóng cửa, `priceRange`, `paymentAccepted`, nhạc sống khi chủ quán đã trả lời (điền `pendingFacts` trong `site.ts`, có sẵn từ PR #10) · chặn bởi 002-T04
-- [ ] 002-T24 Rich Results Test + validator.schema.org không lỗi · AC: 002-AC-04 · validator.schema.org trên bản build của PR #10: 0 lỗi, 0 cảnh báo (2026-10-15); Rich Results Test trên production làm sau deploy (002-T27)
+- [x] 002-T24 Rich Results Test + validator.schema.org không lỗi · AC: 002-AC-04 · validator.schema.org trên bản build của PR #10: 0 lỗi, 0 cảnh báo (2026-10-15); trên production, Google tự đọc: URL Inspection API ngày 2026-10-15 báo Events PASS, 0 lỗi, chỉ cảnh báo thiếu `offers`, `performer`
 - [ ] 002-T25 `Restaurant.image` 3–5 ảnh thật · chặn bởi 001-T40 (ảnh ngang) · PR #10 tạm dùng 5 ảnh gallery + ảnh chia sẻ
-- [ ] 002-T26 `public/favicon.ico` (16/32/48 px) cho request thẳng tới `/favicon.ico` (đang 404) · **PR #10 chờ duyệt** (`6680248`) · xong khi: `curl -sI https://thehot.vn/favicon.ico` trả 200 `image/x-icon`
-- [ ] 002-T27 Sau khi PR #10 deploy: Rich Results Test `https://thehot.vn/` (nhận Local business; Event nếu Google hiện), rồi Search Console → URL Inspection → `https://thehot.vn/` → Request indexing · AC: 002-AC-04 · [TK17](../../plan/tasks.md)
+- [x] 002-T26 `public/favicon.ico` (16/32/48 px) cho request thẳng tới `/favicon.ico` (đang 404) · PR #10 (`6680248`, merge `aafd52b`) · 2026-10-15: production trả 200 `image/x-icon` · xong khi: `curl -sI https://thehot.vn/favicon.ico` trả 200 `image/x-icon`
+- [x] 002-T27 Sau khi PR #10 deploy: Rich Results Test `https://thehot.vn/` (nhận Local business; Event nếu Google hiện), rồi Search Console → URL Inspection → `https://thehot.vn/` → Request indexing · AC: 002-AC-04 · [TK17](../../plan/tasks.md)
 
 ## Phần D, E: ảnh
 
@@ -52,7 +52,7 @@ Tình trạng 2026-10-15 (ảnh chụp của chủ quán): tìm "the hot beer ga
 - [ ] 002-T62 Chủ quán nhận (claim) trang TripAdvisor: danh mục đang là Events/Attraction (cần nhà hàng hoặc quán bar), giờ 16:30 (đúng 17:30), ghim bản đồ lệch khoảng 40 m, thêm website · [TK15](../../plan/tasks.md)
 - [ ] 002-T63 Biểu tượng trong kết quả tìm kiếm: dịch vụ favicon của Google (`https://www.google.com/s2/favicons?domain=thehot.vn&sz=64`) đã trả logo The Hot (2026-10-15); kiểm lại sau vài ngày rằng kết quả không còn quả địa cầu · [TK29](../../plan/tasks.md)
 - [ ] 002-T64 Google Business Profile: giờ 17:30 và website `thehot.vn` để AI Overview và Google Maps hết hiện 16:30 · [TK01, TK07](../../plan/tasks.md)
-- [ ] 002-T65 Tên site "The Hot Beer Garden" và dữ liệu có cấu trúc: hoàn tất bằng 002-T27 (PR #10)
+- [ ] 002-T65 Tên site "The Hot Beer Garden" và dữ liệu có cấu trúc: hoàn tất bằng 002-T27 (PR #10) · dữ liệu đã lên production và Google đã đọc `/` (2026-10-15); còn chờ Google hiện tên site trong kết quả tìm kiếm
 
 ## Tài liệu
 
@@ -68,5 +68,6 @@ Tình trạng 2026-10-15 (ảnh chụp của chủ quán): tìm "the hot beer ga
 | 2026-10-14 | Deploy cả hai | `90f1882`, Jenkins build #16 |
 | 2026-10-15 | Bỏ nhãn minh hoạ sự kiện 16/10, 17/10; link Facebook, Messenger `thehot.dalat`; deploy | PR #8, `46025ad`, merge `ed262e4`, Jenkins build #17 |
 | 2026-10-15 | Mở PR #10: JSON-LD đợt 1 + `/favicon.ico`; validator.schema.org 0 lỗi, 0 cảnh báo; chờ duyệt | PR #10, `8d9ec01`, `6680248` |
+| 2026-10-15 | PR #10 merge và deploy; Google crawl lại `/` lúc 05:55 (giờ VN): Events PASS cho 3 sự kiện, cảnh báo thiếu `offers`, `performer`; `/favicon.ico` 200 | merge `aafd52b`, Jenkins build #20, URL Inspection API |
 | 2026-10-15 | Ghi tình trạng tìm tên quán (`/about` #4) và việc cho chủ quán (TripAdvisor, tiểu sử mạng xã hội, giờ trên Google) | Ảnh chụp của chủ quán; mục Xếp hạng khi tìm tên quán |
 | 2026-10-15 | Menu Premium lên `/menu` (tab thứ hai, 12 trang ảnh có alt, sitemap ảnh thêm 12 mục) và `/menu/list` (104 món dạng chữ); đề xuất mô tả mới cho hai trang menu, chờ duyệt | PR #15 (chờ duyệt) |
