@@ -46,7 +46,7 @@ Người làm: **Chủ quán** (chủ quán hoặc người quản lý) · **Dev
 - [x] TK27 Hạ tầng Umami (repo hạ tầng riêng, private), lấy Website ID (2026-10-15) · M4 · [004-T03](../specs/004-analytics/tasks.md)
 - [ ] TK28 Dọn tệp template NOKTO không còn dùng trong `public/sites/nokto/` · M2 · [002-T32](../specs/002-onpage-seo/tasks.md)
 - [x] TK30 Menu Premium: tab thứ hai ở `/menu` (12 trang ảnh) và `/menu/list` (104 món kèm giá, tên tiếng Anh) · M2 · PR #15 merge 2026-10-15, deploy build #25; mô tả mới áp dụng 2026-10-15; còn chờ chủ quán trả lời Q16–Q24 ([002-T16](../specs/002-onpage-seo/tasks.md))
-- [ ] TK31 Báo máy tìm kiếm sau mỗi deploy: gửi lại sitemap cho Google (Search Console API), URL đổi qua IndexNow; `page-meta.ts` vào `shared` · M1 · [001-T50 đến T56](../specs/001-sitemap-automation/tasks.md), [ADR 0009](../adr/0009-notify-search-engines-after-deploy.md) · PR chờ duyệt; áp credential ở repo hạ tầng trước khi merge · xong khi: log stage Notify search engines của lần deploy đầu có Google 2xx và IndexNow 200/202
+- [ ] TK31 Báo máy tìm kiếm sau mỗi deploy: gửi lại sitemap cho Google (Search Console API), URL đổi qua IndexNow; `page-meta.ts` vào `shared` · M1 · [001-T50 đến T56](../specs/001-sitemap-automation/tasks.md), [ADR 0009](../adr/0009-notify-search-engines-after-deploy.md) · PR #18 chờ duyệt; áp credential (PR #10 của repo hạ tầng) trước khi merge · xong khi: log stage Notify search engines của lần deploy đầu có Google 2xx và IndexNow 200/202
 - [ ] TK29 Theo dõi kết quả tìm tên quán "the hot beer garden đà lạt": vị trí của `thehot.vn`, tiêu đề mới, biểu tượng The Hot thay quả địa cầu (dịch vụ favicon của Google đã trả logo từ 2026-10-15) · M2, M6 · [002-T60, 002-T63](../specs/002-onpage-seo/tasks.md)
 
 ### Để sau

@@ -4,7 +4,7 @@
 
 `/sitemap.xml` của https://thehot.vn cho Google và Bing biết site có những trang nào, trang nào vừa đổi và mỗi trang có ảnh nào của quán. Trước spec này, sitemap là một mảng 5 URL gõ tay trong `src/app/sitemap.ts`, `lastmod` gõ cứng là `2026-10-12` và thiếu trang `/terms`. Spec này thay bằng sitemap sinh từ một file cấu hình duy nhất, ngày lấy từ lịch sử git, và có bước kiểm làm build thất bại khi cấu hình lệch với trang thật.
 
-Hiện thực: xong, PR #3 (merge `b8e2665`), chạy trên production từ Jenkins build #11; bản đang chạy là build #16 (`90f1882`). Phần mở rộng "báo máy tìm kiếm sau deploy" (mục 13, [ADR 0009](../../adr/0009-notify-search-engines-after-deploy.md), đề xuất 2026-10-15) đang ở PR chờ duyệt. Trạng thái chi tiết ở [tasks.md](tasks.md) và [tiến độ](../../plan/progress.md).
+Hiện thực: xong, PR #3 (merge `b8e2665`), chạy trên production từ Jenkins build #11; bản đang chạy là build #16 (`90f1882`). Phần mở rộng "báo máy tìm kiếm sau deploy" (mục 13, [ADR 0009](../../adr/0009-notify-search-engines-after-deploy.md), đề xuất 2026-10-15) ở PR #18, chờ duyệt. Trạng thái chi tiết ở [tasks.md](tasks.md) và [tiến độ](../../plan/progress.md).
 
 ## 1. Mục tiêu
 
