@@ -29,7 +29,7 @@ Hệ quả phụ (đã chấp nhận ở PR #5): thẻ Twitter của trang con g
 
 Chờ duyệt: PR #10 (`8d9ec01`, `6680248`, mở 2026-10-15):
 
-- `src/seo/structured-data.ts` (mới) dựng JSON-LD từ `site.ts` và dữ liệu trang chủ, thay hằng `restaurantSchema` trong `layout.tsx`. Root layout xuất một `@graph` trên mọi trang: nút `Restaurant` + `BarOrPub` (`@id` `/#restaurant`) và nút `WebSite` (`@id` `/#website`). Trường cụ thể ở [spec phần C](spec.md#phần-c-dữ-liệu-có-cấu-trúc-pr-10-chờ-duyệt).
+- `src/seo/structured-data.ts` (mới) dựng JSON-LD từ `site.ts` và dữ liệu trang chủ, thay hằng `restaurantSchema` trong `layout.tsx`. Root layout xuất một `@graph` trên mọi trang: nút `Restaurant` + `BarOrPub` (`@id` `/#restaurant`) và nút `WebSite` (`@id` `/#website`). Trường cụ thể ở [spec phần C](spec.md#phần-c-dữ-liệu-có-cấu-trúc-đợt-1-xong-pr-10).
 - `Event`: chỉ trang chủ xuất (Google muốn dữ liệu sự kiện nằm trên trang hiện sự kiện), một `@graph` thứ hai cho mọi phần tử của `homeEvents` không có `illustrative` và có lịch hợp lệ; sự kiện chỉ có ngày (`dateOnly`) dùng ngày không kèm giờ. Không có `offers` (chưa biết giá vé). Trang tĩnh, nên danh sách là bản trong `content.ts` lúc build.
 - `site.ts`: `pendingFacts` (giờ mở cửa, `priceRange`, `paymentAccepted`, nhạc sống) có kiểu nhưng **để trống**; chỉ xuất khi chủ quán xác nhận. Không đặt giá trị chưa xác nhận làm giá trị mặc định.
 - JSON được escape (`<` thành `\u003c`) theo hướng dẫn JSON-LD của Next.js.

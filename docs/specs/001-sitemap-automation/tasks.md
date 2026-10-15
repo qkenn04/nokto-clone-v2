@@ -41,8 +41,8 @@
 - [x] 001-T51 `ci/notify-search.sh` (`snapshot`, `notify`, `status`) và stage `Sitemap snapshot`, `Notify search engines` trong `Jenkinsfile` · AC: 001-AC-10, 001-AC-11, 001-AC-12
 - [x] 001-T52 Khoá IndexNow `public/<khoá>.txt` · AC: 001-AC-13
 - [x] 001-T53 Kiểm trước PR: chạy thử `DRY_RUN=1` trên production, một lần `sitemaps.submit` thật (HTTP 204), IndexNow với endpoint giả, đoạn stage chạy trên Jenkins tạm cùng image (credential có, rỗng, không có; script lỗi và quá giờ), `npm run check`, smoke test · 2026-10-15 ([plan, mục 10](plan.md#10-phần-mở-rộng-2026-10-15-báo-máy-tìm-kiếm-sau-deploy))
-- [ ] 001-T54 Repo hạ tầng: credential khoá service account trong Jenkins (PR #10 của repo hạ tầng), áp lên Jenkins **trước** khi merge PR #18 (thiếu thì stage chỉ vàng và bỏ qua Google)
-- [ ] 001-T55 Sau lần deploy đầu: log stage Notify search engines có Google HTTP 2xx và IndexNow 200 hoặc 202 cho các trang đổi (lần đầu là cả 6 trang vì `page-meta.ts` vừa vào `shared`); Bing Webmaster Tools → IndexNow thấy URL
+- [x] 001-T54 Repo hạ tầng: credential khoá service account trong Jenkins (PR #10 của repo hạ tầng), áp lên Jenkins **trước** khi merge PR #18 (thiếu thì stage chỉ vàng và bỏ qua Google) · 2026-10-15: merge, `install.sh`, credential có trong Jenkins
+- [x] 001-T55 Sau lần deploy đầu: log stage Notify search engines có Google HTTP 2xx và IndexNow 200 hoặc 202 cho các trang đổi (lần đầu là cả 6 trang vì `page-meta.ts` vừa vào `shared`); Bing Webmaster Tools → IndexNow thấy URL · build #29: 6 trang, Google HTTP 204, IndexNow 202; kiểm phía Bing sau vài ngày
 - [ ] 001-T56 Chủ repo: chấp nhận hoặc bác ADR 0009
 
 ## Việc tiếp theo: PR 2, đổi tên ảnh và ảnh độ phân giải cao
@@ -76,3 +76,4 @@ Tên đề xuất (đặt lại theo nội dung thật của ảnh mới):
 | 2026-10-14 | Bản đang chạy sau các PR khác | `90f1882`, Jenkins build #16 |
 | 2026-10-15 | Search Console qua API: sitemap 6 URL trang, 37 ảnh, 0 lỗi; 5/6 trang "Submitted and indexed", `/reservation` "Discovered - currently not indexed" | `sitemaps.get`, URL Inspection API (`bash ci/notify-search.sh status`) |
 | 2026-10-15 | Mở PR #18 báo máy tìm kiếm sau deploy (001-T50 đến T53) | PR #18 |
+| 2026-10-15 | PR #18 merge, deploy; stage Notify search engines lần đầu: 6 trang đổi, Google HTTP 204, IndexNow 202 | merge `4a61480`, Jenkins build #29 |

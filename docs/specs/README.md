@@ -17,7 +17,7 @@ Cột Tài liệu là trạng thái của spec; trạng thái hiện thực ch�
 | # | Tính năng | Tóm tắt | Mốc | Tài liệu | ADR |
 |---|---|---|---|---|---|
 | [001](001-sitemap-automation/spec.md) | Sitemap tự động | Một file cấu hình trang, kiểm lệch trong CI, `lastmod` từ git, sitemap ảnh | M1 | Đang áp dụng | 0004 |
-| [002](002-onpage-seo/spec.md) | SEO trên trang | Tiêu đề, mô tả, ảnh chia sẻ (xong); JSON-LD (PR #10 chờ duyệt), alt, ảnh chia sẻ riêng, chữ giới thiệu và hỏi đáp | M1, M2 | Đang áp dụng | 0005 |
+| [002](002-onpage-seo/spec.md) | SEO trên trang | Tiêu đề, mô tả, ảnh chia sẻ (xong); JSON-LD đợt 1 (xong, PR #10), alt, ảnh chia sẻ riêng, chữ giới thiệu và hỏi đáp | M1, M2 | Đang áp dụng | 0005 |
 | [003](003-performance/spec.md) | Tốc độ trang | Mục tiêu Core Web Vitals; ưu tiên LCP và logo (xong); cache (xong); video hero, ảnh, màn hình chờ, font | M1, M3 | Đang áp dụng | 0006, 0008 |
 | [004](004-analytics/spec.md) | Đo lường truy cập | Umami luôn chạy, GA4 sau đồng ý, banner, sự kiện, UTM | M4 | Đề xuất | 0007 |
 

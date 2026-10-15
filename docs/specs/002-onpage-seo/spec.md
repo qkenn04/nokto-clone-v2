@@ -4,7 +4,7 @@
 
 Những gì Google, Facebook và Zalo đọc được từ chính các trang của https://thehot.vn: tiêu đề và mô tả trong kết quả tìm kiếm, ảnh khi chia sẻ link, dữ liệu có cấu trúc (JSON-LD) về quán, chữ alt của ảnh và phần chữ giới thiệu trên trang. Mục tiêu là để người tìm "quán nhậu chill Đà Lạt", "beer garden Đà Lạt" hay tên quán thấy đúng trang, với thông tin khớp Google Business Profile.
 
-Hiện thực: phần A (tiêu đề, mô tả) và phần B (ảnh chia sẻ) chạy trên production từ Jenkins build #16 (PR #5, PR #6). Phần C: sự kiện 16/10, 17/10 đã bỏ nhãn minh hoạ (PR #8, Jenkins build #17, 2026-10-15); JSON-LD đợt 1 và `/favicon.ico` ở PR #10, chờ duyệt (2026-10-15); giờ đóng cửa, khoảng giá, thanh toán, nhạc sống chờ chủ quán trả lời (mục 12). Phần D–F chưa làm. Trạng thái chi tiết ở [tasks.md](tasks.md).
+Hiện thực: phần A (tiêu đề, mô tả) và phần B (ảnh chia sẻ) chạy trên production từ Jenkins build #16 (PR #5, PR #6). Phần C: sự kiện 16/10, 17/10 đã bỏ nhãn minh hoạ (PR #8, Jenkins build #17, 2026-10-15); JSON-LD đợt 1 và `/favicon.ico` lên production (PR #10, merge `aafd52b`, Jenkins build #20, 2026-10-15), Google đã đọc: rich result Events PASS; giờ đóng cửa, khoảng giá, thanh toán, nhạc sống chờ chủ quán trả lời (mục 12). Phần D–F chưa làm. Trạng thái chi tiết ở [tasks.md](tasks.md).
 
 ## 1. Mục tiêu
 
@@ -67,7 +67,7 @@ H1 và slogan trên giao diện không đổi.
 
 Mọi trang có `og:image` là thẻ chia sẻ chung `/opengraph-image.png` (1200×630). Trang con có alt của ảnh là tiêu đề slogan. Ảnh riêng cho từng trang thuộc phần E.
 
-### Phần C: dữ liệu có cấu trúc (PR #10, chờ duyệt)
+### Phần C: dữ liệu có cấu trúc (đợt 1 xong, PR #10)
 
 Đích (mọi trường đánh dấu `[CẦN XÁC NHẬN]` chỉ thêm khi chủ quán đã trả lời). Cột "PR #10" ghi trường nào đã có trong PR #10 (mở 2026-10-15; validator.schema.org 0 lỗi, 0 cảnh báo):
 
