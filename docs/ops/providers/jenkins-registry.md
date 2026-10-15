@@ -1,6 +1,6 @@
 # CI/CD provider: Jenkins + Harbor
 
-> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-14 · Liên quan: [Chính sách CI/CD](../ci-cd-core.md), [Triển khai](../deployment.md), [VPS + Docker Compose](../runtimes/vps-docker-compose.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-15 · Liên quan: [Chính sách CI/CD](../ci-cd-core.md), [Triển khai](../deployment.md), [VPS + Docker Compose](../runtimes/vps-docker-compose.md)
 
 Áp dụng [chính sách CI/CD](../ci-cd-core.md) bằng Jenkins Pipeline (`Jenkinsfile` ở gốc repo) và registry Harbor, cả hai chạy trên máy CI riêng. Cài đặt Jenkins (JCasC, plugin, job), Harbor và tài khoản robot nằm ở `qkenn04/infra-qkenn` (`ci/`). Tính tới 2026-10-14.
 
@@ -13,7 +13,7 @@
 | Kích hoạt | Webhook hoặc poll | `pollSCM('H/5 * * * *')` trên nhánh `main` |
 | Registry | Registry riêng; publish và deploy theo digest | Harbor, image `nokto/web:<commit sha>`; deploy theo tag |
 | Cổng duyệt production | `input` hoặc hệ thống quản lý release | Không có: commit trên `main` tự deploy |
-| Bí mật | Jenkins Credentials, bind theo stage | `withCredentials` chỉ trong stage Push, Deploy và khối thông báo |
+| Bí mật | Jenkins Credentials, bind theo stage | `withCredentials` chỉ trong stage Push, Deploy, Notify search engines và khối thông báo |
 | Khoá deploy | Lockable Resources hoặc tương đương, cộng khoá ở runtime | `disableConcurrentBuilds()`; khoá trong script deploy trên VPS |
 | Bằng chứng | Build record, test report, manifest | Log build Jenkins (giữ 20 build), thông báo Discord |
 
@@ -21,7 +21,8 @@
 
 ```text
 main (sau merge) → Sitemap dates → Check → Build (một lần) → Smoke test image
-→ Push Harbor → Deploy (SSH, forced command) → healthcheck trên VPS, lỗi thì quay về image trước
+→ Push Harbor → Sitemap snapshot → Deploy (SSH, forced command) → healthcheck trên VPS, lỗi thì quay về image trước
+→ Notify search engines (Google sitemaps.submit, IndexNow; lỗi chỉ làm stage vàng)
 ```
 
 Chi tiết từng stage: [Triển khai, mục 5](../deployment.md#5-ci). Không chạy mã của PR chưa merge trên agent có quyền push registry hay deploy (hiện PR không được build).
@@ -32,7 +33,9 @@ Chi tiết từng stage: [Triển khai, mục 5](../deployment.md#5-ci). Không 
 |---|---|---|
 | Sitemap dates, Check, Build, Smoke test | Agent `docker` | Không |
 | Push | Agent `docker` | Tài khoản robot chỉ có quyền push, đăng xuất trong `post { always }` |
+| Sitemap snapshot | Agent `docker` | Không |
 | Deploy | Agent `docker` | Khoá SSH chỉ chạy được lệnh deploy; file host key đã ghim (`StrictHostKeyChecking=yes`, không bao giờ tắt) |
+| Notify search engines | Agent `docker` | File khoá service account Google (user của property Search Console, không có quyền Google Cloud). Thiếu credential thì vẫn chạy phần IndexNow, stage vàng |
 | Thông báo (`post`) | Agent `docker` | URL webhook Discord |
 
 Tên credential, cách xoay vòng và quyền của tài khoản robot: repo infra. Agent `docker` dùng một Docker daemon riêng của Jenkins (chú thích đầu `Jenkinsfile`), không dùng chung Docker với việc khác; quyền Docker vẫn gần tương đương root trong môi trường build đó, nên chỉ code đã merge vào `main` được chạy ở đây.

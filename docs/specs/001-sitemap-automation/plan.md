@@ -1,6 +1,6 @@
 # 001: Sitemap tự động, kế hoạch kỹ thuật
 
-> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-14 · Liên quan: [spec.md](spec.md), [tasks.md](tasks.md), [Triển khai](../../ops/deployment.md), [Mục lục ADR](../../adr/README.md) (ADR 0004)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-15 · Liên quan: [spec.md](spec.md), [tasks.md](tasks.md), [Triển khai](../../ops/deployment.md), [Mục lục ADR](../../adr/README.md) (ADR 0004)
 
 Kế hoạch này mô tả **bản đã xây** (PR #3), kèm các điểm lệch so với kế hoạch ban đầu và lý do.
 
@@ -33,7 +33,7 @@ flowchart LR
   BLD --> OUT --> SMK
 ```
 
-Thứ tự stage trong `Jenkinsfile`: `Sitemap dates` → `Check` → `Build` → `Smoke test` → `Push` → `Deploy`.
+Thứ tự stage trong `Jenkinsfile`: `Sitemap dates` → `Check` → `Build` → `Smoke test` → `Push` → `Deploy`. Từ phần mở rộng ngày 2026-10-15 (mục 10): `Push` → `Sitemap snapshot` → `Deploy` → `Notify search engines`.
 
 | File | Mới / sửa | Vai trò |
 |---|---|---|
@@ -122,3 +122,26 @@ Kế hoạch ban đầu: khoảng 4–5 giờ (ước lượng thô). Thực t�
 ## 9. Câu hỏi mở
 
 Không có.
+
+## 10. Phần mở rộng 2026-10-15: báo máy tìm kiếm sau deploy
+
+Đặc tả: [spec, mục 13](spec.md#13-báo-máy-tìm-kiếm-sau-deploy); quyết định: [ADR 0009](../../adr/0009-notify-search-engines-after-deploy.md).
+
+| File | Mới / sửa | Vai trò |
+|---|---|---|
+| `ci/notify-search.sh` | mới | `snapshot` (sitemap trước deploy), `notify` (tìm trang đổi, gửi Google và IndexNow), `status` (chỉ đọc: trạng thái index trên Google của từng trang, chạy tay) |
+| `Jenkinsfile` | sửa | Stage `Sitemap snapshot` trước `Deploy`, `Notify search engines` sau `Deploy`, cả hai trong `catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE')`; tin Discord khi stage vàng |
+| `public/797740c8b300e12454994d21d7c1c1b5.txt` | mới | Khoá IndexNow (công khai) |
+| `seo/sitemap-pages.json` | sửa | `src/seo/page-meta.ts` vào `shared` |
+
+Lựa chọn và lý do:
+
+| # | Chọn | Thay vì | Lý do |
+|---|---|---|---|
+| 1 | So sitemap production trước và sau deploy | So bản chụp với `src/generated/sitemap-lastmod.json` | So hai bản cùng định dạng (cùng URL, cùng chuỗi ngày do Next.js in ra), không phải chép lại cách `sitemap.ts` dựng URL. File ngày chỉ dùng để kiểm sitemap production đã là của build mới trước khi báo, để máy tìm kiếm đến ngay không gặp bản cũ |
+| 2 | Bản chụp giữ trong biến môi trường của build (`env.SITEMAP_BEFORE`) | File trong workspace | Workspace của agent dùng lại giữa các build; file cũ có thể lọt vào lần sau |
+| 3 | Bash + `curl`, `jq`, `openssl`, `awk` | Thêm công cụ vào agent (`xmllint`, Python) | Agent đã có đủ (kiểm trên image agent 2026-10-15: không có `xmllint`, không có Python); JWT RS256 ký bằng `openssl` |
+| 4 | Thiếu credential Google: bắt `CredentialNotFoundException`, vẫn chạy IndexNow | Để stage lỗi | Một bên lỗi không chặn bên kia |
+| 5 | `page-meta.ts` vào `shared` | Tách tiêu đề, mô tả theo từng trang | Một dòng cấu hình; cái giá là mọi trang đổi ngày khi sửa mô tả một trang (ít khi xảy ra) |
+
+Kiểm đã làm trước PR (2026-10-15): chạy thử `DRY_RUN=1` trên production (trong image agent của Jenkins); một lần `sitemaps.submit` thật (HTTP 204); IndexNow với endpoint giả trả 200, 202, 400, 403, 422, 429, 500; đoạn stage của `Jenkinsfile` chạy trên một Jenkins tạm cùng image controller (credential có, rỗng, không có; script thoát 0, 1, 124): stage `UNSTABLE`, build `SUCCESS`, đúng tin Discord; `npm run check`, smoke test trên image, file khoá trả `text/plain` và không nằm trong sitemap.

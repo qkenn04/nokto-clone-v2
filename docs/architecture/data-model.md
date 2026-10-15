@@ -136,11 +136,13 @@ Tính tới 2026-10-14 có 5 mục: 1 sự kiện có ngày thật ("Sạc pin �
 | Trường | Kiểu | Ý nghĩa |
 |---|---|---|
 | `pages[]` | `{ path, sources[] }` | Trang có trong sitemap; `sources` là file và thư mục tạo nên nội dung nhìn thấy của trang (đầu vào cho `lastmod`) |
-| `shared[]` | mảng đường dẫn | File hiện trên mọi trang (`site.ts`, `SiteFooter.tsx`): đổi file này làm đổi `lastmod` của mọi trang |
+| `shared[]` | mảng đường dẫn | File hiện trên mọi trang (`site.ts`, `SiteFooter.tsx`) và `src/seo/page-meta.ts` (tiêu đề, mô tả cho tìm kiếm của mọi trang nằm chung một file): đổi một trong các file này làm đổi `lastmod` của mọi trang |
 | `exclude[]` | mảng đường dẫn trang | Trang cố ý để ngoài sitemap (`/privacy`) |
 | `dynamic[]` | mảng mẫu route, tuỳ chọn | Route động như `/su-kien/[slug]`, phải khai riêng (chưa có) |
 
 `src/generated/sitemap-lastmod.json` có dạng `{ "/": "2026-10-14T09:39:54+07:00", ... }`: với mỗi trang, ngày commit cuối trên `main` chạm vào `sources` hoặc `shared`. Thiếu file thì sitemap bỏ `<lastmod>` thay vì bịa ngày ([ADR 0004](../adr/0004-automate-sitemap-from-page-config-and-git.md)).
+
+`lastmod` cố ý ước lượng dư: thà đổi ngày của một trang không đổi còn hơn bỏ sót trang đổi, vì sau mỗi deploy các trang có `lastmod` đổi được gửi cho Google và IndexNow ([ADR 0009](../adr/0009-notify-search-engines-after-deploy.md)). Hai chỗ dư đã biết: sửa tiêu đề hoặc mô tả của một trang trong `page-meta.ts` làm đổi ngày mọi trang; `the-hot/videos.ts` là nguồn của `/`, `/menu/list`, `/about`, `/reservation` nên đổi một video làm đổi ngày cả bốn trang.
 
 ### 5.6 Tiêu đề và mô tả cho tìm kiếm: `src/seo/page-meta.ts`
 

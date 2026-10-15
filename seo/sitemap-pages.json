@@ -1,6 +1,6 @@
 {
-  "$comment": "Single source of truth for /sitemap.xml. Every page in src/app must be listed in pages, exclude or dynamic (checked by seo/check-sitemap-pages.mjs). sources = the files and public assets that make up a page's visible content; shared = files shown on every page.",
-  "shared": ["src/components/sites/nokto/site.ts", "src/components/sites/nokto/chrome/SiteFooter.tsx"],
+  "$comment": "Single source of truth for /sitemap.xml. Every page in src/app must be listed in pages, exclude or dynamic (checked by seo/check-sitemap-pages.mjs). sources = the files and public assets that make up a page's visible content; shared = files shown on every page, plus src/seo/page-meta.ts (every page's search title and description, kept in one file, so editing one page's text moves every page's date).",
+  "shared": ["src/components/sites/nokto/site.ts", "src/components/sites/nokto/chrome/SiteFooter.tsx", "src/seo/page-meta.ts"],
   "pages": [
     {
       "path": "/",

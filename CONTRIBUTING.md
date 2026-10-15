@@ -5,7 +5,8 @@ Beer Garden in Đà Lạt. It is a Next.js 16 app, not a template: changes here 
 changes to a real venue's public site.
 
 > **Merging to `main` deploys to production.** Jenkins polls GitHub every 5
-> minutes and runs *sitemap dates → check → build → smoke test → push → deploy*
+> minutes and runs *sitemap dates → check → build → smoke test → push →
+> sitemap snapshot → deploy → notify search engines*
 > on every new commit on `main`. A merged pull request is usually live about 5–7
 > minutes later (allow up to about 10). There is no staging environment and no
 > manual approval step, and pull requests are not built before merge, so the
@@ -76,6 +77,12 @@ example), keep that change out of unrelated pull requests.
   and its `sources`). The sitemap check, and therefore the build, fails when the
   file drifts from `src/app` or lists a path that no longer exists. Add new
   routes to the list in [`ci/smoke-test.sh`](ci/smoke-test.sh) too.
+- **Search engines are told automatically.** After each deploy, Jenkins
+  re-submits the sitemap to Google and sends the URLs of pages whose
+  `<lastmod>` changed to IndexNow ([ADR 0009](docs/adr/0009-notify-search-engines-after-deploy.md)),
+  so there is no need to request indexing by hand after a normal change.
+  `public/<32 hex characters>.txt` is the public IndexNow key: keep exactly
+  one such file.
 - **Business facts have one source.** The venue's name, opening hours,
   address, phone number, map link and social links are defined in
   [`src/components/sites/nokto/site.ts`](src/components/sites/nokto/site.ts).

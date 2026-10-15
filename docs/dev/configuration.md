@@ -8,7 +8,7 @@
 
 1. Biến `NEXT_PUBLIC_*` được Next.js **đóng vào bản build** và gửi xuống trình duyệt: đổi giá trị phải build lại image, và **không bao giờ** dùng chúng cho bí mật.
 2. Giá trị cho production chỉ đặt ở `Jenkinsfile`. Không có biến thì build vẫn chạy với giá trị cho máy dev, nên dev, smoke test và image build thử không bao giờ trỏ nhầm vào số liệu hay URL thật.
-3. Ứng dụng không cần bí mật lúc chạy. Bí mật của đường giao hàng (đăng nhập registry, khoá deploy, webhook thông báo) nằm trong Jenkins Credentials; tên, nơi giữ và cách xoay vòng ghi ở repo riêng `qkenn04/infra-qkenn`, không ghi ở đây.
+3. Ứng dụng không cần bí mật lúc chạy. Bí mật của đường giao hàng (đăng nhập registry, khoá deploy, webhook thông báo, khoá service account cho Search Console) nằm trong Jenkins Credentials; tên, nơi giữ và cách xoay vòng ghi ở repo riêng `qkenn04/infra-qkenn`, không ghi ở đây.
 4. Repo không có `.env.example` vì ứng dụng không đọc biến bí mật nào; biến dưới đây là toàn bộ danh sách.
 
 ## 2. Biến và đầu vào build
@@ -50,6 +50,21 @@ Theo [ADR 0007](../adr/0007-use-umami-and-consent-gated-ga4.md), khi triển kha
 
 Giá trị này công khai (nằm trong URL `gtag.js`), không phải bí mật. Khi thêm, cập nhật bảng 2.1, `Dockerfile` (`ARG`/`ENV` ở stage `builder`), `Jenkinsfile` và [Triển khai](../ops/deployment.md) trong cùng PR, như hai biến Umami.
 
+### 2.5 Script báo máy tìm kiếm (`ci/notify-search.sh`, chạy trên agent Jenkins)
+
+Không vào image. Stage `Sitemap snapshot` và `Notify search engines` trong `Jenkinsfile` đặt các biến này ([ADR 0009](../adr/0009-notify-search-engines-after-deploy.md)); chạy tay để thử thì xem [Kiểm thử, mục 3.1](testing.md#31-báo-máy-tìm-kiếm-chạy-thử).
+
+| Biến | Mặc định | Bí mật | Nghĩa |
+|---|---|---|---|
+| `SITEMAP_BEFORE` | trống: mọi trang coi như đã đổi | không (URL công khai và ngày) | JSON `{ "<URL trang>": "<lastmod>" }` do `snapshot` in ra trước deploy; Jenkins giữ trong biến môi trường của build |
+| `GSC_KEY_FILE` | trống: bỏ qua Google, stage vàng | **có**: đường dẫn tới file khoá JSON | Khoá service account là user Full của property Search Console `sc-domain:thehot.vn`. Jenkins bind từ Jenkins Credentials chỉ trong stage Notify search engines; file khoá không bao giờ nằm trong repo |
+| `GSC_SITE` | `sc-domain:<host của site URL>` | không | Property Search Console |
+| `EXPECTED_LASTMOD` | `src/generated/sitemap-lastmod.json` | không | Ngày của build vừa deploy; script chỉ gửi khi sitemap production khớp đúng các ngày này. Đặt rỗng để bỏ bước này khi chạy thử trên máy |
+| `INDEXNOW_URL` | `https://api.indexnow.org/indexnow` | không | Endpoint IndexNow (endpoint của từng máy tìm kiếm cũng nhận) |
+| `DRY_RUN` | không đặt | không | `1`: in ra những gì sẽ gửi, không gửi gì |
+
+Khoá IndexNow **không phải bí mật**: IndexNow đọc nó từ `https://thehot.vn/<khoá>.txt`. Khoá là tên file `public/<32 ký tự hex>.txt`, nội dung file đúng bằng khoá; repo chỉ được có một file như vậy. Đổi khoá: tạo file mới bằng `openssl rand -hex 16`, xoá file cũ, cùng một PR.
+
 ## 3. Kiểm cấu hình
 
 Ứng dụng không tự kiểm biến lúc khởi động. Lỗi cấu hình được bắt ở CI:
@@ -72,7 +87,7 @@ Giá trị này công khai (nằm trong URL `gtag.js`), không phải bí mật.
 
 Ứng dụng: không có bí mật.
 
-Đường giao hàng (Jenkins): có bốn loại bí mật — thông tin đăng nhập để push image lên registry, khoá SSH deploy (chỉ chạy được lệnh deploy), file host key đã ghim của VPS, URL webhook Discord. Tất cả giữ trong Jenkins Credentials và chỉ được bind trong stage cần dùng (`withCredentials` trong `Jenkinsfile`). Danh mục, chủ sở hữu và cách xoay vòng: `qkenn04/infra-qkenn`. Lộ một trong số đó: xoay ngay theo tài liệu của repo infra, rồi ghi vào [mô hình đe doạ](../security/threat-model.md) nếu cần thêm lớp bảo vệ.
+Đường giao hàng (Jenkins): có năm loại bí mật — thông tin đăng nhập để push image lên registry, khoá SSH deploy (chỉ chạy được lệnh deploy), file host key đã ghim của VPS, URL webhook Discord, khoá service account Google cho Search Console (không có quyền Google Cloud nào; chỉ là user của property `thehot.vn`, dùng để gửi lại sitemap). Tất cả giữ trong Jenkins Credentials và chỉ được bind trong stage cần dùng (`withCredentials` trong `Jenkinsfile`). Danh mục, chủ sở hữu và cách xoay vòng: `qkenn04/infra-qkenn`. Lộ một trong số đó: xoay ngay theo tài liệu của repo infra, rồi ghi vào [mô hình đe doạ](../security/threat-model.md) nếu cần thêm lớp bảo vệ. Khoá service account Google xoay vòng hằng năm; thu hồi bằng cách xoá khoá trong Google Cloud và gỡ service account khỏi user của property Search Console (các bước ở repo infra).
 
 ## 6. Cấu hình trong code
 

@@ -4,7 +4,10 @@
 // Docker daemon, images go to the Harbor registry on the same machine, and the deploy is one SSH
 // call to a forced command on the VPS (/srv/nokto/deploy.sh) that pulls the image by commit SHA,
 // waits for its healthcheck and rolls back to the previous image if it fails.
-// A failure before the Deploy stage never touches the VPS.
+// A failure before the Deploy stage never touches the VPS. After a deploy, search engines are told which pages changed
+// (ci/notify-search.sh); that last stage can only turn yellow, never fail the build.
+
+import org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException
 
 def notifyDiscord(String title, int color) {
   withCredentials([string(credentialsId: 'discord-webhook', variable: 'WEBHOOK')]) {
@@ -100,6 +103,18 @@ pipeline {
       }
     }
 
+    // The live sitemap's pages and <lastmod> dates before this deploy, for the "Notify search engines" stage. Never
+    // fails: without a snapshot, every page counts as changed.
+    stage('Sitemap snapshot') {
+      steps {
+        catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+          script {
+            env.SITEMAP_BEFORE = sh(script: 'bash ci/notify-search.sh snapshot "$SITE_URL" || true', returnStdout: true).trim()
+          }
+        }
+      }
+    }
+
     stage('Deploy') {
       steps {
         script { env.DEPLOY_STARTED = 'true' }
@@ -115,11 +130,40 @@ pipeline {
         }
       }
     }
+
+    // Pages whose <lastmod> changed: re-submit the sitemap to Google (Search Console API) and send the URLs to
+    // IndexNow (Bing and others). docs/adr/0009-notify-search-engines-after-deploy.md. The site is already live here, so
+    // any problem (no key, API error, timeout) only marks this stage UNSTABLE; the build stays green and the Discord
+    // message says the search engines were not told.
+    stage('Notify search engines') {
+      steps {
+        catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+          script {
+            env.SEARCH_NOTIFY_FAILED = 'true'
+            try {
+              withCredentials([file(credentialsId: 'gsc-service-account', variable: 'GSC_KEY_FILE')]) {
+                sh 'timeout 5m bash ci/notify-search.sh notify "$SITE_URL"'
+              }
+            } catch (CredentialNotFoundException e) {
+              echo "No 'gsc-service-account' credential in Jenkins: Google is skipped, IndexNow still runs."
+              sh 'timeout 5m bash ci/notify-search.sh notify "$SITE_URL"'
+            }
+            env.SEARCH_NOTIFY_FAILED = 'false'
+          }
+        }
+      }
+    }
   }
 
   post {
     success {
-      notifyDiscord('✅ Deploy thành công — thehot.vn', 3066993)
+      script {
+        if (env.SEARCH_NOTIFY_FAILED == 'true') {
+          notifyDiscord('✅ Deploy thành công — thehot.vn (⚠️ chưa báo được công cụ tìm kiếm, xem log stage Notify)', 15105570)
+        } else {
+          notifyDiscord('✅ Deploy thành công — thehot.vn', 3066993)
+        }
+      }
     }
     failure {
       script {
