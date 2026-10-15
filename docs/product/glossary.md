@@ -32,7 +32,8 @@ Mục lục: [Miền nghiệp vụ](#miền-nghiệp-vụ) · [Tìm kiếm và c
 | **Sitemap ảnh** | Image sitemap | Thẻ `<image:image>` trong sitemap, khai ảnh thật xuất hiện trên trang | `src/seo/sitemap-images.ts` |
 | **JSON-LD** | Dữ liệu cấu trúc | Khối JSON theo từ vựng schema.org nhúng trong HTML, giúp Google hiểu trang mô tả gì | `restaurantSchema` (`@type: Restaurant`) trong `src/app/layout.tsx` |
 | **OG image** | Ảnh chia sẻ | Ảnh Open Graph (`og:image`) hiện khi link được dán vào Facebook, Messenger, Zalo; Twitter card là bản tương tự cho X | `src/app/opengraph-image.png`, `twitter-image.png`; trang con dùng chung ảnh trang chủ ([ADR 0005](../adr/0005-separate-search-titles-from-headings.md)) |
-| **Search Console** | Google Search Console | Công cụ của Google xem trang nào được index, truy vấn nào ra site, lỗi dữ liệu cấu trúc, Core Web Vitals | Property dạng Domain `thehot.vn`, đã gửi sitemap (2026-10-14) |
+| **Search Console** | Google Search Console | Công cụ của Google xem trang nào được index, truy vấn nào ra site, lỗi dữ liệu cấu trúc, Core Web Vitals | Property dạng Domain `thehot.vn`, đã gửi sitemap (2026-10-14); Jenkins gửi lại sitemap qua Search Console API sau mỗi deploy có trang đổi ([ADR 0009](../adr/0009-notify-search-engines-after-deploy.md)) |
+| **IndexNow** | IndexNow | Giao thức mở để site báo cho máy tìm kiếm URL vừa thêm, sửa hoặc xoá bằng một request; dùng chung cho Bing, Yandex, Seznam, Naver… (Google không dùng). Khoá xác minh là một file văn bản công khai trên site | Jenkins gửi URL trang có `lastmod` đổi sau mỗi deploy; khoá là `public/<khoá>.txt` ([ADR 0009](../adr/0009-notify-search-engines-after-deploy.md)) |
 
 ## Hiệu năng
 

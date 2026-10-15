@@ -85,7 +85,7 @@ Spec của từng tính năng:
 
 Một thay đổi được coi là xong khi:
 
-1. Đi qua PR vào `main`; `npm run check` xanh trên máy; Jenkins chạy hết Sitemap dates, Check, Build, Smoke test, Push, Deploy.
+1. Đi qua PR vào `main`; `npm run check` xanh trên máy; Jenkins chạy hết Sitemap dates, Check, Build, Smoke test, Push, Sitemap snapshot, Deploy (stage Notify search engines vàng không chặn việc xong, nhưng phải đọc dòng cảnh báo).
 2. Thay đổi nội dung hoặc giao diện mà khách thấy đã được chủ quán (hoặc người được giao) duyệt trước khi merge.
 3. Tài liệu cập nhật trong cùng PR theo [Definition of Done cho tài liệu](../README.md#definition-of-done-cho-tài-liệu).
 4. Không làm hỏng ngân sách trong [yêu cầu phi chức năng](nfr.md); thay đổi nhắm vào hiệu năng có số đo trước và sau ở [dev/perf.md](../dev/perf.md).

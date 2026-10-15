@@ -1,6 +1,6 @@
 # Triển khai
 
-> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-15 · Liên quan: [Kiến trúc](../architecture/ARCHITECTURE.md), [Cấu hình](../dev/configuration.md), [Kiểm thử](../dev/testing.md), [Runbook](runbooks/README.md), [Postmortem](postmortems/README.md), [CI/CD core](ci-cd-core.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-15 · Liên quan: [ADR 0009](../adr/0009-notify-search-engines-after-deploy.md), [Kiến trúc](../architecture/ARCHITECTURE.md), [Cấu hình](../dev/configuration.md), [Kiểm thử](../dev/testing.md), [Runbook](runbooks/README.md), [Postmortem](postmortems/README.md), [CI/CD core](ci-cd-core.md)
 
 Code đi từ một PR tới https://thehot.vn thế nào, kiểm sau deploy ra sao, và lùi lại bằng cách nào. Repo công khai: file này mô tả ở mức `Jenkinsfile` đã thể hiện. Script deploy trên VPS, compose stack, cấu hình nginx, cài đặt Jenkins và Harbor, quy trình quản trị nằm ở repo riêng `qkenn04/infra-qkenn`. Tính tới 2026-10-14.
 
@@ -15,6 +15,7 @@ Code đi từ một PR tới https://thehot.vn thế nào, kiểm sau deploy ra 
 | Lùi lại thế nào | Mục 7 |
 | Bí mật nằm ở đâu | Jenkins Credentials; [Cấu hình, mục 5](../dev/configuration.md#5-bí-mật-nơi-giữ-xoay-vòng-thu-hồi) |
 | Biết kết quả ở đâu | Thông báo Discord sau mỗi build; lịch sử build trong Jenkins |
+| Máy tìm kiếm biết trang đổi thế nào | Tự động sau deploy: gửi lại sitemap cho Google, gửi URL đổi qua IndexNow (mục 5, [ADR 0009](../adr/0009-notify-search-engines-after-deploy.md)) |
 
 ## 1. Bức tranh tổng thể
 
@@ -27,6 +28,7 @@ flowchart LR
   harbor --> deploy["Script deploy trên VPS<br/>pull, healthcheck"]
   deploy --> run["https://thehot.vn"]
   deploy -->|"không khoẻ"| back["Tự quay về image trước"]
+  run --> notify["Notify search engines<br/>Google sitemaps.submit, IndexNow"]
 ```
 
 ## 2. Thành phần chạy ở đâu
@@ -65,9 +67,11 @@ Một pipeline duy nhất trong `Jenkinsfile`, chạy trên agent nhãn `docker`
 | Build | `docker build --target runner --pull` với `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_UMAMI_WEBSITE_ID`, `NEXT_PUBLIC_UMAMI_SRC` và nhãn OCI | Như trên |
 | Smoke test | `ci/smoke-test.sh "$IMAGE:$GIT_COMMIT" "$SITE_URL" "$UMAMI_WEBSITE_ID"` ([Kiểm thử, mục 3](../dev/testing.md#3-smoke-test-kiểm-gì)) | Như trên |
 | Push | Đăng nhập Harbor bằng tài khoản chỉ dùng để push, push image, đăng xuất | Như trên |
+| Sitemap snapshot | `bash ci/notify-search.sh snapshot`: đọc `/sitemap.xml` đang chạy trên production, giữ URL trang và `<lastmod>` để so sau deploy | Không bao giờ dừng build; không đọc được thì sau deploy coi mọi trang là đã đổi |
 | Deploy | SSH tới VPS bằng khoá chỉ chạy được lệnh deploy, host key ghim: `deploy <commit sha>` | Script trên VPS tự quay về image trước; Discord báo "Deploy THẤT BẠI — VPS đã tự quay về bản cũ" |
+| Notify search engines | `bash ci/notify-search.sh notify` (tối đa 5 phút): đợi sitemap production khớp ngày của build này, so với bản chụp; có trang đổi thì gửi lại sitemap cho Google (Search Console API) và gửi URL đổi qua IndexNow ([ADR 0009](../adr/0009-notify-search-engines-after-deploy.md)) | Chỉ stage này vàng (`UNSTABLE`), build vẫn xanh; Discord báo "Deploy thành công … chưa báo được công cụ tìm kiếm" |
 
-Thông báo Discord: thành công; "Build THẤT BẠI — VPS không bị đụng" khi hỏng trước stage Deploy; "Deploy THẤT BẠI" khi hỏng từ stage Deploy trở đi.
+Thông báo Discord: thành công; thành công nhưng chưa báo được máy tìm kiếm (stage Notify search engines vàng); "Build THẤT BẠI — VPS không bị đụng" khi hỏng trước stage Deploy; "Deploy THẤT BẠI" khi hỏng ở stage Deploy.
 
 ## 6. Deploy
 
@@ -75,10 +79,11 @@ Thông báo Discord: thành công; "Build THẤT BẠI — VPS không bị đụ
 
 1. PR được review và merge vào `main` trên GitHub.
 2. Trong vòng 5 phút, Jenkins thấy commit mới và chạy pipeline (mục 5).
-3. Stage Deploy gọi lệnh deploy trên VPS với commit SHA.
+3. Stage Sitemap snapshot chụp sitemap đang chạy; stage Deploy gọi lệnh deploy trên VPS với commit SHA.
 4. Script deploy trên VPS kéo image `nokto/web:<sha>` từ Harbor, thay container, đợi healthcheck (`HEALTHCHECK` trong `Dockerfile` gọi `/`).
 5. Container mới khoẻ: xong; VPS giữ 3 image gần nhất để lùi tay. Không khoẻ: script tự chạy lại image trước và báo lỗi về Jenkins.
-6. Kiểm sau deploy (mục 6.3).
+6. Stage Notify search engines báo Google và IndexNow những trang có `<lastmod>` đổi (không đổi trang nào thì không gửi gì).
+7. Kiểm sau deploy (mục 6.3).
 
 ### 6.2 Các bước và cách hỏng
 
@@ -88,6 +93,7 @@ Thông báo Discord: thành công; "Build THẤT BẠI — VPS không bị đụ
 | Sitemap dates, Check, Build, Smoke test | Lỗi lint, kiểu, sitemap, build hoặc smoke test | Dừng; VPS không bị đụng | Sửa bằng PR mới |
 | Push | Harbor không chạy, sai quyền | Dừng; VPS không bị đụng | Kiểm Harbor trên máy CI (repo infra) |
 | Deploy, healthcheck | Container mới không khoẻ | Tự quay về image trước | Xem log container (repo infra), sửa bằng PR |
+| Notify search engines | Thiếu khoá Google, API Google hoặc IndexNow lỗi, sitemap production chưa khớp build sau khoảng 1 phút | Stage vàng, build vẫn xanh, site không bị ảnh hưởng; lần deploy sau chỉ gửi trang đổi ở lần đó | Đọc log stage (mỗi lỗi có một dòng `notify-search: WARNING`); khoá Google: repo infra; trang cần gấp thì Request indexing tay (mục 6.3) |
 
 ### 6.3 Kiểm sau deploy
 
@@ -104,7 +110,8 @@ curl -s https://thehot.vn/sitemap.xml | grep -o '<loc>[^<]*</loc>\|<lastmod>[^<]
 curl -sI https://thehot.k2-tech.dev/menu | grep -i '^location'
 ```
 
-- Nếu PR đổi trang hoặc nội dung: Search Console → URL Inspection → Request indexing cho trang đó; Search Console → Sitemaps xem "Last read".
+- Nếu PR đổi trang hoặc nội dung: không cần làm gì với máy tìm kiếm. Stage Notify search engines đã gửi lại sitemap cho Google và gửi URL đổi qua IndexNow; log stage ghi trang nào được gửi và kết quả. Kiểm khi cần: Search Console → Sitemaps xem "Last read"; Bing Webmaster Tools → IndexNow xem URL nhận được.
+- Request indexing tay (Search Console → URL Inspection) chỉ còn cho trang hoàn toàn mới cần lên nhanh, bản sửa gấp, hoặc khi stage Notify search engines vàng.
 - Nếu PR nhằm vào hiệu năng: PageSpeed Mobile 3 lần, ghi vào [dev/perf.md](../dev/perf.md).
 - Nếu PR đổi tiêu đề, mô tả, ảnh chia sẻ: Facebook Sharing Debugger → Scrape Again.
 - Nếu PR thay nội dung một ảnh hoặc video mà giữ nguyên tên tệp: purge URL trên Cloudflare (mục 6.4).

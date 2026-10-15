@@ -72,8 +72,8 @@ Vì sao thứ tự này:
 - [x] Tiêu đề, mô tả, ảnh chia sẻ trên production · PR #5, PR #6, build #16
 - [x] Ưu tiên LCP và logo trên production · PR #4, build #16
 - [ ] SSL/TLS **Full (strict)** trong Cloudflare: chủ quán xác nhận (ảnh chụp màn hình); không kiểm được từ bên ngoài
-- [ ] Request indexing cho `/terms` (trang mới vào sitemap)
-- [ ] Search Console → Sitemaps báo *Success*, 6 trang được khám phá
+- [x] Request indexing cho `/terms` (trang mới vào sitemap) · không cần nữa: `/terms` đã "Submitted and indexed" (URL Inspection API, 2026-10-15)
+- [x] Search Console → Sitemaps báo *Success*, 6 trang được khám phá · `sitemaps.get` 2026-10-15: 6 URL trang, 37 ảnh, 0 lỗi
 - [ ] PageSpeed Mobile đo lại sau build #16, ghi vào [tiến độ](progress.md#đo-lường)
 
 **Ước lượng.** Không ước lượng trước; làm trong ngày 2026-10-14.

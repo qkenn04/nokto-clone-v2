@@ -25,6 +25,7 @@ Chạy từ gốc repo. Cần Node.js 24 trở lên (`.nvmrc`).
 | Tính ngày sitemap như CI | `bash ci/sitemap-lastmod.sh` (cần `git`, `jq`, lịch sử git đầy đủ) |
 | Chạy lại đúng các bước Jenkins bằng Docker | xem khối lệnh dưới bảng |
 | Kiểm link tài liệu | `python3 scripts/check-links.py .` |
+| Chạy thử báo máy tìm kiếm, không gửi gì | xem mục 3.1 |
 
 ```bash
 # Giống Jenkins: Sitemap dates → Check → Build → Smoke test
@@ -46,6 +47,25 @@ ci/smoke-test.sh nokto:local
 6. Tracker Umami ([spec 004](../specs/004-analytics/spec.md)), trên mọi trang HTML ở bước 2 kể cả trang 404: có Website ID thì HTML phải có tracker với đúng ID, `data-domains="thehot.vn"`, `data-exclude-hash="true"`, không `data-exclude-search`, kèm `<link rel="preload" as="script">` tới URL tracker; không có ID thì không trang nào có tracker. `next/script` (`afterInteractive`) chỉ chèn thẻ `<script>` trên trình duyệt sau khi hydrate, nên bước này đọc thuộc tính của nó trong payload React của HTML. Jenkins truyền cùng `UMAMI_WEBSITE_ID` cho build và cho bước này.
 
 Container tạm luôn bị xoá khi script kết thúc.
+
+### 3.1 Báo máy tìm kiếm: chạy thử
+
+`ci/notify-search.sh` (stage Sitemap snapshot và Notify search engines, [ADR 0009](../adr/0009-notify-search-engines-after-deploy.md)) không có test tự động; kiểm bằng chế độ chạy thử với production. `DRY_RUN=1` chỉ đọc: tải sitemap đang chạy và file khoá IndexNow, có khoá Google thì xin token và đọc trạng thái sitemap trong Search Console, nhưng không gửi lại sitemap và không gửi IndexNow.
+
+```bash
+# Bản chụp sitemap production, như stage Sitemap snapshot
+bash ci/notify-search.sh snapshot > /tmp/before.json
+
+# Giả như /menu vừa đổi ngày; EXPECTED_LASTMOD= bỏ bước đợi sitemap khớp build của máy mình
+SITEMAP_BEFORE="$(jq -c '.["https://thehot.vn/menu"] = "cũ"' /tmp/before.json)" \
+  EXPECTED_LASTMOD= DRY_RUN=1 bash ci/notify-search.sh notify
+
+# Có khoá service account (file JSON, chỉ trên máy được giao giữ khoá): thêm GSC_KEY_FILE=<đường dẫn tới file khoá>
+# Trạng thái index trên Google của từng trang trong sitemap (chỉ đọc, URL Inspection API)
+GSC_KEY_FILE=<đường dẫn tới file khoá> bash ci/notify-search.sh status
+```
+
+Kết quả mong đợi: dòng `changed pages` liệt kê đúng trang đổi; dòng `IndexNow (dry run): would POST …` có `urlList` chỉ gồm các trang đó; trước lần deploy đầu tiên của file khoá, script báo file khoá chưa có trên production và thoát mã 1. Mã thoát 1 trong Jenkins chỉ làm stage vàng.
 
 ## 4. Tiêu chí nghiệm thu và cách kiểm
 
@@ -69,6 +89,7 @@ Jenkins chỉ build nhánh `main` (sau merge); PR không được build tự đ�
 | Check | Lỗi lint, kiểu, guard sitemap | `docker build --target check .` |
 | Build | Next.js build lỗi | `docker build --target runner …` |
 | Smoke test | Mục 3 | `ci/smoke-test.sh` |
+| Notify search engines | Không bao giờ chặn: lỗi chỉ làm stage vàng sau khi đã deploy | `DRY_RUN=1 bash ci/notify-search.sh notify` (mục 3.1) |
 | Link tài liệu | Chưa có trong CI (`.dockerignore` loại `docs/`); chạy tay | lệnh ở mục 2 |
 | Ngân sách hiệu năng, quét secret | Chưa có cổng tự động | — |
 
@@ -82,7 +103,8 @@ Sau deploy một PR chạm phần tương ứng:
 - [ ] Đổi JSON-LD hoặc thông tin quán: https://search.google.com/test/rich-results.
 - [ ] Đổi phần ảnh hưởng tải trang: PageSpeed Mobile 3 lần, ghi trung vị vào [perf.md](perf.md).
 - [ ] Đổi video hero: DevTools → Network (lọc `videos`, tắt cache) tải `/`: request `main.v2.*` chỉ có sau sự kiện `load` và sau màn hình chờ; bật *Emulate prefers-reduced-motion* thì không có request video ([003-AC-04, 003-AC-05](../specs/003-performance/spec.md#8-tiêu-chí-nghiệm-thu)).
-- [ ] Đổi trang mới hoặc URL: Search Console → URL Inspection → Request indexing.
+- [ ] Đổi trang hoặc nội dung: log stage Notify search engines trong Jenkins có `Google: sitemap … re-submitted` và `IndexNow: … submitted` (hoặc `received`) cho đúng các trang đổi. Stage vàng thì đọc dòng `WARNING`.
+- [ ] Trang hoàn toàn mới cần lên Google nhanh, hoặc bản sửa gấp: Search Console → URL Inspection → Request indexing (việc tay, ngoài phần tự động).
 
 ## 7. Nợ test
 

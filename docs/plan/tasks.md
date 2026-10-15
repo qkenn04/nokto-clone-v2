@@ -12,8 +12,8 @@ Người làm: **Chủ quán** (chủ quán hoặc người quản lý) · **Dev
 
 - [ ] TK01 Google Business Profile: đổi giờ mở cửa từ 16:30 sang **17:30** cho khớp website · mốc M5 · xong khi: Google Maps hiện 17:30 · gấp: khách đang thấy giờ sai; từ 2026-10-15 AI Overview của Google cũng hiện "4:30 PM–12 AM", lấy từ Google Maps và TripAdvisor (sửa cả TripAdvisor: TK15)
 - [ ] TK02 Cloudflare: xác nhận SSL/TLS đang ở **Full (strict)** · M1 · xong khi: gửi ảnh chụp màn hình (không kiểm được từ bên ngoài)
-- [ ] TK03 Search Console: URL Inspection → `https://thehot.vn/terms` → Request indexing · M1 · [001-T31](../specs/001-sitemap-automation/tasks.md)
-- [ ] TK04 Search Console → Sitemaps: kiểm *Success* và 6 trang được khám phá · M1 · [001-T32](../specs/001-sitemap-automation/tasks.md)
+- [x] TK03 Search Console: URL Inspection → `https://thehot.vn/terms` → Request indexing · M1 · [001-T31](../specs/001-sitemap-automation/tasks.md) · không cần nữa: `/terms` đã "Submitted and indexed" (URL Inspection API, 2026-10-15)
+- [x] TK04 Search Console → Sitemaps: kiểm *Success* và 6 trang được khám phá · M1 · [001-T32](../specs/001-sitemap-automation/tasks.md) · 2026-10-15 qua API: 6 URL trang, 37 ảnh, 0 lỗi
 - [ ] TK05 PageSpeed Insights Mobile `https://thehot.vn` sau build #16, chạy 3 lần, gửi số trung vị cho dev (hoặc dev tự đo) · M1 · xong khi: số vào [tiến độ](progress.md#đo-lường)
 - [ ] TK06 Search Console → Settings → Users: thêm quyền cho người cùng làm · M1
 - [ ] TK07 Google Business Profile: website `https://thehot.vn/?utm_source=google&utm_medium=gbp`, link đặt chỗ `https://thehot.vn/reservation?utm_source=google&utm_medium=gbp&utm_campaign=booking` · M5 · làm cùng TK01: link từ hồ sơ Google giúp Google gắn site với quán khi tìm tên quán
@@ -46,6 +46,7 @@ Người làm: **Chủ quán** (chủ quán hoặc người quản lý) · **Dev
 - [x] TK27 Hạ tầng Umami (repo hạ tầng riêng, private), lấy Website ID (2026-10-15) · M4 · [004-T03](../specs/004-analytics/tasks.md)
 - [ ] TK28 Dọn tệp template NOKTO không còn dùng trong `public/sites/nokto/` · M2 · [002-T32](../specs/002-onpage-seo/tasks.md)
 - [x] TK30 Menu Premium: tab thứ hai ở `/menu` (12 trang ảnh) và `/menu/list` (104 món kèm giá, tên tiếng Anh) · M2 · PR #15 merge 2026-10-15, deploy build #25; mô tả mới áp dụng 2026-10-15; còn chờ chủ quán trả lời Q16–Q24 ([002-T16](../specs/002-onpage-seo/tasks.md))
+- [ ] TK31 Báo máy tìm kiếm sau mỗi deploy: gửi lại sitemap cho Google (Search Console API), URL đổi qua IndexNow; `page-meta.ts` vào `shared` · M1 · [001-T50 đến T56](../specs/001-sitemap-automation/tasks.md), [ADR 0009](../adr/0009-notify-search-engines-after-deploy.md) · PR chờ duyệt; áp credential ở repo hạ tầng trước khi merge · xong khi: log stage Notify search engines của lần deploy đầu có Google 2xx và IndexNow 200/202
 - [ ] TK29 Theo dõi kết quả tìm tên quán "the hot beer garden đà lạt": vị trí của `thehot.vn`, tiêu đề mới, biểu tượng The Hot thay quả địa cầu (dịch vụ favicon của Google đã trả logo từ 2026-10-15) · M2, M6 · [002-T60, 002-T63](../specs/002-onpage-seo/tasks.md)
 
 ### Để sau

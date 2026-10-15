@@ -1,6 +1,6 @@
 # 001: Sitemap tự động, việc
 
-> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-14 · Liên quan: [spec.md](spec.md), [plan.md](plan.md), [Tiến độ](../../plan/progress.md), [Việc sắp làm](../../plan/tasks.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-15 · Liên quan: [spec.md](spec.md), [plan.md](plan.md), [Tiến độ](../../plan/progress.md), [Việc sắp làm](../../plan/tasks.md)
 
 ## Chuẩn bị
 
@@ -30,8 +30,20 @@
 ## Phát hành
 
 - [x] 001-T30 Merge PR #3 (`b8e2665`), Jenkins build #11 deploy; production có 6 URL, 6 `<lastmod>`, 25 mục ảnh · 2026-10-14
-- [ ] 001-T31 Chủ quán: Search Console → URL Inspection → `https://thehot.vn/terms` → Request indexing (trang mới vào sitemap; 5 URL kia đã gửi ngày 14/10)
-- [ ] 001-T32 Chủ quán: Search Console → Sitemaps kiểm *Success* và 6 trang được khám phá · AC: 001-AC-09 · Google tự đọc lại sitemap, không cần gửi lại (Google đã bỏ "ping" từ 2023)
+- [x] 001-T31 Chủ quán: Search Console → URL Inspection → `https://thehot.vn/terms` → Request indexing (trang mới vào sitemap; 5 URL kia đã gửi ngày 14/10) · không cần nữa: URL Inspection API ngày 2026-10-15 báo `/terms` "Submitted and indexed" (crawl 2026-10-14)
+- [x] 001-T32 Chủ quán: Search Console → Sitemaps kiểm *Success* và 6 trang được khám phá · AC: 001-AC-09 · 2026-10-15 qua Search Console API (`sitemaps.get`): 6 URL trang, 37 ảnh, 0 lỗi, 0 cảnh báo
+
+## Báo máy tìm kiếm sau deploy (mở rộng 2026-10-15)
+
+[Spec, mục 13](spec.md#13-báo-máy-tìm-kiếm-sau-deploy) · [ADR 0009](../../adr/0009-notify-search-engines-after-deploy.md) (Đề xuất)
+
+- [x] 001-T50 `src/seo/page-meta.ts` vào `shared` của `seo/sitemap-pages.json`: PR #17 (mô tả mới của `/menu`, `/menu/list`, merge `3e99c5e`) đã không đổi `lastmod` của hai trang đó · AC: 001-AC-04
+- [x] 001-T51 `ci/notify-search.sh` (`snapshot`, `notify`, `status`) và stage `Sitemap snapshot`, `Notify search engines` trong `Jenkinsfile` · AC: 001-AC-10, 001-AC-11, 001-AC-12
+- [x] 001-T52 Khoá IndexNow `public/<khoá>.txt` · AC: 001-AC-13
+- [x] 001-T53 Kiểm trước PR: chạy thử `DRY_RUN=1` trên production, một lần `sitemaps.submit` thật (HTTP 204), IndexNow với endpoint giả, đoạn stage chạy trên Jenkins tạm cùng image (credential có, rỗng, không có; script lỗi và quá giờ), `npm run check`, smoke test · 2026-10-15 ([plan, mục 10](plan.md#10-phần-mở-rộng-2026-10-15-báo-máy-tìm-kiếm-sau-deploy))
+- [ ] 001-T54 Repo hạ tầng: credential khoá service account trong Jenkins, áp lên Jenkins **trước** khi merge PR này (thiếu thì stage chỉ vàng và bỏ qua Google)
+- [ ] 001-T55 Sau lần deploy đầu: log stage Notify search engines có Google HTTP 2xx và IndexNow 200 hoặc 202 cho các trang đổi (lần đầu là cả 6 trang vì `page-meta.ts` vừa vào `shared`); Bing Webmaster Tools → IndexNow thấy URL
+- [ ] 001-T56 Chủ repo: chấp nhận hoặc bác ADR 0009
 
 ## Việc tiếp theo: PR 2, đổi tên ảnh và ảnh độ phân giải cao
 
@@ -62,3 +74,5 @@ Tên đề xuất (đặt lại theo nội dung thật của ảnh mới):
 |---|---|---|
 | 2026-10-14 | Merge và deploy sitemap tự động | PR #3, `b8e2665`, Jenkins build #11 |
 | 2026-10-14 | Bản đang chạy sau các PR khác | `90f1882`, Jenkins build #16 |
+| 2026-10-15 | Search Console qua API: sitemap 6 URL trang, 37 ảnh, 0 lỗi; 5/6 trang "Submitted and indexed", `/reservation` "Discovered - currently not indexed" | `sitemaps.get`, URL Inspection API (`bash ci/notify-search.sh status`) |
+| 2026-10-15 | Mở PR báo máy tìm kiếm sau deploy (001-T50 đến T53) | Nhánh `feat/search-notify` |

@@ -11,7 +11,7 @@ Bản ngắn (tầng T2) cho một site giới thiệu không có tài khoản v
 | Tài khoản, phần quản trị | Không có trên site | NG3 ở [đặc tả](../product/spec.md#5-không-làm) |
 | Dữ liệu khách | Form đặt bàn chỉ giữ dữ liệu trong trình duyệt, không gửi, không lưu | T04, PRIV-01 |
 | Bên thứ ba chạy trên trang | Cloudflare Web Analytics (beacon do Cloudflare tự chèn, đang chạy, có trong `/privacy`). Umami (không cookie): code có sẵn, chỉ tải khi build có Website ID. Dự kiến: GA4 chỉ sau khi khách đồng ý | T04, [ADR 0007](../adr/0007-use-umami-and-consent-gated-ga4.md) |
-| Đường giao hàng | Jenkins chỉ bind bí mật trong stage cần dùng; khoá deploy chỉ chạy được một lệnh; host key được ghim | T05, mục 4 |
+| Đường giao hàng | Jenkins chỉ bind bí mật trong stage cần dùng; khoá deploy chỉ chạy được một lệnh; host key được ghim; khoá service account cho Search Console không có quyền Google Cloud | T05, T09, mục 4 |
 | Header bảo mật | Thiếu HSTS, CSP, `X-Frame-Options`, COOP (PageSpeed 2026-10-14) | T03, việc cần làm |
 
 ## 1. Nguyên tắc
@@ -27,7 +27,7 @@ Bản ngắn (tầng T2) cho một site giới thiệu không có tài khoản v
 |---|---|---|---|---|
 | TS1 | Đường deploy (Jenkins, quyền push registry, khoá deploy) | Chiếm được là chạy được code tuỳ ý trên production | Máy CI, Jenkins Credentials | L4 |
 | TS2 | Nội dung và uy tín của site | Trang bị sửa, hoặc giờ, hotline, giá sai làm khách mất lòng tin và gọi nhầm | Repo, image trên VPS | L1, review, chủ quán duyệt |
-| TS3 | Domain `thehot.vn`, zone Cloudflare, tài khoản Google (Search Console, Business Profile) | Mất là mất cả site và hiện diện trên Google | Ngoài repo, chủ quán và chủ repo quản lý | Ngoài phạm vi repo `[CẦN XÁC NHẬN: tài khoản đã bật 2FA chưa]` |
+| TS3 | Domain `thehot.vn`, zone Cloudflare, tài khoản Google (Search Console, Business Profile); service account Google là user của property Search Console (gửi lại sitemap sau deploy) | Mất là mất cả site và hiện diện trên Google | Ngoài repo, chủ quán và chủ repo quản lý; khoá service account trong Jenkins Credentials | Ngoài phạm vi repo `[CẦN XÁC NHẬN: tài khoản đã bật 2FA chưa]` |
 | TS4 | Dữ liệu khách nhập vào form; số liệu truy cập của khách | Dữ liệu cá nhân, trách nhiệm pháp lý | Trình duyệt của khách; công cụ analytics (dự kiến) | L1, L7 |
 | TS5 | Repo GitHub công khai | Nguồn của mọi build; secret lỡ commit thì lộ ngay | GitHub | Review, L8 (chưa có) |
 
@@ -91,6 +91,8 @@ Ranh giới cần giữ:
 | T06 | Thông tin quán sai trên site (sửa nhầm, hoặc lệch giữa các chỗ) | A4 → PR | Khách đến sai giờ, gọi nhầm số | Một nguồn `site.ts` (I-01); chủ quán duyệt; review | Kiểm tay, Rich Results Test | Một phần: còn chỗ gõ lại (I-01), giờ lệch Google Maps |
 | T07 | Site hoặc khả năng deploy ngừng do sự cố hạ tầng | A5 | Khách không vào được; không sửa được site | Tự rollback khi healthcheck lỗi; VPS giữ image cũ; lỗi CI không chạm VPS | [Runbook 001](../ops/runbooks/001-jenkins-git-cache-corrupted.md) | Có |
 | T08 | JSON-LD chèn chuỗi chứa `</script>` làm vỡ trang hoặc chèn script | A4 → dữ liệu | XSS | Dữ liệu JSON-LD là hằng số trong repo; nếu sau này lấy dữ liệu từ ngoài thì phải escape `<` trước khi nhúng | Review | Có (với dữ liệu hiện tại) |
+| T09 | Lộ khoá service account dùng cho Search Console ([ADR 0009](../adr/0009-notify-search-engines-after-deploy.md)) | A2 → máy CI; A4 → in khoá ra log | Gửi hoặc xoá sitemap, đọc số liệu Search Console của `thehot.vn`; không sửa được site, không có quyền Google Cloud | Khoá chỉ nằm trong Jenkins Credentials, chỉ bind trong stage Notify search engines; script không in khoá hay token (token đi vào `curl` qua stdin); service account không có vai trò Google Cloud nào; xoay vòng hằng năm | Review `ci/notify-search.sh`; danh sách user trong Search Console | Có; thu hồi theo repo infra |
+| T10 | Người khác dùng khoá IndexNow (công khai theo thiết kế) gửi URL của `thehot.vn` | A1 | Gửi nhiều có thể làm IndexNow tạm từ chối site (429); chỉ gửi được URL trên `thehot.vn` | Chấp nhận; đổi khoá bằng cách đổi tên file `public/<khoá>.txt` | Log stage Notify search engines | Rủi ro chấp nhận |
 
 ## 4. Lớp bảo vệ
 
@@ -99,7 +101,7 @@ Ranh giới cần giữ:
 | L1 | Không tài khoản, không backend, form không gửi dữ liệu | T04, T08 và cả nhóm đe doạ đăng nhập, injection | Thiết kế ([đặc tả](../product/spec.md)) | Có |
 | L2 | Container chạy user không phải root, có healthcheck | T02 | `Dockerfile` | Có |
 | L3 | Cloudflare proxy, Always Use HTTPS; nginx dùng chứng chỉ Origin CA | T03 | Cloudflare, repo infra | Có `[CẦN XÁC NHẬN: chế độ Full (strict)]` |
-| L4 | Bí mật CI bind theo stage, đăng xuất registry sau push, forced command, host key ghim | T01, T05 | `Jenkinsfile`, repo infra | Có |
+| L4 | Bí mật CI bind theo stage, đăng xuất registry sau push, forced command, host key ghim, khoá Search Console không có quyền Google Cloud | T01, T05, T09 | `Jenkinsfile`, repo infra | Có |
 | L5 | Lockfile, `npm ci`, image Node ghim phiên bản | T02 | `package-lock.json`, `Dockerfile` | Có |
 | L6 | Header bảo mật HSTS, `X-Frame-Options` hoặc CSP `frame-ancestors`, `X-Content-Type-Options` | T03 | Cloudflare hoặc nginx (repo infra) | Chưa có |
 | L7 | GA4 sau đồng ý, danh sách tham số cho phép, `/privacy` đầy đủ | T04 | `src/lib/analytics.ts`, `legal/content.ts` | Một phần: danh sách cho phép và `/privacy` cho Umami, Cloudflare có trong code; GA4 đề xuất ([ADR 0007](../adr/0007-use-umami-and-consent-gated-ga4.md)) |
@@ -123,6 +125,7 @@ Ranh giới cần giữ:
 |---|---|---|---|
 | Dùng ảnh nền `hero-backdrop.jpg` và vài SVG của template NOKTO trên site công khai, đã index | Chưa có ảnh thay; chủ quán chọn giữ giao diện hiện tại | Chủ quán ([ADR 0003](../adr/0003-allow-search-indexing.md)) | Có ảnh của quán hoặc phương án gradient được duyệt |
 | Một VPS, không bản dự phòng | Site giới thiệu, chi phí thấp | `[CẦN XÁC NHẬN: chủ repo và chủ quán]` | Khi có yêu cầu sẵn sàng cao hơn (AVAIL-01) |
+| Khoá IndexNow nằm công khai ở `https://thehot.vn/<khoá>.txt` (T10) | IndexNow bắt buộc như vậy; khoá chỉ dùng được cho URL trên `thehot.vn` | Chủ repo, khi chấp nhận [ADR 0009](../adr/0009-notify-search-engines-after-deploy.md) `[CẦN XÁC NHẬN]` | IndexNow trả 429 hoặc 403 không rõ lý do |
 | Repo công khai, `Jenkinsfile` lộ tên máy CI trong mạng riêng | Repo được chọn để công khai (2026-10-10); máy CI và VPS chỉ nhận kết nối deploy từ mạng riêng | Chủ repo chọn công khai; việc chấp nhận phần lộ trong `Jenkinsfile`: `[CẦN XÁC NHẬN]` | Khi đổi kiến trúc mạng |
 
 ## 8. Câu hỏi mở

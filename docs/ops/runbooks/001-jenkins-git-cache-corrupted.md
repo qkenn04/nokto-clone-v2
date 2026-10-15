@@ -59,7 +59,7 @@ Nếu job khác trên cùng Jenkins cũng hỏng cùng kiểu, lặp lại cho t
 
 ## Xong khi
 
-- Build mới chạy hết Sitemap dates, Check, Build, Smoke test, Push, Deploy.
+- Build mới chạy hết Sitemap dates, Check, Build, Smoke test, Push, Sitemap snapshot, Deploy, Notify search engines.
 - `curl -sI https://thehot.vn/` trả 200 và nội dung là commit mới nhất trên `main`.
 - Lệnh đếm ở bước 2 của "Kiểm nhanh" trả 0.
 

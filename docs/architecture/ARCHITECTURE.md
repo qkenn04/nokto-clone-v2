@@ -14,7 +14,7 @@ Tính tới 2026-10-14. Repo công khai: tài liệu này chỉ mô tả hạ t�
 | Khi khách mở một trang thì sao? | Cloudflare chuyển request tới nginx, nginx tới container Next.js; HTML được render sẵn lúc build. Ảnh qua `/_next/image` được tối ưu lúc chạy; video và ảnh gốc phục vụ từ `public/` (luồng ở mục 4.1) |
 | Khách đặt bàn thì sao? | Form `/reservation` chỉ chạy trong trình duyệt, không gửi dữ liệu; khách gọi hoặc nhắn quán qua link `tel:`, Facebook, Messenger, Zalo (mục 4.3) |
 | Hỏng thành phần nào thì khách thấy gì? | VPS hoặc container ngừng: Cloudflare trả trang lỗi 5xx. Cloudflare sự cố: site không vào được. Máy CI tắt: site vẫn chạy, chỉ không deploy được |
-| Deploy thế nào? | Merge vào `main` → Jenkins poll (tối đa 5 phút) → Sitemap dates → Check → Build → Smoke test → Push lên Harbor → Deploy qua SSH ([Triển khai](../ops/deployment.md)) |
+| Deploy thế nào? | Merge vào `main` → Jenkins poll (tối đa 5 phút) → Sitemap dates → Check → Build → Smoke test → Push lên Harbor → Sitemap snapshot → Deploy qua SSH → Notify search engines ([Triển khai](../ops/deployment.md)) |
 
 ## 2. Sơ đồ ngữ cảnh (C4 mức 1)
 
@@ -27,6 +27,7 @@ flowchart TB
   delivery["Đường giao hàng<br/>[Hệ thống của dự án]<br/>GitHub, Jenkins, Harbor"]
   cf["Cloudflare<br/>[Hệ thống ngoài]<br/>DNS, TLS, proxy, Web Analytics"]
   google["Google<br/>[Hệ thống ngoài]<br/>Search, Search Console, Business Profile"]
+  indexnow["IndexNow: Bing và các máy khác<br/>[Hệ thống ngoài]<br/>Nhận URL vừa đổi"]
   social["Điện thoại, Facebook, Messenger, Zalo<br/>[Hệ thống ngoài]<br/>Kênh chốt bàn"]
 
   guest -->|"HTTPS"| cf
@@ -36,13 +37,16 @@ flowchart TB
   owner -->|"duyệt nội dung, quản lý GBP"| google
   dev -->|"git push, PR"| delivery
   delivery -->|"build image, deploy"| site
+  delivery -->|"sau deploy: gửi lại sitemap (Search Console API)"| google
+  delivery -->|"sau deploy: URL đổi (IndexNow)"| indexnow
+  indexnow -->|"crawl URL đổi"| cf
 
   classDef person fill:#08427b,stroke:#052e56,color:#ffffff
   classDef system fill:#1168bd,stroke:#0b4884,color:#ffffff
   classDef external fill:#999999,stroke:#6b6b6b,color:#ffffff
   class guest,owner,dev person
   class site,delivery system
-  class cf,google,social external
+  class cf,google,indexnow,social external
 ```
 
 ## 3. Thành phần (C4 mức 2)
@@ -80,9 +84,10 @@ flowchart LR
 | nginx | nginx | TLS với chứng chỉ Cloudflare Origin CA; 301 tên miền cũ và `www`; chuyển tiếp tới container | VPS | Không | [0002](../adr/0002-use-thehot-vn-as-primary-domain.md), [0003](../adr/0003-allow-search-indexing.md) |
 | Ứng dụng web | Next.js 16.3.5, React 19, Node 24 (`node:24.14.1-slim`), user `node` | Phục vụ 7 trang, `sitemap.xml`, `robots.txt`, `/_next/image`, file tĩnh trong `public/`; có Docker `HEALTHCHECK` | Container trên VPS, chỉ nghe trong máy | Nội dung build sẵn trong image | [0004](../adr/0004-automate-sitemap-from-page-config-and-git.md), [0005](../adr/0005-separate-search-titles-from-headings.md), [0006](../adr/0006-prioritize-lcp-with-fetchpriority.md) |
 | Script deploy | Shell, Docker Compose | Kéo image theo commit SHA, đợi healthcheck, tự quay về image trước khi lỗi; giữ 3 image gần nhất | VPS (nguồn ở `qkenn04/infra-qkenn`) | Image đã kéo | — |
-| Jenkins | Jenkins Pipeline, agent nhãn `docker` | Chạy `Jenkinsfile`: tính ngày sitemap, kiểm, build, smoke test, push, deploy; báo kết quả lên Discord | Máy CI (nguồn ở `qkenn04/infra-qkenn`) | Lịch sử build | — |
+| Jenkins | Jenkins Pipeline, agent nhãn `docker` | Chạy `Jenkinsfile`: tính ngày sitemap, kiểm, build, smoke test, push, deploy; sau deploy báo máy tìm kiếm trang nào đổi ([ADR 0009](../adr/0009-notify-search-engines-after-deploy.md)); báo kết quả lên Discord | Máy CI (nguồn ở `qkenn04/infra-qkenn`) | Lịch sử build | — |
 | Harbor | Harbor | Lưu image `nokto/web:<commit sha>` | Máy CI | Image | — |
 | GitHub | Dịch vụ ngoài | Nguồn code, PR, review | GitHub | Lịch sử git (cũng là nguồn ngày `lastmod`) | [0004](../adr/0004-automate-sitemap-from-page-config-and-git.md) |
+| Google Search Console API, IndexNow | Dịch vụ ngoài | Nhận tin "sitemap đã đổi" (Google, `sitemaps.submit`) và danh sách URL trang vừa đổi (IndexNow: Bing, Yandex, Seznam, Naver…). Chỉ Jenkins gọi, chỉ gửi URL công khai, không có dữ liệu khách | Google, IndexNow | Không | [0009](../adr/0009-notify-search-engines-after-deploy.md) |
 | Umami | Umami tự cài (hạ tầng ở repo riêng) | Nhận lượt xem và sự kiện từ trình duyệt khách, không cookie. Site chỉ tải tracker khi build có Website ID (Website ID đặt trong `Jenkinsfile` từ 2026-10-15) | Tên miền con của `thehot.vn` | Số liệu truy cập | [0007](../adr/0007-use-umami-and-consent-gated-ga4.md) |
 
 ### 3.1 Ranh giới giữa các phần
@@ -92,6 +97,7 @@ flowchart LR
 - **Container chỉ nhận traffic từ nginx;** nginx chỉ nhận traffic từ Cloudflare. Cấu hình và kiểm ở `qkenn04/infra-qkenn`.
 - **Jenkins không có quyền shell trên VPS:** khoá deploy chỉ chạy được một lệnh deploy định sẵn, host key được ghim (`StrictHostKeyChecking=yes` trong `Jenkinsfile`). VPS tự kéo image từ Harbor.
 - **Lỗi trước stage Deploy không chạm VPS.** Thông báo Discord phân biệt "Build thất bại, VPS không bị đụng" với "Deploy thất bại, VPS đã tự quay về bản cũ".
+- **Báo máy tìm kiếm không bao giờ làm hỏng deploy.** Stage Notify search engines chạy sau khi site mới đã lên; lỗi ở đó (thiếu khoá, API lỗi) chỉ làm stage vàng. Script chỉ đọc sitemap công khai, không cần quyền gì trên VPS.
 - **Thư mục `docs/`, `ci/`, `scripts/` không vào Docker build context** (`.dockerignore`). Script phải chạy trong bước Check thì đặt ngoài các thư mục đó (vì vậy `seo/check-sitemap-pages.mjs` nằm ở `seo/`). `.git` cũng bị loại, nên mọi thứ cần lịch sử git chạy trên agent Jenkins trước `docker build` ([ADR 0004](../adr/0004-automate-sitemap-from-page-config-and-git.md)).
 - **Dữ liệu mà code phía server cần đọc không nằm trong file `"use client"`** (giá trị export từ module client là client reference). Ví dụ: `menuPages.ts` tách khỏi `MenuBook.tsx` để sitemap đọc được. Chi tiết: [Front-end](../dev/frontend.md).
 
@@ -129,8 +135,11 @@ flowchart LR
   check --> build["Build<br/>docker build --target runner<br/>NEXT_PUBLIC_SITE_URL"]
   build --> smoke["Smoke test<br/>ci/smoke-test.sh"]
   smoke --> push["Push<br/>Harbor nokto/web:commit-sha"]
-  push --> deploy["Deploy<br/>SSH: deploy commit-sha"]
+  push --> snap["Sitemap snapshot<br/>sitemap production trước deploy"]
+  snap --> deploy["Deploy<br/>SSH: deploy commit-sha"]
   deploy --> vps["VPS: pull, healthcheck<br/>lỗi thì quay về image trước"]
+  vps --> notify["Notify search engines<br/>trang có lastmod đổi:<br/>Google sitemaps.submit, IndexNow"]
+  notify -. lỗi .-> warn["Stage vàng, build vẫn xanh<br/>Discord: chưa báo được"]
   dates -. lỗi .-> stop["Dừng, VPS không bị đụng<br/>Discord: build thất bại"]
   check -. lỗi .-> stop
   build -. lỗi .-> stop
@@ -171,7 +180,7 @@ Mỗi commit trên `main` được build một lần thành image gắn nhãn co
 
 ## 8. Bảo mật (tóm tắt)
 
-Site không có tài khoản, không nhận dữ liệu từ khách, không có bí mật lúc chạy. Bề mặt chính là đường giao hàng (Jenkins, Harbor, khoá deploy) và các script bên thứ ba chạy trên trang (beacon Cloudflare hiện tại; Umami và GA4 theo kế hoạch). Header bảo mật (HSTS, CSP, X-Frame-Options) còn thiếu. Chi tiết: [Mô hình đe doạ](../security/threat-model.md).
+Site không có tài khoản, không nhận dữ liệu từ khách, không có bí mật lúc chạy. Bề mặt chính là đường giao hàng (Jenkins, Harbor, khoá deploy, khoá service account cho Search Console) và các script bên thứ ba chạy trên trang (beacon Cloudflare hiện tại; Umami và GA4 theo kế hoạch). Header bảo mật (HSTS, CSP, X-Frame-Options) còn thiếu. Chi tiết: [Mô hình đe doạ](../security/threat-model.md).
 
 ## 9. Cấu trúc thư mục repo
 
@@ -183,8 +192,8 @@ nokto-clone-v2/
 ├── src/seo/                 page-meta.ts (tiêu đề, mô tả), sitemap-images.ts (sitemap ảnh)
 ├── src/generated/           sitemap-lastmod.json do CI sinh (git-ignored)
 ├── seo/                     sitemap-pages.json (danh sách trang), check-sitemap-pages.mjs (guard chạy trong bước Check)
-├── public/                  ảnh, video, font; sites/the-hot-beer-garden/ (của quán), sites/nokto/ (của template)
-├── ci/                      sitemap-lastmod.sh, smoke-test.sh (chạy trên agent Jenkins)
+├── public/                  ảnh, video, font; sites/the-hot-beer-garden/ (của quán), sites/nokto/ (của template); <khoá>.txt (khoá IndexNow, công khai)
+├── ci/                      sitemap-lastmod.sh, smoke-test.sh, notify-search.sh (chạy trên agent Jenkins)
 ├── Dockerfile, Jenkinsfile  build nhiều stage (dependencies, check, builder, runner) và pipeline
 ├── docs/                    tài liệu (bắt đầu từ docs/README.md)
 └── scripts/                 check-links.py (kiểm link tài liệu), script tải tài sản template
