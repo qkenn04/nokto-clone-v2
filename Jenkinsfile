@@ -17,12 +17,12 @@ def notifyDiscord(String title, int color) {
         MSG=$(git log -1 --format=%s "$GIT_COMMIT" 2>/dev/null || true)
         jq -n --arg title "$TITLE" --argjson color "$COLOR" --arg url "$BUILD_URL" \
               --arg msg "${MSG:-(no commit message)}" --arg sha "$(printf %.7s "$GIT_COMMIT")" \
-              --arg build "#$BUILD_NUMBER" \
+              --arg build "#$BUILD_NUMBER" --arg ci "${QKENN_CI_NAME:-qkenn-ci}" \
           '{embeds: [{title: $title, url: $url, color: $color, description: $msg,
              fields: [{name: "Repo", value: "qkenn04/nokto-clone-v2", inline: true},
                       {name: "Commit", value: $sha, inline: true},
                       {name: "Build", value: $build, inline: true}],
-             footer: {text: "thehot.vn · Jenkins qkenn-ci · Harbor"},
+             footer: {text: ("thehot.vn · Jenkins " + $ci + " · Harbor")},
              timestamp: (now | todate)}]}' > discord.json
         curl -sS --fail-with-body -H 'Content-Type: application/json' -d @discord.json "$WEBHOOK" >/dev/null
       '''
@@ -43,7 +43,8 @@ pipeline {
   triggers { pollSCM('H/5 * * * *') }
 
   environment {
-    REGISTRY = 'qkenn-ci.tailb41a82.ts.net'
+    // Harbor on the machine running this Jenkins: qkenn-ci, or the standby CI while qkenn-ci is down (set by JCasC).
+    REGISTRY = "${env.QKENN_HARBOR_REGISTRY ?: 'qkenn-ci.tailb41a82.ts.net'}"
     IMAGE = "${REGISTRY}/nokto/web"
     SITE_URL = 'https://thehot.vn'
     // Umami analytics (docs/specs/004-analytics). Public values that end up in every page's HTML, not secrets;
