@@ -1,6 +1,6 @@
 # 002: SEO trên trang, việc
 
-> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-15 · Liên quan: [spec.md](spec.md), [plan.md](plan.md), [Tiến độ](../../plan/progress.md), [Việc sắp làm](../../plan/tasks.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-18 · Liên quan: [spec.md](spec.md), [plan.md](plan.md), [Tiến độ](../../plan/progress.md), [Việc sắp làm](../../plan/tasks.md)
 
 ## Chuẩn bị
 
@@ -43,6 +43,10 @@
 - [ ] 002-T41 Dựng component, quay màn hình trước/sau cho chủ quán và `kennle04` duyệt · AC: 002-AC-09
 - [ ] 002-T42 Rà chữ của link nội bộ ("xem menu nhậu", "đặt bàn cho nhóm")
 
+## Phần G: link trang ở footer
+
+- [ ] 002-T70 Dòng link 6 trang ở footer (`site.footerNav`), khoảng đệm dưới footer cho cụm nút liên hệ nổi, tracking `booking_cta_click` (`location: footer`) cho link Đặt bàn · AC: 002-AC-10, 002-AC-11 · PR `seo/footer-page-links` (chờ duyệt)
+
 ## Xếp hạng khi tìm tên quán
 
 Tình trạng 2026-10-15 (ảnh chụp của chủ quán): tìm "the hot beer garden đà lạt" thì Instagram #1, TripAdvisor #2, Facebook #3, `thehot.vn/about` #4, còn tiêu đề cũ và biểu tượng quả địa cầu. Trang chủ `/` đã được index ("URL is on Google"). AI Overview hiện giờ mở 4:30 PM–12 AM, lấy từ Google Maps và TripAdvisor. Mục tiêu: `thehot.vn` (trang chủ) đứng đầu cho tên quán, với tiêu đề mới, logo The Hot và giờ 17:30 ở mọi nơi.
@@ -71,3 +75,4 @@ Tình trạng 2026-10-15 (ảnh chụp của chủ quán): tìm "the hot beer ga
 | 2026-10-15 | PR #10 merge và deploy; Google crawl lại `/` lúc 05:55 (giờ VN): Events PASS cho 3 sự kiện, cảnh báo thiếu `offers`, `performer`; `/favicon.ico` 200 | merge `aafd52b`, Jenkins build #20, URL Inspection API |
 | 2026-10-15 | Ghi tình trạng tìm tên quán (`/about` #4) và việc cho chủ quán (TripAdvisor, tiểu sử mạng xã hội, giờ trên Google) | Ảnh chụp của chủ quán; mục Xếp hạng khi tìm tên quán |
 | 2026-10-15 | Menu Premium lên `/menu` (tab thứ hai, 12 trang ảnh có alt, sitemap ảnh thêm 12 mục) và `/menu/list` (104 món dạng chữ); đề xuất mô tả mới cho hai trang menu, chờ duyệt | PR #15 (chờ duyệt) |
+| 2026-10-18 | Mở PR: dòng link 6 trang ở footer, khoảng đệm dưới footer cho cụm nút liên hệ nổi, tracking link Đặt bàn ở footer; HTML server của 7 trang có đủ 6 link (trước: trang chủ có 3) | Nhánh `seo/footer-page-links` (chờ duyệt) |

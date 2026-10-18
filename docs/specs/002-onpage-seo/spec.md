@@ -1,6 +1,6 @@
 # 002: SEO trên trang
 
-> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-15 · Liên quan: [Mục lục spec](../README.md), [plan.md](plan.md), [tasks.md](tasks.md), [Mục lục ADR](../../adr/README.md) (ADR 0005), [Lộ trình M1, M2](../../plan/roadmap.md#m2-on-page-và-dữ-liệu-có-cấu-trúc)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-18 · Liên quan: [Mục lục spec](../README.md), [plan.md](plan.md), [tasks.md](tasks.md), [Mục lục ADR](../../adr/README.md) (ADR 0005), [Lộ trình M1, M2](../../plan/roadmap.md#m2-on-page-và-dữ-liệu-có-cấu-trúc)
 
 Những gì Google, Facebook và Zalo đọc được từ chính các trang của https://thehot.vn: tiêu đề và mô tả trong kết quả tìm kiếm, ảnh khi chia sẻ link, dữ liệu có cấu trúc (JSON-LD) về quán, chữ alt của ảnh và phần chữ giới thiệu trên trang. Mục tiêu là để người tìm "quán nhậu chill Đà Lạt", "beer garden Đà Lạt" hay tên quán thấy đúng trang, với thông tin khớp Google Business Profile.
 
@@ -104,6 +104,12 @@ Mỗi trang chính có ảnh chia sẻ 1200×630 riêng, làm từ ảnh ngang t
 - Phần hỏi đáp hiển thị (không schema): mở mấy giờ, có nhạc sống không, chỗ để xe, nhóm đông, Đà Lạt tối có lạnh không. Câu trả lời cần thông tin thật từ chủ quán.
 - Link nội bộ dùng chữ mô tả rõ, ví dụ "xem menu nhậu", "đặt bàn cho nhóm".
 
+### Phần G: link trang ở footer (PR chờ duyệt)
+
+- Menu điều hướng chỉ được render khi khách bấm nút "Menu" (`PersistentChrome.tsx`), nên HTML mà máy tìm kiếm nhận chỉ có link tới `/`, `/menu`, `/reservation`; `/about`, `/menu/list`, `/terms`, `/privacy` chỉ được biết qua sitemap.
+- Footer của mọi trang có dòng link tới 6 trang (`site.footerNav`): Thực đơn, Bảng giá món, Về The Hot, Đặt bàn, Thông tin đặt bàn, Bảo mật thông tin. `SiteFooter` là Server Component nên link nằm sẵn trong HTML, không cần bấm hay chạy JavaScript.
+- Footer có khoảng đệm dưới bằng chiều cao cụm nút liên hệ nổi (`FloatingContact`, che 120px trên điện thoại, 129px từ 768px trở lên) cộng `safe-area-inset-bottom`, để khi cuộn hết trang không link hay chữ nào của footer nằm dưới cụm nút. Đổi kích thước `FloatingContact` thì đo và sửa lại khoảng đệm này.
+
 ## 4. Dữ liệu
 
 Site không có cơ sở dữ liệu. Thông tin quán lấy từ `src/components/sites/nokto/site.ts` (tên, địa chỉ, hotline, giờ mở, mạng xã hội); tiêu đề và mô tả ở `src/seo/page-meta.ts`; sự kiện ở `src/components/sites/the-hot/home/content.ts` (`homeEvents`). Đề xuất thêm vào `site.ts` khi có xác nhận: toạ độ, các link `sameAs`, giờ đóng cửa, khoảng giá, hình thức thanh toán.
@@ -139,6 +145,8 @@ Loại kiểm: xem [mục lục spec, mục 4](../README.md#4-quy-ước).
 | 002-AC-07 | Đã deploy phần D | Rà ảnh trên 7 trang | Ảnh nội dung có alt khác rỗng; ảnh trang trí `alt=""` | M |
 | 002-AC-08 | Đã deploy phần B hoặc E | Facebook Sharing Debugger từng URL (bấm Scrape Again) | Hiện ảnh và tiêu đề đúng trang | E |
 | 002-AC-09 | Đã deploy phần F | Search Console → URL Inspection → Test live URL trang chủ | Ảnh chụp thấy đoạn giới thiệu và hỏi đáp | E |
+| 002-AC-10 | Đã deploy phần G | `curl` HTML của 7 trang (không chạy JavaScript) | Mỗi trang có `href` tới `/menu`, `/menu/list`, `/about`, `/reservation`, `/terms`, `/privacy` | E |
+| 002-AC-11 | Đã deploy phần G | Điện thoại 360–412px và màn hình 1280px, cuộn hết trang | Không link hay chữ nào của footer bị cụm nút liên hệ nổi che | M |
 
 ## 9. Ngoài phạm vi
 
@@ -172,3 +180,4 @@ Phần A, B: M1. Phần C–F: M2 ([lộ trình](../../plan/roadmap.md#m2-on-pag
 | 2026-10-14 | Tạo từ ghi chú kế hoạch SEO; phần A, B theo bản đã merge (PR #5, #6); trạng thái Đang áp dụng |
 | 2026-10-15 | Phần C: nhãn sự kiện 16/10, 17/10 đã gỡ (PR #8); link Facebook mới `thehot.dalat`; thêm TripAdvisor vào `sameAs`; cột trạng thái theo PR #10 (chờ duyệt) |
 | 2026-10-15 | Phần A: đề xuất mô tả mới cho `/menu`, `/menu/list` sau khi thêm menu Premium (chờ duyệt); phần D: alt cho 12 trang menu Premium |
+| 2026-10-18 | Thêm phần G (link trang ở footer, khoảng đệm cho cụm nút liên hệ) và 002-AC-10, 002-AC-11 |
