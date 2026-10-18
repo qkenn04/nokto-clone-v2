@@ -5,6 +5,15 @@ export const THE_HOT_ASSET_BASE = "/sites/the-hot-beer-garden";
 const sloganLines = ["Đà Lạt lên đèn,", "The Hot lên mood."] as const;
 const slogan = sloganLines.join(" ");
 
+const pageLinks = {
+  menu: { label: "Thực đơn", href: "/menu" },
+  menuList: { label: "Bảng giá món", href: "/menu/list" },
+  about: { label: "Về The Hot", href: "/about" },
+  reservation: { label: "Đặt bàn", href: "/reservation" },
+  terms: { label: "Thông tin đặt bàn", href: "/terms" },
+  privacy: { label: "Bảo mật thông tin", href: "/privacy" },
+} as const;
+
 export const site = {
   name: "The Hot Beer Garden",
   location: "Đà Lạt",
@@ -18,11 +27,8 @@ export const site = {
   label: "BEER GARDEN — ĐÀ LẠT",
   tagline: "Đà Lạt Chill Zone",
   logo: { src: `${THE_HOT_ASSET_BASE}/images/logo.png`, width: 640, height: 479 },
-  nav: [
-    { label: "Thực đơn", href: "/menu" },
-    { label: "Về The Hot", href: "/about" },
-    { label: "Đặt bàn", href: "/reservation" },
-  ],
+  nav: [pageLinks.menu, pageLinks.about, pageLinks.reservation],
+  footerNav: [pageLinks.menu, pageLinks.menuList, pageLinks.about, pageLinks.reservation, pageLinks.terms, pageLinks.privacy],
   cta: { label: "Đặt bàn", href: "/reservation" },
   hours: {
     opens: "17:30",
@@ -55,10 +61,7 @@ export const site = {
   amenities: ["Chỗ ngồi ngoài trời"],
   currency: { symbol: "₫", position: "after" },
   beerOffer: "Giá bia trong menu áp dụng từ Chủ nhật đến thứ Năm hằng tuần.",
-  legal: [
-    { label: "Thông tin đặt bàn", href: "/terms" },
-    { label: "Bảo mật thông tin", href: "/privacy" },
-  ],
+  legal: [pageLinks.terms, pageLinks.privacy],
 } as const;
 
 type Weekday = "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday" | "Sunday";

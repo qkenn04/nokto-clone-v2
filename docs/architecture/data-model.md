@@ -1,6 +1,6 @@
 # Mô hình dữ liệu nội dung
 
-> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-15 · Liên quan: [Kiến trúc](ARCHITECTURE.md), [Đặc tả sản phẩm](../product/spec.md), [Front-end](../dev/frontend.md), [Kiểm thử](../dev/testing.md), [Mục lục ADR](../adr/README.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-18 · Liên quan: [Kiến trúc](ARCHITECTURE.md), [Đặc tả sản phẩm](../product/spec.md), [Front-end](../dev/frontend.md), [Kiểm thử](../dev/testing.md), [Mục lục ADR](../adr/README.md)
 
 Site không có cơ sở dữ liệu. "Dữ liệu" là các module TypeScript, file JSON và file trong `public/` mà trang, metadata, JSON-LD và sitemap cùng đọc. Nguồn sự thật là chính các file đó (kiểu TypeScript là schema); file này giải thích điều code không nói: ai đọc gì, bất biến nào không được phá, và đổi dữ liệu thế nào. Tính tới 2026-10-14.
 
@@ -95,7 +95,7 @@ flowchart LR
 | `phone`, `phoneHref` | Hotline hiển thị và link `tel:` | Footer, nút Gọi, form đặt bàn, JSON-LD (`telephone`) |
 | `hours` (`opens`, `display`) | "17:30", "17:30 – Late" | Footer, `/terms`, `/about`, mô tả trang. Đang lệch Google Maps (mục 11) |
 | `socialHref`, `messengerHref`, `zaloHref` | Facebook, Messenger, Zalo của quán | Nút liên hệ nhanh, JSON-LD `sameAs` (chỉ Facebook) |
-| `logo`, `nav`, `cta`, `legal` | Logo, menu điều hướng, nút Đặt bàn, link trang pháp lý | Khung trang (`chrome/`) |
+| `logo`, `nav`, `footerNav`, `cta`, `legal` | Logo, menu điều hướng, dòng link trang ở footer, nút Đặt bàn, link trang pháp lý. `nav`, `footerNav`, `legal` lấy từng link từ `pageLinks` (một nhãn, một đường dẫn cho mỗi trang) | Khung trang (`chrome/`): `footerNav` ở `SiteFooter` |
 | `beerOffer` | Câu ưu đãi bia Chủ nhật đến thứ Năm | Bảng giá, `/terms` |
 | `rootOgDescription` | Mô tả chia sẻ ngắn | Chưa có nơi nào đọc (2026-10-14) |
 
