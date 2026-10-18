@@ -147,7 +147,7 @@ export function HeroIntro() {
               <Stack direction="row" align="center" gap={6} wrap className="pt-2">
                 <CheersButton href={site.cta.href} label={site.cta.label} tracking={trackAttrs("booking_cta_click", { location: "hero" })} />
                 <ButtonLink href="/menu" variant="link">
-                  Xem menu
+                  Xem menu nhậu
                 </ButtonLink>
               </Stack>
             </div>
