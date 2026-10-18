@@ -39,9 +39,9 @@
 
 ## Phần F: chữ trên trang
 
-- [ ] 002-T40 Viết đoạn giới thiệu 200–300 chữ, H2 có từ khoá, phần hỏi đáp · chặn bởi 002-T04 · chủ quán duyệt câu chữ
-- [ ] 002-T41 Dựng component, quay màn hình trước/sau cho chủ quán và `kennle04` duyệt · AC: 002-AC-09
-- [ ] 002-T42 Rà chữ của link nội bộ ("xem menu nhậu", "đặt bàn cho nhóm")
+- [ ] 002-T40 Viết đoạn giới thiệu 200–300 chữ, H2 có từ khoá, phần hỏi đáp · chặn bởi 002-T04 · chủ quán duyệt câu chữ · giới thiệu (khoảng 190 chữ) và H2: nhánh `content/home-intro`; hỏi đáp còn chờ 002-T04
+- [ ] 002-T41 Dựng component, quay màn hình trước/sau cho chủ quán và `kennle04` duyệt · AC: 002-AC-09 · `HomeIntro` dựng, ảnh xem trước 360/412/1024/1280/1440px do chủ repo duyệt 2026-10-18; còn 002-AC-09 sau deploy
+- [x] 002-T42 Rà chữ của link nội bộ ("xem menu nhậu", "đặt bàn cho nhóm") · nút hero "Xem menu nhậu", link trong khối giới thiệu, dòng link trang ở footer (PR #24)
 
 ## Phần G: link trang ở footer
 
@@ -77,3 +77,4 @@ Tình trạng 2026-10-15 (ảnh chụp của chủ quán): tìm "the hot beer ga
 | 2026-10-15 | Menu Premium lên `/menu` (tab thứ hai, 12 trang ảnh có alt, sitemap ảnh thêm 12 mục) và `/menu/list` (104 món dạng chữ); đề xuất mô tả mới cho hai trang menu, chờ duyệt | PR #15 (chờ duyệt) |
 | 2026-10-18 | Mở PR: dòng link 6 trang ở footer, khoảng đệm dưới footer cho cụm nút liên hệ nổi, tracking link Đặt bàn ở footer; HTML server của 7 trang có đủ 6 link (trước: trang chủ có 3) | Nhánh `seo/footer-page-links` (chờ duyệt) |
 | 2026-10-18 | Dấu cách thật giữa các dòng của 5 heading (H1 `/`, `/menu`, `/about`, `/reservation`; H2 khối đặt bàn ở `/`): chữ máy đọc từ "Lật menu.Chốt món." thành "Lật menu. Chốt món."; quét 194 heading trên 7 trang: 0 dính chữ; so pixel 10 ảnh (412px, 1280px): 0 khác | Nhánh `fix/heading-word-spacing` |
+| 2026-10-18 | Khối giới thiệu ở trang chủ: H2 "Quán nhậu ngoài trời cho hội bạn ở Đà Lạt.", ba đoạn chữ có link; "quán nhậu" trong nội dung trang chủ: 0 → 2 lần; nút hero "Xem menu nhậu" | Nhánh `content/home-intro` |

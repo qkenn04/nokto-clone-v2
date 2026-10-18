@@ -3,6 +3,7 @@ import { SiteFooter } from "@/components/sites/nokto/chrome/SiteFooter";
 import { HeroIntro } from "@/components/sites/nokto/home/HeroIntro";
 import { HeroVideo } from "@/components/sites/the-hot/HeroVideo";
 import { HomeGallery } from "@/components/sites/the-hot/home/HomeGallery";
+import { HomeIntro } from "@/components/sites/the-hot/home/HomeIntro";
 import { EventTimeline } from "@/components/sites/the-hot/home/EventTimeline";
 import { heroVideo } from "@/components/sites/the-hot/videos";
 import { homeEventsJsonLd } from "@/seo/structured-data";
@@ -28,6 +29,7 @@ export default function HomePage() {
           </a>
         </div>
       </div>
+      <HomeIntro />
       <HomeGallery />
       <EventTimeline />
       <SiteFooter />
