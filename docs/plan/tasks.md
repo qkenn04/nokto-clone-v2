@@ -1,6 +1,6 @@
 # Việc sắp làm
 
-> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-15 · Liên quan: [Lộ trình](roadmap.md), [Tiến độ](progress.md), [Mục lục spec](../specs/README.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-18 · Liên quan: [Lộ trình](roadmap.md), [Tiến độ](progress.md), [Mục lục spec](../specs/README.md)
 
 Mốc đang làm: đóng M1; M2, M3, M4 làm song song tuỳ việc nào gỡ chặn trước (2026-10-15: M2 đã có JSON-LD đợt 1 trên production, M3 đã xong cache và video hero); chủ quán bắt đầu M5 ngay ([lộ trình](roadmap.md)). Việc chi tiết của từng tính năng nằm trong `tasks.md` của spec; ở đây chỉ trỏ tới.
 
@@ -62,7 +62,7 @@ Mỗi câu chặn việc ghi ở cột "Chặn"; chưa có câu trả lời thì
 | # | Câu hỏi | Dùng cho | Chặn | Từ ngày |
 |---|---|---|---|---|
 | Q1 | Giờ đóng cửa: 00:00 hay 00:30? Mở mọi ngày trong tuần? Chưa xác định, cần chủ quán xác nhận | JSON-LD giờ mở cửa, Google Business Profile, hỏi đáp | 002-T23, TK01 (giờ đóng) | 2026-10-14 |
-| Q2 | Có nhạc sống không; nếu có thì tối nào (sự kiện thứ Sáu ghi "Live performance")? | `amenityFeature`, thuộc tính hồ sơ Google, alt, tiêu đề | 002-T23, 002-T30 | 2026-10-14 |
+| Q2 | Có nhạc sống không; nếu có thì tối nào (sự kiện thứ Sáu ghi "Live performance")? | `amenityFeature`, thuộc tính hồ sơ Google, tiêu đề | 002-T23 | 2026-10-14 |
 | Q3 | Khoảng giá phổ biến? | `priceRange`, mức giá trên Google Maps | 002-T23 | 2026-10-14 |
 | Q4 | Hình thức thanh toán nhận (tiền mặt, chuyển khoản, thẻ, ví)? | `paymentAccepted`, thuộc tính hồ sơ Google | 002-T23 | 2026-10-14 |
 | Q5 | Chuỗi địa chỉ chính xác như đang ghi trên Google Business Profile? | Thông tin nhất quán mọi nơi (M5), địa chỉ trong JSON-LD | TK13 | 2026-10-14 |
