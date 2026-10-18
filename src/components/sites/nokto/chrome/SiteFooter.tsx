@@ -39,6 +39,7 @@ export function SiteFooter() {
             <li key={item.href}>
               <Link
                 href={item.href}
+                {...(item.href === site.cta.href ? trackAttrs("booking_cta_click", { location: "footer" }) : {})}
                 className="type-label inline-flex min-h-11 items-center text-muted transition-colors duration-[var(--duration-fast)] hover:text-foreground focus-visible:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
               >
                 {item.label}
