@@ -92,8 +92,8 @@ Lượt xem trang do Umami và GA4 tự đếm, kể cả khi chuyển trang tro
 
 | Sự kiện | Khi nào | Thuộc tính | GA4 key event |
 |---|---|---|---|
-| `contact_click` | Bấm Gọi / Zalo / Messenger / Facebook | `method`: `phone` \| `zalo` \| `messenger` \| `facebook`; `location`: `floating` \| `footer` \| `nav` \| `event` \| `reservation` | Có |
-| `booking_cta_click` | Bấm "Đặt bàn" / "Chốt bàn" | `location`: `hero` \| `floating` \| `nav` \| `event` \| `closing` \| `menu_top` \| `menu_bottom` \| `about` \| `not_found` \| `footer` | Không |
+| `contact_click` | Bấm Gọi / Zalo / Messenger / Facebook | `method`: `phone` \| `zalo` \| `messenger` \| `facebook`; `location`: `floating` \| `footer` \| `nav` \| `event` \| `reservation` \| `intro` | Có |
+| `booking_cta_click` | Bấm "Đặt bàn" / "Chốt bàn" | `location`: `hero` \| `floating` \| `nav` \| `event` \| `closing` \| `menu_top` \| `menu_bottom` \| `about` \| `not_found` \| `footer` \| `intro` | Không |
 | `reservation_complete` | Form đặt bàn tới bước thành công | `party_size` (số khách 1–8) | Có |
 | `menu_view_mode` | Chuyển giữa menu lật sách và danh sách (chỉ khi bấm lựa chọn chưa chọn) | `mode`: `book` \| `list` | Không |
 | `menu_tab_select` | Chọn tab menu "Món ăn chơi" hoặc "Premium" (bấm hoặc phím mũi tên, Home, End; chỉ khi chọn tab chưa chọn) | `tab`: `an_choi` \| `premium`; `mode`: `book` \| `list` (đang ở sách lật hay danh sách) | Không |
@@ -104,8 +104,8 @@ Vị trí gắn:
 
 | Sự kiện | Component |
 |---|---|
-| `contact_click` | `FloatingContact` (4 nút), `SiteFooter` (hotline, Facebook), `PersistentChrome` (Facebook trong menu), `EventTimeline` ("Ghé Facebook The Hot"), `ReservationSuccess` (Gọi, Nhắn Facebook) |
-| `booking_cta_click` | `HeroIntro` → `CheersButton`, `FloatingContact`, `PersistentChrome` (`NavItem` khi trỏ tới trang đặt bàn), `EventTimeline` (từng sự kiện, khối kết), `MenuBook` (trên, dưới), `AboutClosing`, `not-found.tsx`, `SiteFooter` (link "Đặt bàn" trong dòng link trang) |
+| `contact_click` | `FloatingContact` (4 nút), `SiteFooter` (hotline, Facebook), `PersistentChrome` (Facebook trong menu), `EventTimeline` ("Ghé Facebook The Hot"), `ReservationSuccess` (Gọi, Nhắn Facebook), `HomeIntro` (hotline trong khối giới thiệu) |
+| `booking_cta_click` | `HeroIntro` → `CheersButton`, `FloatingContact`, `PersistentChrome` (`NavItem` khi trỏ tới trang đặt bàn), `EventTimeline` (từng sự kiện, khối kết), `MenuBook` (trên, dưới), `AboutClosing`, `not-found.tsx`, `SiteFooter` (link "Đặt bàn" trong dòng link trang), `HomeIntro` ("đặt bàn trước" trong khối giới thiệu) |
 | `reservation_complete` | `ReservationForm`, ngay trước khi chuyển sang bước thành công |
 | `menu_view_mode` | `MenuViewSwitcher` |
 | `menu_tab_select` | `MenuBook` (sách lật), `MenuList` (danh sách), qua `MenuTabs`; gọi `track()` vì phím mũi tên cũng đổi tab, `ClickTracker` chỉ nghe click |
@@ -223,3 +223,4 @@ Nội dung `/privacy` cần chủ quán duyệt; đây là nhận định chung,
 | 2026-10-14 | Tạo từ ghi chú kế hoạch analytics (chỉ phần website; phần hạ tầng chuyển sang repo hạ tầng riêng); trạng thái Đề xuất |
 | 2026-10-15 | Thêm sự kiện `menu_tab_select` và thuộc tính `tab` cho hai tab menu "Món ăn chơi" / "Premium" |
 | 2026-10-18 | `booking_cta_click` thêm `location: footer` cho link Đặt bàn trong dòng link trang ở footer |
+| 2026-10-18 | `contact_click` và `booking_cta_click` thêm `location: intro` cho hotline và "đặt bàn trước" trong khối giới thiệu ở trang chủ |

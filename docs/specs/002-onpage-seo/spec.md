@@ -4,7 +4,7 @@
 
 Những gì Google, Facebook và Zalo đọc được từ chính các trang của https://thehot.vn: tiêu đề và mô tả trong kết quả tìm kiếm, ảnh khi chia sẻ link, dữ liệu có cấu trúc (JSON-LD) về quán, chữ alt của ảnh và phần chữ giới thiệu trên trang. Mục tiêu là để người tìm "quán nhậu chill Đà Lạt", "beer garden Đà Lạt" hay tên quán thấy đúng trang, với thông tin khớp Google Business Profile.
 
-Hiện thực: phần A (tiêu đề, mô tả) và phần B (ảnh chia sẻ) chạy trên production từ Jenkins build #16 (PR #5, PR #6). Phần C: sự kiện 16/10, 17/10 đã bỏ nhãn minh hoạ (PR #8, Jenkins build #17, 2026-10-15); JSON-LD đợt 1 và `/favicon.ico` lên production (PR #10, merge `aafd52b`, Jenkins build #20, 2026-10-15), Google đã đọc: rich result Events PASS; giờ đóng cửa, khoảng giá, thanh toán, nhạc sống chờ chủ quán trả lời (mục 12). Phần D–F chưa làm. Trạng thái chi tiết ở [tasks.md](tasks.md).
+Hiện thực: phần A (tiêu đề, mô tả) và phần B (ảnh chia sẻ) chạy trên production từ Jenkins build #16 (PR #5, PR #6). Phần C: sự kiện 16/10, 17/10 đã bỏ nhãn minh hoạ (PR #8, Jenkins build #17, 2026-10-15); JSON-LD đợt 1 và `/favicon.ico` lên production (PR #10, merge `aafd52b`, Jenkins build #20, 2026-10-15), Google đã đọc: rich result Events PASS; giờ đóng cửa, khoảng giá, thanh toán, nhạc sống chờ chủ quán trả lời (mục 12). Phần D, E chưa làm. Phần F: khối giới thiệu (H2 có từ khoá, 3 đoạn chữ) và chữ link "Xem menu nhậu" ở nhánh `content/home-intro`; hỏi đáp còn chờ chủ quán. Trạng thái chi tiết ở [tasks.md](tasks.md).
 
 ## 1. Mục tiêu
 
@@ -97,12 +97,21 @@ Không dùng `FAQPage`: từ 2023 Google chỉ hiện kết quả hỏi đáp ch
 
 Mỗi trang chính có ảnh chia sẻ 1200×630 riêng, làm từ ảnh ngang thật của quán. Chặn bởi ảnh (001-T40).
 
-### Phần F: chữ trên trang (chưa làm, cần duyệt)
+### Phần F: chữ trên trang (giới thiệu và H2 xong; hỏi đáp chờ chủ quán)
 
 - Đoạn giới thiệu khoảng 200–300 chữ ở trang chủ, chứa tự nhiên các cụm quán nhậu chill Đà Lạt, beer garden, bia lạnh, Đà Lạt về đêm, hội bạn. Chữ hiển thị thật, không giấu chữ.
 - Một tiêu đề phụ (H2) có từ khoá bên cạnh H1 dạng slogan.
 - Phần hỏi đáp hiển thị (không schema): mở mấy giờ, có nhạc sống không, chỗ để xe, nhóm đông, Đà Lạt tối có lạnh không. Câu trả lời cần thông tin thật từ chủ quán.
 - Link nội bộ dùng chữ mô tả rõ, ví dụ "xem menu nhậu", "đặt bàn cho nhóm".
+
+Đã làm (`src/components/sites/the-hot/home/HomeIntro.tsx`, ngay dưới hero ở `/`):
+
+- H2 "Quán nhậu ngoài trời cho hội bạn ở Đà Lạt." (kiểu tiêu đề và nhãn dán của Gallery), nhãn `site.label`.
+- Ba đoạn chữ (khoảng 190 chữ): địa chỉ, giờ mở cửa và tên quán đọc từ `site.ts`; món, combo, đồ uống và "giá đã gồm VAT" gõ theo `menu/data.ts`, nên **đổi menu thì sửa cả đoạn này** (như `page-meta.ts`). Không dùng thông tin chưa chốt: giờ đóng cửa, nhạc sống, khoảng giá, ưu đãi bia.
+- Link trong đoạn: "bảng giá món nhậu" (`/menu/list`), "lịch sự kiện" (`#events`), "đặt bàn trước" (`/reservation`), hotline (`tel:`).
+- Server Component, không hiệu ứng hiện dần, để chữ có trong HTML và hiện ngay (002-AC-09). Điện thoại xếp dọc; từ 1024px tiêu đề bên trái, chữ bên phải.
+- Nút phụ ở hero: "Xem menu" thành "Xem menu nhậu".
+- Câu chữ và bố cục: chủ repo duyệt bản xem trước ngày 2026-10-18.
 
 ### Phần G: link trang ở footer (PR chờ duyệt)
 
@@ -181,3 +190,4 @@ Phần A, B: M1. Phần C–F: M2 ([lộ trình](../../plan/roadmap.md#m2-on-pag
 | 2026-10-15 | Phần C: nhãn sự kiện 16/10, 17/10 đã gỡ (PR #8); link Facebook mới `thehot.dalat`; thêm TripAdvisor vào `sameAs`; cột trạng thái theo PR #10 (chờ duyệt) |
 | 2026-10-15 | Phần A: đề xuất mô tả mới cho `/menu`, `/menu/list` sau khi thêm menu Premium (chờ duyệt); phần D: alt cho 12 trang menu Premium |
 | 2026-10-18 | Thêm phần G (link trang ở footer, khoảng đệm cho cụm nút liên hệ) và 002-AC-10, 002-AC-11 |
+| 2026-10-18 | Phần F: khối giới thiệu ở trang chủ (H2, ba đoạn, link) và chữ link "Xem menu nhậu"; hỏi đáp còn chờ |
