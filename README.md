@@ -1,4 +1,4 @@
-# NOKTO clone (v2)
+# thehot.vn — The Hot Beer Garden
 
 A Next.js recreation of the public [NOKTO restaurant template](https://nokto-template.vercel.app/), rebuilt from scratch with the [AI Website Cloner Template](https://github.com/JCodesMore/ai-website-cloner-template) `clone-website` workflow (template v0.6.1). It replaces the earlier `nokto-clone` attempt, which is kept separately for comparison.
 
@@ -24,11 +24,11 @@ Every push to `main` is built and deployed to https://thehot.vn (the old https:/
 
 ```
 GitHub main ──poll 5 min──▶ Jenkins (qkenn-ci, WSL) ──push──▶ Harbor (qkenn-ci) ◀──pull── VPS
-                            sitemap dates → check → build → smoke test         /srv/nokto/deploy.sh
+                            sitemap dates → check → build → smoke test              deploy.sh
                             after the deploy: notify search engines (Google Search Console, IndexNow)
 ```
 
-- `Jenkinsfile` — write the sitemap dates (`ci/sitemap-lastmod.sh`, below), `docker build --target check` (lint + typecheck + `check:sitemap`), build the `runner` image with `NEXT_PUBLIC_SITE_URL` and the Umami build args (`NEXT_PUBLIC_UMAMI_WEBSITE_ID`, `NEXT_PUBLIC_UMAMI_SRC`; no website ID means no tracker), run `ci/smoke-test.sh` (which also checks the tracker matches the website ID), push `nokto/web:<commit sha>` to Harbor, then SSH to the VPS with `deploy <sha>`.
+- `Jenkinsfile` — write the sitemap dates (`ci/sitemap-lastmod.sh`, below), `docker build --target check` (lint + typecheck + `check:sitemap`), build the `runner` image with `NEXT_PUBLIC_SITE_URL` and the Umami build args (`NEXT_PUBLIC_UMAMI_WEBSITE_ID`, `NEXT_PUBLIC_UMAMI_SRC`; no website ID means no tracker), run `ci/smoke-test.sh` (which also checks the tracker matches the website ID), push `thehot/web:<commit sha>` to Harbor, then SSH to the VPS with `deploy <sha>`.
 - Search engines: the *Sitemap snapshot* stage reads the live sitemap just before the deploy, and the *Notify search engines* stage after it runs `ci/notify-search.sh`: it waits until the live sitemap shows this build's dates, works out which page URLs are new or have a new `<lastmod>`, re-submits the sitemap to Google through the Search Console API (`sitemaps.submit`, with a service-account key held in Jenkins) and posts those URLs to IndexNow (Bing and others; the key is the public file `public/<key>.txt`). Google's Indexing API is never used (it only allows job postings and livestreams). The stage cannot fail the build: any problem marks it UNSTABLE and the Discord message says so. Try it without sending anything: `DRY_RUN=1 EXPECTED_LASTMOD= bash ci/notify-search.sh notify` ([docs/dev/testing.md](docs/dev/testing.md#31-báo-máy-tìm-kiếm-chạy-thử), [ADR 0009](docs/adr/0009-notify-search-engines-after-deploy.md)).
 - Sitemap `<lastmod>`: the *Sitemap dates* stage runs `ci/sitemap-lastmod.sh`, which gives each page in `seo/sitemap-pages.json` the date of the last commit on `main` that touched its `sources` or `shared` paths (`git log --first-parent`, so a merged PR counts from its merge commit) and writes it to `src/generated/sitemap-lastmod.json` (git-ignored). It runs on the agent because the Docker build context has no `.git`; the file goes into the build with the rest of the context and `src/app/sitemap.ts` reads it at build time. The stage fails on a shallow clone or a listed path with no commits. Without the file (a plain local `npm run build`) the sitemap just has no `<lastmod>`, and `ci/smoke-test.sh` fails on that image.
 - The VPS side (forced-command `deploy.sh`, compose stack, Nginx vhost) and the Jenkins/Harbor setup live in [`qkenn04/infra-qkenn`](https://github.com/qkenn04/infra-qkenn) (`stacks/nokto/`, `ci/`).
@@ -39,8 +39,8 @@ GitHub main ──poll 5 min──▶ Jenkins (qkenn-ci, WSL) ──push──�
   ```bash
   bash ci/sitemap-lastmod.sh
   docker build --target check .
-  docker build --target runner --build-arg NEXT_PUBLIC_SITE_URL=https://thehot.vn -t nokto:local .
-  ci/smoke-test.sh nokto:local
+  docker build --target runner --build-arg NEXT_PUBLIC_SITE_URL=https://thehot.vn -t thehot:local .
+  ci/smoke-test.sh thehot:local
   ```
 
 ## Routes

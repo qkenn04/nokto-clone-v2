@@ -1,6 +1,6 @@
 # Kiểm thử
 
-> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-15 · Liên quan: [Đặc tả sản phẩm](../product/spec.md), [Yêu cầu phi chức năng](../product/nfr.md), [Cấu hình](configuration.md), [Số đo hiệu năng](perf.md), [Triển khai](../ops/deployment.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-18 · Liên quan: [Đặc tả sản phẩm](../product/spec.md), [Yêu cầu phi chức năng](../product/nfr.md), [Cấu hình](configuration.md), [Số đo hiệu năng](perf.md), [Triển khai](../ops/deployment.md)
 
 Site không có unit test hay test trình duyệt tự động. Lớp bảo vệ là các bước kiểm tĩnh (lint, typecheck, guard sitemap), build, và **smoke test trên chính image sẽ được deploy**. Hiệu năng, SEO và giao diện được kiểm tay, có ghi lại. Tính tới 2026-10-14.
 
@@ -31,8 +31,8 @@ Chạy từ gốc repo. Cần Node.js 24 trở lên (`.nvmrc`).
 # Giống Jenkins: Sitemap dates → Check → Build → Smoke test
 bash ci/sitemap-lastmod.sh
 docker build --target check .
-docker build --target runner --build-arg NEXT_PUBLIC_SITE_URL=https://thehot.vn -t nokto:local .
-ci/smoke-test.sh nokto:local
+docker build --target runner --build-arg NEXT_PUBLIC_SITE_URL=https://thehot.vn -t thehot:local .
+ci/smoke-test.sh thehot:local
 ```
 
 ## 3. Smoke test kiểm gì

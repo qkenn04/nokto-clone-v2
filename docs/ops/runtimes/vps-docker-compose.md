@@ -1,6 +1,6 @@
 # CI/CD runtime: VPS + Docker Compose
 
-> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-14 · Liên quan: [Chính sách CI/CD](../ci-cd-core.md), [Jenkins + Harbor](../providers/jenkins-registry.md), [Triển khai](../deployment.md), [Kiến trúc](../../architecture/ARCHITECTURE.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-18 · Liên quan: [Chính sách CI/CD](../ci-cd-core.md), [Jenkins + Harbor](../providers/jenkins-registry.md), [Triển khai](../deployment.md), [Kiến trúc](../../architecture/ARCHITECTURE.md)
 
 Site chạy thành một container trên một VPS, quản lý bằng Docker Compose, sau nginx và Cloudflare. File này ghi cách runtime đó đáp ứng [chính sách CI/CD](../ci-cd-core.md). Compose stack, script deploy, cấu hình nginx và bố cục thư mục trên VPS nằm ở `qkenn04/infra-qkenn` (`stacks/`, `nginx/`), không ghi lại ở repo công khai này. Tính tới 2026-10-14.
 
@@ -23,7 +23,7 @@ Chỉ nginx nhận traffic từ ngoài, và chỉ từ Cloudflare. Không có bl
 ```text
 Jenkins gọi "deploy <commit sha>" qua SSH (forced command)
 → khoá chống chạy chồng
-→ kéo image nokto/web:<sha> từ Harbor
+→ kéo image thehot/web:<sha> từ Harbor
 → chạy container mới
 → đợi Docker HEALTHCHECK
 → khoẻ: giữ, dọn image cũ (giữ 3 bản gần nhất)

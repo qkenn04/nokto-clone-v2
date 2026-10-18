@@ -4,8 +4,8 @@ services:
       context: .
       dockerfile: Dockerfile
       target: runner
-    image: nokto-clone-v2:latest
-    container_name: nokto-clone-v2
+    image: thehot:latest
+    container_name: thehot
     restart: unless-stopped
     ports:
       - "${PORT:-3000}:3000"
@@ -23,8 +23,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
-    image: nokto-clone-v2:dev
-    container_name: nokto-clone-v2-dev
+    image: thehot:dev
+    container_name: thehot-dev
     restart: unless-stopped
     ports:
       - "${DEV_PORT:-3001}:3000"

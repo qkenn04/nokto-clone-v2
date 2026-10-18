@@ -27,8 +27,8 @@ version in `NODE_VERSION` in the [`Dockerfile`](Dockerfile)), npm and Git.
 Docker is only needed to run the pipeline's image checks locally.
 
 ```bash
-git clone https://github.com/qkenn04/nokto-clone-v2.git
-cd nokto-clone-v2
+git clone https://github.com/qkenn04/thehot.git
+cd thehot
 npm ci
 npm run dev        # http://localhost:3000
 ```
@@ -140,7 +140,7 @@ anything reaches `main`.
 ## Bugs, ideas and questions
 
 - **Something wrong on the site, or an idea:** open an
-  [issue](https://github.com/qkenn04/nokto-clone-v2/issues/new/choose) with the
+  [issue](https://github.com/qkenn04/thehot/issues/new/choose) with the
   bug report or feature request form.
 - **A security problem:** do not open a public issue with details; follow
   [SECURITY.md](SECURITY.md).
