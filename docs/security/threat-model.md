@@ -1,6 +1,6 @@
 # Mô hình đe doạ
 
-> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-15 · Liên quan: [Kiến trúc](../architecture/ARCHITECTURE.md), [Yêu cầu phi chức năng](../product/nfr.md), [Cấu hình](../dev/configuration.md), [Triển khai](../ops/deployment.md), [Runbook](../ops/runbooks/README.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-18 · Liên quan: [Kiến trúc](../architecture/ARCHITECTURE.md), [Yêu cầu phi chức năng](../product/nfr.md), [Cấu hình](../dev/configuration.md), [Triển khai](../ops/deployment.md), [Runbook](../ops/runbooks/README.md)
 
 Bản ngắn (tầng T2) cho một site giới thiệu không có tài khoản và không nhận dữ liệu. Repo công khai: file này không ghi địa chỉ, tên bí mật hay chi tiết khai thác được; cấu hình bảo vệ phía máy chủ nằm ở `qkenn04/infra-qkenn`. Tính tới 2026-10-15.
 
@@ -27,7 +27,7 @@ Bản ngắn (tầng T2) cho một site giới thiệu không có tài khoản v
 |---|---|---|---|---|
 | TS1 | Đường deploy (Jenkins, quyền push registry, khoá deploy) | Chiếm được là chạy được code tuỳ ý trên production | Máy CI, Jenkins Credentials | L4 |
 | TS2 | Nội dung và uy tín của site | Trang bị sửa, hoặc giờ, hotline, giá sai làm khách mất lòng tin và gọi nhầm | Repo, image trên VPS | L1, review, chủ quán duyệt |
-| TS3 | Domain `thehot.vn`, zone Cloudflare, tài khoản Google (Search Console, Business Profile); service account Google là user của property Search Console (gửi lại sitemap sau deploy) | Mất là mất cả site và hiện diện trên Google | Ngoài repo, chủ quán và chủ repo quản lý; khoá service account trong Jenkins Credentials | Ngoài phạm vi repo `[CẦN XÁC NHẬN: tài khoản đã bật 2FA chưa]` |
+| TS3 | Domain `thehot.vn`, zone Cloudflare, tài khoản Google (Search Console, Business Profile); service account Google là user của property Search Console (gửi lại sitemap sau deploy) | Mất là mất cả site và hiện diện trên Google | Ngoài repo, chủ quán và chủ repo quản lý; khoá service account trong Jenkins Credentials; phiên đăng nhập Google trong profile Chrome của script Rich Results Test trên máy dev (T11) | Ngoài phạm vi repo `[CẦN XÁC NHẬN: tài khoản đã bật 2FA chưa]` |
 | TS4 | Dữ liệu khách nhập vào form; số liệu truy cập của khách | Dữ liệu cá nhân, trách nhiệm pháp lý | Trình duyệt của khách; công cụ analytics (dự kiến) | L1, L7 |
 | TS5 | Repo GitHub công khai | Nguồn của mọi build; secret lỡ commit thì lộ ngay | GitHub | Review, L8 (chưa có) |
 
@@ -93,6 +93,7 @@ Ranh giới cần giữ:
 | T08 | JSON-LD chèn chuỗi chứa `</script>` làm vỡ trang hoặc chèn script | A4 → dữ liệu | XSS | Dữ liệu JSON-LD là hằng số trong repo; nếu sau này lấy dữ liệu từ ngoài thì phải escape `<` trước khi nhúng | Review | Có (với dữ liệu hiện tại) |
 | T09 | Lộ khoá service account dùng cho Search Console ([ADR 0009](../adr/0009-notify-search-engines-after-deploy.md)) | A2 → máy CI; A4 → in khoá ra log | Gửi hoặc xoá sitemap, đọc số liệu Search Console của `thehot.vn`; không sửa được site, không có quyền Google Cloud | Khoá chỉ nằm trong Jenkins Credentials, chỉ bind trong stage Notify search engines; script không in khoá hay token (token đi vào `curl` qua stdin); service account không có vai trò Google Cloud nào; xoay vòng hằng năm | Review `ci/notify-search.sh`; danh sách user trong Search Console | Có; thu hồi theo repo infra |
 | T10 | Người khác dùng khoá IndexNow (công khai theo thiết kế) gửi URL của `thehot.vn` | A1 | Gửi nhiều có thể làm IndexNow tạm từ chối site (429); chỉ gửi được URL trên `thehot.vn` | Chấp nhận; đổi khoá bằng cách đổi tên file `public/<khoá>.txt` | Log stage Notify search engines | Rủi ro chấp nhận |
+| T11 | Lộ phiên đăng nhập Google trong profile Chrome của script Rich Results Test ([ADR 0010](../adr/0010-check-rich-results-with-signed-in-chrome.md)) | A2 → mã độc hoặc người khác trên máy dev; A4 → chép hoặc commit thư mục profile | Dùng được tài khoản Google đó như chủ của nó; nếu tài khoản có quyền Search Console hoặc Business Profile của quán thì mất TS3 | Profile riêng, không phải profile Chrome hằng ngày, nằm ngoài repo (`~/.local/share/thehot-rrt/`, quyền `0700`); script không đọc hay in cookie, trang kết quả được tải không kèm cookie; không chạy trong CI | `stat` thư mục profile; Google Account → Security → Your devices | Một phần: `[CẦN XÁC NHẬN: tài khoản đang đăng nhập trong profile có quyền gì với Search Console, Business Profile của quán]` |
 
 ## 4. Lớp bảo vệ
 
@@ -118,6 +119,7 @@ Ranh giới cần giữ:
 - [x] T04: ghi Cloudflare Web Analytics vào `/privacy` ([ADR 0007](../adr/0007-use-umami-and-consent-gated-ga4.md)); thay mục "Tùy chọn hiển thị" của `/privacy` bằng "Cookie và lưu trữ trên trình duyệt" (code không dùng cookie, `sessionStorage` hay `localStorage`) · spec 004 PR A, chữ chờ chủ quán duyệt. Nếu sau này tắt Cloudflare Web Analytics thì bỏ mục đó.
 - [ ] L8: chọn và bật quét secret.
 - [ ] L9: quyết định ngưỡng chặn theo kết quả quét lỗ hổng image.
+- [ ] T11: kiểm tài khoản Google đang đăng nhập trong profile của script Rich Results Test; nếu có quyền Search Console hoặc Business Profile của quán thì đổi sang tài khoản không có quyền (`RRT_PROFILE` trỏ tới thư mục mới, chạy `check.mjs --login`), rồi đăng xuất phiên cũ.
 
 ## 7. Rủi ro đã chấp nhận
 
