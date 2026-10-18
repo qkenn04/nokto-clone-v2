@@ -1,6 +1,6 @@
 # Chính sách CI/CD
 
-> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-14 · Liên quan: [Triển khai](deployment.md), [Jenkins + registry](providers/jenkins-registry.md), [VPS + Docker Compose](runtimes/vps-docker-compose.md), [Mô hình đe doạ](../security/threat-model.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-18 · Liên quan: [Triển khai](deployment.md), [Jenkins + registry](providers/jenkins-registry.md), [VPS + Docker Compose](runtimes/vps-docker-compose.md), [Mô hình đe doạ](../security/threat-model.md)
 
 File gồm hai phần: mục 0 là hiện trạng của dự án so với chính sách (nguồn sự thật cho câu hỏi "pipeline đang thiếu gì"); mục 1–15 là chính sách chung lấy từ docs-template, không phụ thuộc GitHub, Jenkins hay Docker Compose, dùng làm đích khi cải tiến pipeline. Cách làm cụ thể: [Triển khai](deployment.md).
 
@@ -12,7 +12,7 @@ Tính tới 2026-10-14, theo `Jenkinsfile`, `Dockerfile`, `ci/` và tài liệu 
 |---|---|---|
 | Review thay đổi (mục 4) | Thay đổi đi qua PR vào `main` trên GitHub | `main` chưa bật branch protection, chưa bắt buộc review (kiểm 2026-10-15; chủ quán chưa cần, khuyến nghị cân nhắc sau).. Không có status check: PR không được build trước khi merge |
 | Kiểm lại commit sau merge (mục 4, 5) | Mỗi commit trên `main` chạy lại lint, typecheck, guard sitemap, build, smoke test | Không có unit test, test tích hợp, quét secret, quét phụ thuộc |
-| Build một lần, artifact bất biến (mục 6) | Build một lần mỗi commit; image đã smoke test là image được deploy; tag = commit SHA đầy đủ | Deploy theo tag, chưa theo digest. `[CẦN XÁC NHẬN: Harbor đã bật tag immutability cho project chưa]` |
+| Build một lần, artifact bất biến (mục 6) | Build một lần mỗi commit; image đã smoke test là image được deploy; tag = commit SHA đầy đủ | Deploy theo tag, chưa theo digest. Harbor chưa bật tag immutability cho project (kiểm 2026-10-18), nên push lại cùng tag sẽ thay image; build lại một commit đã có image thì kéo image đó về dùng lại, không build và push lần nữa ([Triển khai, mục 5](deployment.md#5-ci)) |
 | Chuỗi cung ứng (mục 7) | Lockfile + `npm ci`; image nền ghim tag và `--pull` mỗi build; nhãn OCI `revision`, `source` | Chưa có SBOM, chữ ký, provenance; pipeline không chặn theo kết quả quét lỗ hổng; image nền chưa ghim digest |
 | Bí mật (mục 8) | Ứng dụng không có bí mật lúc chạy; bí mật CI trong Jenkins Credentials, bind theo stage; không có job PR nào chạm bí mật | — |
 | Môi trường và promotion (mục 9) | Chỉ có production | Không có staging; smoke test trên máy CI thay cho bước kiểm trên staging |

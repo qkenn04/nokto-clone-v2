@@ -1,7 +1,8 @@
 // Build, test and deploy https://thehot.vn (thehot.k2-tech.dev and nokto.qkenn.cloud redirect there).
 //
 // Runs on the qkenn-ci Jenkins (infra-qkenn/ci/jenkins). The `docker` agent talks to its own
-// Docker daemon, images go to the Harbor registry on the same machine, and the deploy is one SSH
+// Docker daemon, images go to the Harbor registry on the same machine (a commit whose image is already there pulls and
+// smoke-tests that image instead of building it again), and the deploy is one SSH
 // call to a forced command on the VPS (/srv/nokto/deploy.sh) that pulls the image by commit SHA,
 // waits for its healthcheck and rolls back to the previous image if it fails.
 // A failure before the Deploy stage never touches the VPS. After a deploy, search engines are told which pages changed
@@ -55,21 +56,48 @@ pipeline {
   }
 
   stages {
+    stage('Existing image') {
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'harbor-robot-push',
+                                          usernameVariable: 'HARBOR_USER', passwordVariable: 'HARBOR_TOKEN')]) {
+          script {
+            def pulled = sh(returnStatus: true, script: '''
+              echo "$HARBOR_TOKEN" | docker login "$REGISTRY" --username "$HARBOR_USER" --password-stdin >/dev/null || exit 1
+              status=0
+              docker pull -q "$IMAGE:$GIT_COMMIT" >/dev/null || status=$?
+              docker logout "$REGISTRY" >/dev/null || true
+              exit $status
+            ''')
+            env.IMAGE_EXISTS = pulled == 0 ? 'true' : 'false'
+          }
+        }
+        script {
+          if (env.IMAGE_EXISTS == 'true') {
+            echo "${env.IMAGE}:${env.GIT_COMMIT} đã có trên Harbor: bỏ qua sitemap dates, check, build, push; smoke test image này"
+            currentBuild.description = "${env.GIT_COMMIT.substring(0, 7)} · image có sẵn trên Harbor"
+          }
+        }
+      }
+    }
+
     // The Docker build has no .git, so the sitemap <lastmod> dates are computed here from the full
     // history into src/generated/sitemap-lastmod.json, which goes into the build context.
     stage('Sitemap dates') {
+      when { expression { env.IMAGE_EXISTS != 'true' } }
       steps {
         sh 'bash ci/sitemap-lastmod.sh'
       }
     }
 
     stage('Check') {
+      when { expression { env.IMAGE_EXISTS != 'true' } }
       steps {
         sh 'docker build --target check --progress=plain .'
       }
     }
 
     stage('Build') {
+      when { expression { env.IMAGE_EXISTS != 'true' } }
       steps {
         sh '''
           docker build --target runner --pull --progress=plain \
@@ -90,6 +118,7 @@ pipeline {
     }
 
     stage('Push') {
+      when { expression { env.IMAGE_EXISTS != 'true' } }
       steps {
         withCredentials([usernamePassword(credentialsId: 'harbor-robot-push',
                                           usernameVariable: 'HARBOR_USER', passwordVariable: 'HARBOR_TOKEN')]) {
