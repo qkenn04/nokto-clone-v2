@@ -33,7 +33,7 @@
 
 ## Phần D, E: ảnh
 
-- [ ] 002-T30 Rà alt ảnh nội dung trên 7 trang · AC: 002-AC-07 · làm cùng 001-T42 nếu ảnh mới đã có · gồm alt poster "ảnh minh hoạ chương trình …" của sự kiện 16/10, 17/10 (sự kiện đã là thật)
+- [x] 002-T30 Rà alt ảnh nội dung trên 7 trang · AC: 002-AC-07 · gồm alt poster "ảnh minh hoạ chương trình …" của sự kiện 16/10, 17/10 (sự kiện đã là thật) · PR `seo/image-alt`, 2026-10-18: 50 `<img>` trên HTML production, 0 thiếu `alt`, ảnh `alt=""` đều trang trí; alt poster tả ảnh sân khấu; `jsx-a11y/alt-text` lên mức error. Ảnh mới của 001-T42 kiểm alt theo [Kiểm thử, mục 6](../../dev/testing.md#6-kiểm-tay-m)
 - [ ] 002-T31 Ảnh chia sẻ 1200×630 riêng cho `/menu`, `/about`, `/reservation` · chặn bởi 001-T40
 - [ ] 002-T32 Dọn tệp template NOKTO không còn dùng trong `public/sites/nokto/` (giữ `hero-backdrop.jpg` và các SVG còn dùng; chủ quán quyết định giữ ảnh nền, 2026-10-14)
 

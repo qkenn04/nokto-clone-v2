@@ -4,7 +4,7 @@
 
 Những gì Google, Facebook và Zalo đọc được từ chính các trang của https://thehot.vn: tiêu đề và mô tả trong kết quả tìm kiếm, ảnh khi chia sẻ link, dữ liệu có cấu trúc (JSON-LD) về quán, chữ alt của ảnh và phần chữ giới thiệu trên trang. Mục tiêu là để người tìm "quán nhậu chill Đà Lạt", "beer garden Đà Lạt" hay tên quán thấy đúng trang, với thông tin khớp Google Business Profile.
 
-Hiện thực: phần A (tiêu đề, mô tả) và phần B (ảnh chia sẻ) chạy trên production từ Jenkins build #16 (PR #5, PR #6). Phần C: sự kiện 16/10, 17/10 đã bỏ nhãn minh hoạ (PR #8, Jenkins build #17, 2026-10-15); JSON-LD đợt 1 và `/favicon.ico` lên production (PR #10, merge `aafd52b`, Jenkins build #20, 2026-10-15), Google đã đọc: rich result Events PASS; giờ đóng cửa, khoảng giá, thanh toán, nhạc sống chờ chủ quán trả lời (mục 12). Phần D, E chưa làm. Phần F: khối giới thiệu (H2 có từ khoá, 3 đoạn chữ) và chữ link "Xem menu nhậu" ở nhánh `content/home-intro`; hỏi đáp còn chờ chủ quán. Trạng thái chi tiết ở [tasks.md](tasks.md).
+Hiện thực: phần A (tiêu đề, mô tả) và phần B (ảnh chia sẻ) chạy trên production từ Jenkins build #16 (PR #5, PR #6). Phần C: sự kiện 16/10, 17/10 đã bỏ nhãn minh hoạ (PR #8, Jenkins build #17, 2026-10-15); JSON-LD đợt 1 và `/favicon.ico` lên production (PR #10, merge `aafd52b`, Jenkins build #20, 2026-10-15), Google đã đọc: rich result Events PASS; giờ đóng cửa, khoảng giá, thanh toán, nhạc sống chờ chủ quán trả lời (mục 12). Phần D: alt đã rà trên 7 trang, lint chặn ảnh thiếu alt (PR `seo/image-alt`). Phần E chưa làm. Phần F: khối giới thiệu (H2 có từ khoá, 3 đoạn chữ) và chữ link "Xem menu nhậu" ở nhánh `content/home-intro`; hỏi đáp còn chờ chủ quán. Trạng thái chi tiết ở [tasks.md](tasks.md).
 
 ## 1. Mục tiêu
 
@@ -89,9 +89,11 @@ Mọi trang có `og:image` là thẻ chia sẻ chung `/opengraph-image.png` (120
 
 Không dùng `FAQPage`: từ 2023 Google chỉ hiện kết quả hỏi đáp cho trang chính phủ và y tế.
 
-### Phần D: alt của ảnh (chưa làm)
+### Phần D: alt của ảnh (xong)
 
 Ảnh có nội dung (món ăn, không gian, menu, sự kiện) có alt mô tả, chứa từ khoá tự nhiên. 12 trang ảnh menu Premium đã có alt liệt kê món chính (`menuPages.ts`, 2026-10-15). Ảnh trang trí giữ `alt=""`. Chỉ dùng "nhạc sống" khi chủ quán xác nhận.
+
+Rà 2026-10-18 trên HTML production của 7 trang: 50 thẻ `<img>`, không thẻ nào thiếu `alt`; ảnh `alt=""` đều là trang trí (ảnh nền `hero-backdrop.jpg`, các trang menu xếp chồng phía sau trang đang mở, SVG, poster video trong `aria-hidden`). Poster của hai sự kiện thật 16/10, 17/10 bỏ chữ "ảnh minh hoạ chương trình …", alt tả ảnh sân khấu; sự kiện còn nhãn minh hoạ giữ chữ đó. Lint chặn `<img>`, `<Image>` thiếu `alt` (`jsx-a11y/alt-text` mức error); alt rỗng hay sai lấy từ dữ liệu vẫn kiểm tay ([Kiểm thử, mục 6](../../dev/testing.md#6-kiểm-tay-m)).
 
 ### Phần E: ảnh chia sẻ riêng từng trang (chưa làm)
 
@@ -191,3 +193,4 @@ Phần A, B: M1. Phần C–F: M2 ([lộ trình](../../plan/roadmap.md#m2-on-pag
 | 2026-10-15 | Phần A: đề xuất mô tả mới cho `/menu`, `/menu/list` sau khi thêm menu Premium (chờ duyệt); phần D: alt cho 12 trang menu Premium |
 | 2026-10-18 | Thêm phần G (link trang ở footer, khoảng đệm cho cụm nút liên hệ) và 002-AC-10, 002-AC-11 |
 | 2026-10-18 | Phần F: khối giới thiệu ở trang chủ (H2, ba đoạn, link) và chữ link "Xem menu nhậu"; hỏi đáp còn chờ |
+| 2026-10-18 | Phần D xong: kết quả rà alt 7 trang, alt poster hai sự kiện thật, lint chặn ảnh thiếu alt |
