@@ -1,6 +1,6 @@
 # 002: SEO trên trang
 
-> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-15 · Liên quan: [Mục lục spec](../README.md), [plan.md](plan.md), [tasks.md](tasks.md), [Mục lục ADR](../../adr/README.md) (ADR 0005), [Lộ trình M1, M2](../../plan/roadmap.md#m2-on-page-và-dữ-liệu-có-cấu-trúc)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-18 · Liên quan: [Mục lục spec](../README.md), [plan.md](plan.md), [tasks.md](tasks.md), [Mục lục ADR](../../adr/README.md) (ADR 0005), [Lộ trình M1, M2](../../plan/roadmap.md#m2-on-page-và-dữ-liệu-có-cấu-trúc)
 
 Những gì Google, Facebook và Zalo đọc được từ chính các trang của https://thehot.vn: tiêu đề và mô tả trong kết quả tìm kiếm, ảnh khi chia sẻ link, dữ liệu có cấu trúc (JSON-LD) về quán, chữ alt của ảnh và phần chữ giới thiệu trên trang. Mục tiêu là để người tìm "quán nhậu chill Đà Lạt", "beer garden Đà Lạt" hay tên quán thấy đúng trang, với thông tin khớp Google Business Profile.
 
@@ -83,7 +83,7 @@ Mọi trang có `og:image` là thẻ chia sẻ chung `/opengraph-image.png` (120
 | `priceRange` | [CẦN XÁC NHẬN: khoảng giá — chưa xác định, cần chủ quán xác nhận] | Chủ quán | Chưa (`pendingFacts`) |
 | `paymentAccepted` | [CẦN XÁC NHẬN: hình thức thanh toán — chưa xác định, cần chủ quán xác nhận] | Chủ quán | Chưa (`pendingFacts`) |
 | `amenityFeature` | Chỗ ngồi ngoài trời. Nhạc sống: [CẦN XÁC NHẬN: có nhạc sống không, tối nào — chưa xác định, cần chủ quán xác nhận] | Hồ sơ Google ghi cả hai; chỉ dùng "nhạc sống" khi chủ quán xác nhận | Chỗ ngồi ngoài trời: có. Nhạc sống: chưa (`pendingFacts`) |
-| Khác | `acceptsReservations` (URL `/reservation`), `hasMenu` (`/menu`), `servesCuisine`, `currenciesAccepted` | `site.ts` | Có |
+| Khác | `acceptsReservations` (URL `/reservation`), `menu` và `hasMenu` (`/menu/list`: bản chữ có giá, máy đọc được; `/menu` là ảnh), `servesCuisine`, `currenciesAccepted` | `site.ts` | Có |
 | Nút `WebSite` | `name` "The Hot Beer Garden" (tên site Google hiện trong kết quả), `alternateName`, `url`, `inLanguage: vi-VN`, `publisher` trỏ về quán; không có `SearchAction` (site không có ô tìm kiếm) | Đề xuất | Có |
 | Nút `Event` | Chỉ cho sự kiện thật (không có `illustrative`). Chủ quán xác nhận hai sự kiện 16/10 (Friday on Fire, 19:00–00:30) và 17/10 (Hot Saturday, 19:30–00:30) là thật; PR #8 (2026-10-15) đã bỏ `illustrative` và nhãn "Chương trình minh hoạ" của hai sự kiện này. Chỉ xuất trên `/`, trang hiện dòng sự kiện | Dữ liệu sự kiện trên trang chủ | Có: 16/10, 17/10 và "Sạc pin đêm" 10/10 (chỉ có ngày); không có `offers` |
 

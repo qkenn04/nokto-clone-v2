@@ -49,7 +49,8 @@ function restaurantNode(): JsonLdNode {
     // A few real photos of the venue from the home gallery, then the share card.
     image: [...galleryPhotos.slice(0, 5).map((photo) => absolute(photo.src)), absolute("/opengraph-image.png")],
     servesCuisine: site.cuisine,
-    hasMenu: absolute("/menu"),
+    menu: absolute("/menu/list"),
+    hasMenu: absolute("/menu/list"),
     acceptsReservations: absolute("/reservation"),
     currenciesAccepted: "VND",
     amenityFeature: [...site.amenities, ...(liveMusic ? ["Nhạc sống"] : [])].map(amenity),
