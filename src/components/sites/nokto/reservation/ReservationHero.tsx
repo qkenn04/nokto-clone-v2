@@ -58,6 +58,7 @@ export function ReservationHero() {
                   transition={{ duration: 0.8, delay: 0.25 + 0.12 * index, ease: EASE_CINEMA }}
                   className="block"
                 >
+                  {index > 0 ? " " : null}
                   {line}
                 </motion.span>
               ))}
