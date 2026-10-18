@@ -1,6 +1,6 @@
 # CI/CD provider: Jenkins + Harbor
 
-> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-15 · Liên quan: [Chính sách CI/CD](../ci-cd-core.md), [Triển khai](../deployment.md), [VPS + Docker Compose](../runtimes/vps-docker-compose.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-18 · Liên quan: [Chính sách CI/CD](../ci-cd-core.md), [Triển khai](../deployment.md), [VPS + Docker Compose](../runtimes/vps-docker-compose.md)
 
 Áp dụng [chính sách CI/CD](../ci-cd-core.md) bằng Jenkins Pipeline (`Jenkinsfile` ở gốc repo) và registry Harbor, cả hai chạy trên máy CI riêng. Cài đặt Jenkins (JCasC, plugin, job), Harbor và tài khoản robot nằm ở `qkenn04/infra-qkenn` (`ci/`). Tính tới 2026-10-14.
 
@@ -13,14 +13,15 @@
 | Kích hoạt | Webhook hoặc poll | `pollSCM('H/5 * * * *')` trên nhánh `main` |
 | Registry | Registry riêng; publish và deploy theo digest | Harbor, image `nokto/web:<commit sha>`; deploy theo tag |
 | Cổng duyệt production | `input` hoặc hệ thống quản lý release | Không có: commit trên `main` tự deploy |
-| Bí mật | Jenkins Credentials, bind theo stage | `withCredentials` chỉ trong stage Push, Deploy, Notify search engines và khối thông báo |
+| Bí mật | Jenkins Credentials, bind theo stage | `withCredentials` chỉ trong stage Existing image, Push, Deploy, Notify search engines và khối thông báo |
 | Khoá deploy | Lockable Resources hoặc tương đương, cộng khoá ở runtime | `disableConcurrentBuilds()`; khoá trong script deploy trên VPS |
 | Bằng chứng | Build record, test report, manifest | Log build Jenkins (giữ 20 build), thông báo Discord |
 
 ## 2. Pipeline
 
 ```text
-main (sau merge) → Sitemap dates → Check → Build (một lần) → Smoke test image
+main (sau merge) → Existing image (commit đã có image trên Harbor: kéo về, nhảy tới Smoke test)
+→ Sitemap dates → Check → Build (một lần) → Smoke test image
 → Push Harbor → Sitemap snapshot → Deploy (SSH, forced command) → healthcheck trên VPS, lỗi thì quay về image trước
 → Notify search engines (Google sitemaps.submit, IndexNow; lỗi chỉ làm stage vàng)
 ```
@@ -31,8 +32,9 @@ Chi tiết từng stage: [Triển khai, mục 5](../deployment.md#5-ci). Không 
 
 | Stage | Agent | Bí mật được bind |
 |---|---|---|
+| Existing image | Agent `docker` | Tài khoản robot của stage Push, chỉ để kéo image; đăng xuất ngay sau khi kéo |
 | Sitemap dates, Check, Build, Smoke test | Agent `docker` | Không |
-| Push | Agent `docker` | Tài khoản robot chỉ có quyền push, đăng xuất trong `post { always }` |
+| Push | Agent `docker` | Tài khoản robot chỉ có quyền push và pull trong project này, đăng xuất trong `post { always }` |
 | Sitemap snapshot | Agent `docker` | Không |
 | Deploy | Agent `docker` | Khoá SSH chỉ chạy được lệnh deploy; file host key đã ghim (`StrictHostKeyChecking=yes`, không bao giờ tắt) |
 | Notify search engines | Agent `docker` | File khoá service account Google (user của property Search Console, không có quyền Google Cloud). Thiếu credential thì vẫn chạy phần IndexNow, stage vàng |
@@ -44,7 +46,7 @@ Tên credential, cách xoay vòng và quyền của tài khoản robot: repo inf
 
 1. Checkout đúng commit trên `main` với **lịch sử đầy đủ** (không shallow clone): stage Sitemap dates cần `git log` ([ADR 0004](../../adr/0004-automate-sitemap-from-page-config-and-git.md)).
 2. Agent có `git`, `jq`, `bash`, `docker`.
-3. Build image một lần, smoke test chính image đó, push với tag là `$GIT_COMMIT`.
+3. Build image một lần, smoke test chính image đó, push với tag là `$GIT_COMMIT`. Commit đã có image trên Harbor thì kéo image đó về và smoke test, không build và push lần nữa: build lại không ra image giống từng byte, và project chưa bật tag immutability nên push lại sẽ thay image dưới cùng tag.
 4. Gọi deploy với đúng `$GIT_COMMIT`; script trên VPS kéo đúng tag đó.
 5. Dọn image khỏi Docker của máy CI sau build và dọn build cache cũ hơn 7 ngày (`post { cleanup }`).
 

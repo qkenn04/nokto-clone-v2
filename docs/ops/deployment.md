@@ -1,6 +1,6 @@
 # Triển khai
 
-> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-15 · Liên quan: [ADR 0009](../adr/0009-notify-search-engines-after-deploy.md), [Kiến trúc](../architecture/ARCHITECTURE.md), [Cấu hình](../dev/configuration.md), [Kiểm thử](../dev/testing.md), [Runbook](runbooks/README.md), [Postmortem](postmortems/README.md), [CI/CD core](ci-cd-core.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-18 · Liên quan: [ADR 0009](../adr/0009-notify-search-engines-after-deploy.md), [Kiến trúc](../architecture/ARCHITECTURE.md), [Cấu hình](../dev/configuration.md), [Kiểm thử](../dev/testing.md), [Runbook](runbooks/README.md), [Postmortem](postmortems/README.md), [CI/CD core](ci-cd-core.md)
 
 Code đi từ một PR tới https://thehot.vn thế nào, kiểm sau deploy ra sao, và lùi lại bằng cách nào. Repo công khai: file này mô tả ở mức `Jenkinsfile` đã thể hiện. Script deploy trên VPS, compose stack, cấu hình nginx, cài đặt Jenkins và Harbor, quy trình quản trị nằm ở repo riêng `qkenn04/infra-qkenn`. Tính tới 2026-10-14.
 
@@ -62,6 +62,7 @@ Một pipeline duy nhất trong `Jenkinsfile`, chạy trên agent nhãn `docker`
 
 | Stage | Làm gì | Hỏng thì |
 |---|---|---|
+| Existing image | Kéo `$IMAGE:$GIT_COMMIT` từ Harbor bằng robot của stage Push, đăng xuất ngay. Kéo được (commit đã build trước đó): bỏ qua Sitemap dates, Check, Build, Push; Smoke test chạy trên image vừa kéo, rồi deploy như thường | Không dừng: kéo lỗi thì build như commit mới |
 | Sitemap dates | `bash ci/sitemap-lastmod.sh`: tính `lastmod` từ lịch sử git, ghi `src/generated/sitemap-lastmod.json` ([ADR 0004](../adr/0004-automate-sitemap-from-page-config-and-git.md)) | Dừng; VPS không bị đụng |
 | Check | `docker build --target check`: lint, typecheck, `check:sitemap` | Như trên |
 | Build | `docker build --target runner --pull` với `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_UMAMI_WEBSITE_ID`, `NEXT_PUBLIC_UMAMI_SRC` và nhãn OCI | Như trên |
