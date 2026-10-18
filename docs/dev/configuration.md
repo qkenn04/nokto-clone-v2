@@ -1,6 +1,6 @@
 # Cấu hình
 
-> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-15 · Liên quan: [Triển khai](../ops/deployment.md), [Kiểm thử](testing.md), [Kiến trúc](../architecture/ARCHITECTURE.md), [Mô hình đe doạ](../security/threat-model.md), [Tài liệu](../README.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-18 · Liên quan: [Triển khai](../ops/deployment.md), [Kiểm thử](testing.md), [Kiến trúc](../architecture/ARCHITECTURE.md), [Mô hình đe doạ](../security/threat-model.md), [Tài liệu](../README.md)
 
 Ứng dụng gần như không có cấu hình lúc chạy: nội dung nằm trong code, không có cơ sở dữ liệu, không có bí mật. Cấu hình quan trọng nhất là **build arg** `NEXT_PUBLIC_SITE_URL` và file ngày sitemap do CI sinh; hai build arg của Umami bật hoặc tắt thống kê truy cập. Tính tới 2026-10-15.
 
@@ -65,6 +65,15 @@ Không vào image. Stage `Sitemap snapshot` và `Notify search engines` trong `J
 
 Khoá IndexNow **không phải bí mật**: IndexNow đọc nó từ `https://thehot.vn/<khoá>.txt`. Khoá là tên file `public/<32 ký tự hex>.txt`, nội dung file đúng bằng khoá; repo chỉ được có một file như vậy. Đổi khoá: tạo file mới bằng `openssl rand -hex 16`, xoá file cũ, cùng một PR.
 
+### 2.6 Script kiểm Rich Results Test (`scripts/rich-results/check.mjs`, chạy trên máy dev)
+
+Không vào image, không chạy trong CI ([ADR 0010](../adr/0010-check-rich-results-with-signed-in-chrome.md)); cách chạy ở [Kiểm thử, mục 3.2](testing.md#32-rich-results-test-script-đọc-kết-quả).
+
+| Biến | Mặc định | Bí mật | Nghĩa |
+|---|---|---|---|
+| `RRT_PROFILE` | `~/.local/share/thehot-rrt/chrome-profile` | **có**: thư mục giữ phiên đăng nhập Google | Profile Chrome riêng của script, tách khỏi profile Chrome dùng hằng ngày; nằm ngoài repo, quyền `0700`. Tạo và đăng nhập bằng `check.mjs --login` |
+| `RRT_HEADLESS` | không đặt | không | `1`: chạy Chrome không cửa sổ; Google thường từ chối ("Something went wrong") |
+
 ## 3. Kiểm cấu hình
 
 Ứng dụng không tự kiểm biến lúc khởi động. Lỗi cấu hình được bắt ở CI:
@@ -88,6 +97,8 @@ Khoá IndexNow **không phải bí mật**: IndexNow đọc nó từ `https://th
 Ứng dụng: không có bí mật.
 
 Đường giao hàng (Jenkins): có năm loại bí mật — thông tin đăng nhập để push image lên registry, khoá SSH deploy (chỉ chạy được lệnh deploy), file host key đã ghim của VPS, URL webhook Discord, khoá service account Google cho Search Console (không có quyền Google Cloud nào; chỉ là user của property `thehot.vn`, dùng để gửi lại sitemap). Tất cả giữ trong Jenkins Credentials và chỉ được bind trong stage cần dùng (`withCredentials` trong `Jenkinsfile`). Danh mục, chủ sở hữu và cách xoay vòng: `qkenn04/infra-qkenn`. Lộ một trong số đó: xoay ngay theo tài liệu của repo infra, rồi ghi vào [mô hình đe doạ](../security/threat-model.md) nếu cần thêm lớp bảo vệ. Khoá service account Google xoay vòng hằng năm; thu hồi bằng cách xoá khoá trong Google Cloud và gỡ service account khỏi user của property Search Console (các bước ở repo infra).
+
+Máy dev: profile Chrome của script Rich Results Test (`RRT_PROFILE`, mục 2.6) giữ phiên đăng nhập của một tài khoản Google. Thư mục này không bao giờ nằm trong repo. Rich Results Test không đòi quyền với site được kiểm (2026-10-18 đã kiểm một đoạn code trên tên miền giả `example-test.site`), nên tài khoản dùng ở đây không cần quyền gì với Search Console hay Google Business Profile của quán. Thu hồi: Google Account → Security → Your devices → đăng xuất phiên của Chrome đó, hoặc xoá thư mục profile ([mô hình đe doạ, T11](../security/threat-model.md#33-bảng-đe-doạ)).
 
 ## 6. Cấu hình trong code
 
