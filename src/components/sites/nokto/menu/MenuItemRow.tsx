@@ -18,11 +18,14 @@ export function MenuItemRow({ item }: { item: MenuItem }) {
         <Heading as="h3" level="h3" family="sans">
           {item.name}
           {item.subtitle ? (
-            <span className="ml-2" lang="en">
-              <Text as="span" variant="body" tone="muted">
-                {item.subtitle}
-              </Text>
-            </span>
+            <>
+              {" "}
+              <span className="ml-1" lang="en">
+                <Text as="span" variant="body" tone="muted">
+                  {item.subtitle}
+                </Text>
+              </span>
+            </>
           ) : null}
         </Heading>
         {item.description ? <Text variant="small" tone="low">{item.description}</Text> : null}
