@@ -169,7 +169,7 @@ export function EventTimeline() {
               visible: { scaleX: 1, transition: { duration: reduce ? 0 : 0.55, delay: reduce ? 0 : 0.2, ease: EASE_CINEMA } },
             }}
           />
-          <Heading as="h2" level="closing" className={styles.closingTitle}>Tối nay gặp nhau<br /><span>ở The Hot?</span></Heading>
+          <Heading as="h2" level="closing" className={styles.closingTitle}>Tối nay gặp nhau{" "}<br /><span>ở The Hot?</span></Heading>
           <Text variant="small" className={styles.closingNote}>Chọn giờ, chốt bàn, kéo hội mình tới.</Text>
         </motion.div>
         <motion.div

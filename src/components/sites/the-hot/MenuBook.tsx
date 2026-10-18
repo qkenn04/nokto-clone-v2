@@ -725,6 +725,7 @@ export function MenuBook() {
             <Text variant="label" tone="muted">Menu nhậu — The Hot</Text>
             <Heading as="h1" level="h1" id="hot-menu-title" balance={false}>
               <span className="block">Lật menu.</span>
+              {" "}
               <span className="block text-accent">Chốt món.</span>
             </Heading>
             <Text variant="body" tone="muted" measure="comfort">Mồi bén, bia lạnh — đủ gu cho cả hội.</Text>

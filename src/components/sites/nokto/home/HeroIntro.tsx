@@ -59,6 +59,7 @@ function HeroHeadline({ reduce }: { reduce: boolean }) {
     <Heading as="h1" level="display" aria-label={site.slogan} className={styles.headline}>
       <span aria-hidden="true" className={styles.lettering}>
         <span className={styles.opening}>{copy.opening}</span>
+        {" "}
         <span className={styles.brandLine}>
           {Array.from(copy.brand).map((letter, index) => (
             <span
@@ -70,6 +71,7 @@ function HeroHeadline({ reduce }: { reduce: boolean }) {
             </span>
           ))}
         </span>
+        {" "}
         <motion.span
           style={{ rotate: -3 }}
           whileHover={reduce ? undefined : { rotate: 0, scale: 1.025 }}
