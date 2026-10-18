@@ -105,7 +105,7 @@ Các định danh cần phân biệt:
 | Artifact tag | Tìm kiếm và truy vết |
 | Artifact digest | Cố định chính xác nội dung để deploy |
 
-Deploy dùng digest đầy đủ: tên image, `@sha256:` và 64 ký tự hex do registry trả về sau khi push (ví dụ `nokto/web@sha256:` + digest), thay vì tag như `nokto/web:<commit sha>`. Dự án này hiện deploy theo tag (mục 0).
+Deploy dùng digest đầy đủ: tên image, `@sha256:` và 64 ký tự hex do registry trả về sau khi push (ví dụ `thehot/web@sha256:` + digest), thay vì tag như `thehot/web:<commit sha>`. Dự án này hiện deploy theo tag (mục 0).
 
 ## 7. Security supply chain
 

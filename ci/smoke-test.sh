@@ -14,7 +14,7 @@ set -euo pipefail
 IMAGE="${1:?usage: ci/smoke-test.sh <image> [site-url] [umami-website-id]}"
 SITE_URL="${2:-https://thehot.vn}"
 UMAMI_WEBSITE_ID="${3:-}"
-NAME="nokto-smoke-${BUILD_NUMBER:-local}-$$"
+NAME="thehot-smoke-${BUILD_NUMBER:-local}-$$"
 
 cleanup() { docker rm -f "$NAME" >/dev/null 2>&1 || true; }
 trap cleanup EXIT

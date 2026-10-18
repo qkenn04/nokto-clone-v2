@@ -9,7 +9,7 @@ body:
         Thanks for reporting a problem with the website. This form is for the site itself: layout, broken links or buttons, wrong text, slow or missing pages.
 
         - For bookings or questions about the venue, use the contact options on https://thehot.vn.
-        - For a security problem, do not use this form. Follow [SECURITY.md](https://github.com/qkenn04/nokto-clone-v2/blob/main/SECURITY.md) instead.
+        - For a security problem, do not use this form. Follow [SECURITY.md](https://github.com/qkenn04/thehot/blob/main/SECURITY.md) instead.
 
   - type: input
     id: page-url

@@ -1,6 +1,6 @@
 # Kiến trúc The Hot Beer Garden (thehot.vn)
 
-> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-15 · Liên quan: [Đặc tả sản phẩm](../product/spec.md), [Yêu cầu phi chức năng](../product/nfr.md), [Mô hình dữ liệu nội dung](data-model.md), [Sơ đồ](diagrams/README.md), [Mục lục ADR](../adr/README.md), [Triển khai](../ops/deployment.md), [Mô hình đe doạ](../security/threat-model.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-18 · Liên quan: [Đặc tả sản phẩm](../product/spec.md), [Yêu cầu phi chức năng](../product/nfr.md), [Mô hình dữ liệu nội dung](data-model.md), [Sơ đồ](diagrams/README.md), [Mục lục ADR](../adr/README.md), [Triển khai](../ops/deployment.md), [Mô hình đe doạ](../security/threat-model.md)
 
 Tính tới 2026-10-14. Repo công khai: tài liệu này chỉ mô tả hạ tầng ở mức đã thấy trong `Jenkinsfile`. Địa chỉ máy chủ, cổng nội bộ, đường dẫn trên máy chủ, cấu hình nginx và script deploy nằm ở repo riêng tư `qkenn04/infra-qkenn`.
 
@@ -64,9 +64,9 @@ flowchart LR
   end
   subgraph CI["Máy CI"]
     jenkins["Jenkins<br/>[Container: controller + agent docker]<br/>Chạy Jenkinsfile"]
-    harbor[("Harbor<br/>[Container: registry]<br/>nokto/web:commit-sha")]
+    harbor[("Harbor<br/>[Container: registry]<br/>thehot/web:commit-sha")]
   end
-  github["GitHub<br/>[Hệ thống ngoài]<br/>qkenn04/nokto-clone-v2, nhánh main"]
+  github["GitHub<br/>[Hệ thống ngoài]<br/>qkenn04/thehot, nhánh main"]
 
   guest -->|"HTTPS"| cf
   cf -->|"HTTPS, Full (strict)"| nginx
@@ -85,7 +85,7 @@ flowchart LR
 | Ứng dụng web | Next.js 16.3.5, React 19, Node 24 (`node:24.14.1-slim`), user `node` | Phục vụ 7 trang, `sitemap.xml`, `robots.txt`, `/_next/image`, file tĩnh trong `public/`; có Docker `HEALTHCHECK` | Container trên VPS, chỉ nghe trong máy | Nội dung build sẵn trong image | [0004](../adr/0004-automate-sitemap-from-page-config-and-git.md), [0005](../adr/0005-separate-search-titles-from-headings.md), [0006](../adr/0006-prioritize-lcp-with-fetchpriority.md) |
 | Script deploy | Shell, Docker Compose | Kéo image theo commit SHA, đợi healthcheck, tự quay về image trước khi lỗi; giữ 3 image gần nhất | VPS (nguồn ở `qkenn04/infra-qkenn`) | Image đã kéo | — |
 | Jenkins | Jenkins Pipeline, agent nhãn `docker` | Chạy `Jenkinsfile`: tính ngày sitemap, kiểm, build, smoke test, push, deploy; sau deploy báo máy tìm kiếm trang nào đổi ([ADR 0009](../adr/0009-notify-search-engines-after-deploy.md)); báo kết quả lên Discord | Máy CI (nguồn ở `qkenn04/infra-qkenn`) | Lịch sử build | — |
-| Harbor | Harbor | Lưu image `nokto/web:<commit sha>` | Máy CI | Image | — |
+| Harbor | Harbor | Lưu image `thehot/web:<commit sha>` | Máy CI | Image | — |
 | GitHub | Dịch vụ ngoài | Nguồn code, PR, review | GitHub | Lịch sử git (cũng là nguồn ngày `lastmod`) | [0004](../adr/0004-automate-sitemap-from-page-config-and-git.md) |
 | Google Search Console API, IndexNow | Dịch vụ ngoài | Nhận tin "sitemap đã đổi" (Google, `sitemaps.submit`) và danh sách URL trang vừa đổi (IndexNow: Bing, Yandex, Seznam, Naver…). Chỉ Jenkins gọi, chỉ gửi URL công khai, không có dữ liệu khách | Google, IndexNow | Không | [0009](../adr/0009-notify-search-engines-after-deploy.md) |
 | Umami | Umami tự cài (hạ tầng ở repo riêng) | Nhận lượt xem và sự kiện từ trình duyệt khách, không cookie. Site chỉ tải tracker khi build có Website ID (Website ID đặt trong `Jenkinsfile` từ 2026-10-15) | Tên miền con của `thehot.vn` | Số liệu truy cập | [0007](../adr/0007-use-umami-and-consent-gated-ga4.md) |
@@ -134,7 +134,7 @@ flowchart LR
   dates --> check["Check<br/>docker build --target check<br/>lint, typecheck, check:sitemap"]
   check --> build["Build<br/>docker build --target runner<br/>NEXT_PUBLIC_SITE_URL"]
   build --> smoke["Smoke test<br/>ci/smoke-test.sh"]
-  smoke --> push["Push<br/>Harbor nokto/web:commit-sha"]
+  smoke --> push["Push<br/>Harbor thehot/web:commit-sha"]
   push --> snap["Sitemap snapshot<br/>sitemap production trước deploy"]
   snap --> deploy["Deploy<br/>SSH: deploy commit-sha"]
   deploy --> vps["VPS: pull, healthcheck<br/>lỗi thì quay về image trước"]
@@ -169,7 +169,7 @@ Chi tiết và bất biến: [Mô hình dữ liệu nội dung](data-model.md).
 | Môi trường | Mục đích | Chạy ở đâu | Dữ liệu | Tên riêng |
 |---|---|---|---|---|
 | dev | Phát triển | Máy dev: `npm run dev` (`http://localhost:3000`), hoặc dịch vụ `dev` trong `docker-compose.yml` | Nội dung trong repo | `NEXT_PUBLIC_SITE_URL` không đặt nên URL tuyệt đối là `http://localhost:3000`; sitemap không có `<lastmod>` nếu chưa chạy `ci/sitemap-lastmod.sh` |
-| CI | Kiểm và build mỗi commit trên `main` | Agent Jenkins nhãn `docker` trên máy CI | Như trên | Container smoke test tên `nokto-smoke-$BUILD_NUMBER-$$`, xoá sau khi chạy |
+| CI | Kiểm và build mỗi commit trên `main` | Agent Jenkins nhãn `docker` trên máy CI | Như trên | Container smoke test tên `thehot-smoke-$BUILD_NUMBER-$$`, xoá sau khi chạy |
 | prod | Khách thật | VPS sau Cloudflare | Như trên | `https://thehot.vn` |
 
 Không có staging: image đã qua smoke test được deploy thẳng lên production. Nhánh tính năng không được build tự động; PR chỉ được kiểm trên máy người làm (`npm run check`) trước khi merge.
@@ -185,7 +185,7 @@ Site không có tài khoản, không nhận dữ liệu từ khách, không có 
 ## 9. Cấu trúc thư mục repo
 
 ```text
-nokto-clone-v2/
+thehot/
 ├── src/app/                 route Next.js: 7 trang, layout (metadata, JSON-LD, màn hình chờ), sitemap.ts, robots.ts, ảnh OG
 ├── src/components/sites/    giao diện và dữ liệu nội dung: nokto/ (khung dựng từ template) và the-hot/ (phần riêng của quán)
 ├── src/components/analytics/, src/lib/analytics.ts   tracker Umami, listener click, track() (spec 004)

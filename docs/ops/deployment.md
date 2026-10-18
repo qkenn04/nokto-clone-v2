@@ -4,11 +4,13 @@
 
 Code đi từ một PR tới https://thehot.vn thế nào, kiểm sau deploy ra sao, và lùi lại bằng cách nào. Repo công khai: file này mô tả ở mức `Jenkinsfile` đã thể hiện. Script deploy trên VPS, compose stack, cấu hình nginx, cài đặt Jenkins và Harbor, quy trình quản trị nằm ở repo riêng `qkenn04/infra-qkenn`. Tính tới 2026-10-14.
 
+Ngày 2026-10-18, repo (`qkenn04/nokto-clone-v2` → `qkenn04/thehot`) và hạ tầng của site (project Harbor và image `thehot/web`, stack trên VPS, tài khoản robot mà Jenkins dùng để push) đổi tên từ `nokto` sang `thehot`; tên miền không đổi. Thư mục `src/components/sites/nokto/` và `public/sites/nokto/` cố ý giữ tên cũ vì là phần dựng từ template NOKTO.
+
 ## 0. Tóm tắt một trang
 
 | Câu hỏi | Trả lời |
 |---|---|
-| Artifact là gì | Image Docker `nokto/web:<commit sha đầy đủ>` trong Harbor, gắn nhãn OCI `org.opencontainers.image.revision` (commit) và `source` (URL repo) |
+| Artifact là gì | Image Docker `thehot/web:<commit sha đầy đủ>` trong Harbor, gắn nhãn OCI `org.opencontainers.image.revision` (commit) và `source` (URL repo) |
 | Ai kích hoạt deploy | Merge (hoặc push) vào `main`. Jenkins poll GitHub mỗi 5 phút; không có bước duyệt tay |
 | Chạy ở đâu | Một container trên VPS, sau nginx và Cloudflare ([Kiến trúc](../architecture/ARCHITECTURE.md)) |
 | Deploy mất bao lâu | Khoảng 10 phút từ lúc merge tới khi lên production (ước lượng thô: poll tối đa 5 phút cộng pipeline khoảng 7 phút) |
@@ -24,7 +26,7 @@ Sơ đồ đầy đủ (kèm đường lỗi): [Kiến trúc, mục 4.2](../arch
 ```mermaid
 flowchart LR
   pr["PR merge vào main"] --> jenkins["Jenkins<br/>Sitemap dates, Check, Build, Smoke test"]
-  jenkins --> harbor[("Harbor<br/>nokto/web:commit-sha")]
+  jenkins --> harbor[("Harbor<br/>thehot/web:commit-sha")]
   harbor --> deploy["Script deploy trên VPS<br/>pull, healthcheck"]
   deploy --> run["https://thehot.vn"]
   deploy -->|"không khoẻ"| back["Tự quay về image trước"]
@@ -62,7 +64,7 @@ Một pipeline duy nhất trong `Jenkinsfile`, chạy trên agent nhãn `docker`
 
 | Stage | Làm gì | Hỏng thì |
 |---|---|---|
-| Existing image | Kéo `$IMAGE:$GIT_COMMIT` từ Harbor bằng robot của stage Push, đăng xuất ngay. Kéo được (commit đã build trước đó): bỏ qua Sitemap dates, Check, Build, Push; Smoke test chạy trên image vừa kéo, rồi deploy như thường | Không dừng: kéo lỗi thì build như commit mới |
+| Existing image | Kéo `$IMAGE:$GIT_COMMIT` từ Harbor bằng robot của stage Push, đăng xuất ngay. Kéo được (commit đã build trước đó): bỏ qua Sitemap dates, Check, Build, Push; Smoke test chạy trên image vừa kéo, rồi deploy như thường. Trước đó kiểm Jenkins có đặt địa chỉ registry và VPS (`QKENN_HARBOR_REGISTRY`, `QKENN_DEPLOY_HOST`, đặt bằng JCasC ở repo infra); `Jenkinsfile` không còn giá trị mặc định nào cho hai biến này | Thiếu một trong hai biến: dừng ngay, VPS không bị đụng. Kéo lỗi: không dừng, build như commit mới |
 | Sitemap dates | `bash ci/sitemap-lastmod.sh`: tính `lastmod` từ lịch sử git, ghi `src/generated/sitemap-lastmod.json` ([ADR 0004](../adr/0004-automate-sitemap-from-page-config-and-git.md)) | Dừng; VPS không bị đụng |
 | Check | `docker build --target check`: lint, typecheck, `check:sitemap` | Như trên |
 | Build | `docker build --target runner --pull` với `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_UMAMI_WEBSITE_ID`, `NEXT_PUBLIC_UMAMI_SRC` và nhãn OCI | Như trên |
@@ -81,7 +83,7 @@ Thông báo Discord: thành công; thành công nhưng chưa báo được máy 
 1. PR được review và merge vào `main` trên GitHub.
 2. Trong vòng 5 phút, Jenkins thấy commit mới và chạy pipeline (mục 5).
 3. Stage Sitemap snapshot chụp sitemap đang chạy; stage Deploy gọi lệnh deploy trên VPS với commit SHA.
-4. Script deploy trên VPS kéo image `nokto/web:<sha>` từ Harbor, thay container, đợi healthcheck (`HEALTHCHECK` trong `Dockerfile` gọi `/`).
+4. Script deploy trên VPS kéo image `thehot/web:<sha>` từ Harbor, thay container, đợi healthcheck (`HEALTHCHECK` trong `Dockerfile` gọi `/`).
 5. Container mới khoẻ: xong; VPS giữ 3 image gần nhất để lùi tay. Không khoẻ: script tự chạy lại image trước và báo lỗi về Jenkins.
 6. Stage Notify search engines báo Google và IndexNow những trang có `<lastmod>` đổi (không đổi trang nào thì không gửi gì).
 7. Kiểm sau deploy (mục 6.3).

@@ -28,11 +28,11 @@ Please do **not** put vulnerability details in a public issue, pull request,
 discussion or comment.
 
 1. **Preferred:** GitHub private vulnerability reporting for this repository:
-   <https://github.com/qkenn04/nokto-clone-v2/security/advisories/new>.
+   <https://github.com/qkenn04/thehot/security/advisories/new>.
    As of 2026-10-15 this feature is **not enabled** in the repository
    settings, so the form may not be available.
 2. **If the form is not available:** open a
-   [new issue](https://github.com/qkenn04/nokto-clone-v2/issues/new) titled
+   [new issue](https://github.com/qkenn04/thehot/issues/new) titled
    "Request for a private security contact" and include **no details**: no
    description of the problem, no affected URL or file, no proof of concept.
    A maintainer will reply with a private way to send the report.

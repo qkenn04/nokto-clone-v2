@@ -3,7 +3,7 @@
 // Runs on the qkenn-ci Jenkins (infra-qkenn/ci/jenkins). The `docker` agent talks to its own
 // Docker daemon, images go to the Harbor registry on the same machine (a commit whose image is already there pulls and
 // smoke-tests that image instead of building it again), and the deploy is one SSH
-// call to a forced command on the VPS (/srv/nokto/deploy.sh) that pulls the image by commit SHA,
+// call to a forced command on the VPS (deploy.sh) that pulls the image by commit SHA,
 // waits for its healthcheck and rolls back to the previous image if it fails.
 // A failure before the Deploy stage never touches the VPS. After a deploy, search engines are told which pages changed
 // (ci/notify-search.sh); that last stage can only turn yellow, never fail the build.
@@ -20,7 +20,7 @@ def notifyDiscord(String title, int color) {
               --arg msg "${MSG:-(no commit message)}" --arg sha "$(printf %.7s "$GIT_COMMIT")" \
               --arg build "#$BUILD_NUMBER" --arg ci "${QKENN_CI_NAME:-qkenn-ci}" \
           '{embeds: [{title: $title, url: $url, color: $color, description: $msg,
-             fields: [{name: "Repo", value: "qkenn04/nokto-clone-v2", inline: true},
+             fields: [{name: "Repo", value: "qkenn04/thehot", inline: true},
                       {name: "Commit", value: $sha, inline: true},
                       {name: "Build", value: $build, inline: true}],
              footer: {text: ("thehot.vn · Jenkins " + $ci + " · Harbor")},
@@ -45,20 +45,25 @@ pipeline {
 
   environment {
     // Harbor on the machine running this Jenkins: qkenn-ci, or the standby CI while qkenn-ci is down (set by JCasC).
-    REGISTRY = "${env.QKENN_HARBOR_REGISTRY ?: 'qkenn-ci.tailb41a82.ts.net'}"
-    IMAGE = "${REGISTRY}/nokto/web"
+    REGISTRY = "${env.QKENN_HARBOR_REGISTRY}"
+    IMAGE = "${REGISTRY}/thehot/web"
     SITE_URL = 'https://thehot.vn'
     // Umami analytics (docs/specs/004-analytics). Public values that end up in every page's HTML, not secrets;
     // changing one needs a new build. Empty ID = no tracker and no Umami section on /privacy.
     UMAMI_WEBSITE_ID = '8834d3ef-90e0-40e5-b6ca-2932a0fea7d8'
     UMAMI_SRC = 'https://stats.thehot.vn/ht.js'
-    VPS = '100.93.222.27' // qkenn-server on the tailnet; the deploy key only works from 100.64.0.0/10
+    VPS = "${env.QKENN_DEPLOY_HOST}" // set by JCasC; the deploy key only works from the private network
   }
 
   stages {
     stage('Existing image') {
       steps {
-        withCredentials([usernamePassword(credentialsId: 'harbor-robot-push',
+        script {
+          if (!env.QKENN_HARBOR_REGISTRY?.trim() || !env.QKENN_DEPLOY_HOST?.trim()) {
+            error('Jenkins is missing QKENN_HARBOR_REGISTRY or QKENN_DEPLOY_HOST (JCasC globalNodeProperties)')
+          }
+        }
+        withCredentials([usernamePassword(credentialsId: 'thehot-harbor-robot-push',
                                           usernameVariable: 'HARBOR_USER', passwordVariable: 'HARBOR_TOKEN')]) {
           script {
             def pulled = sh(returnStatus: true, script: '''
@@ -105,7 +110,7 @@ pipeline {
             --build-arg NEXT_PUBLIC_UMAMI_WEBSITE_ID="$UMAMI_WEBSITE_ID" \
             --build-arg NEXT_PUBLIC_UMAMI_SRC="$UMAMI_SRC" \
             --label org.opencontainers.image.revision="$GIT_COMMIT" \
-            --label org.opencontainers.image.source=https://github.com/qkenn04/nokto-clone-v2 \
+            --label org.opencontainers.image.source=https://github.com/qkenn04/thehot \
             --tag "$IMAGE:$GIT_COMMIT" .
         '''
       }
@@ -120,7 +125,7 @@ pipeline {
     stage('Push') {
       when { expression { env.IMAGE_EXISTS != 'true' } }
       steps {
-        withCredentials([usernamePassword(credentialsId: 'harbor-robot-push',
+        withCredentials([usernamePassword(credentialsId: 'thehot-harbor-robot-push',
                                           usernameVariable: 'HARBOR_USER', passwordVariable: 'HARBOR_TOKEN')]) {
           sh '''
             echo "$HARBOR_TOKEN" | docker login "$REGISTRY" --username "$HARBOR_USER" --password-stdin

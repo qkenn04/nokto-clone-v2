@@ -11,7 +11,7 @@
 | Review thay đổi | Quy tắc PR ở Git host; Jenkins báo status check | PR trên GitHub; Jenkins không báo status check cho PR |
 | Runner | Agent theo nhãn và vùng tin cậy | Agent nhãn `docker`, Docker riêng cho build |
 | Kích hoạt | Webhook hoặc poll | `pollSCM('H/5 * * * *')` trên nhánh `main` |
-| Registry | Registry riêng; publish và deploy theo digest | Harbor, image `nokto/web:<commit sha>`; deploy theo tag |
+| Registry | Registry riêng; publish và deploy theo digest | Harbor, image `thehot/web:<commit sha>`; deploy theo tag |
 | Cổng duyệt production | `input` hoặc hệ thống quản lý release | Không có: commit trên `main` tự deploy |
 | Bí mật | Jenkins Credentials, bind theo stage | `withCredentials` chỉ trong stage Existing image, Push, Deploy, Notify search engines và khối thông báo |
 | Khoá deploy | Lockable Resources hoặc tương đương, cộng khoá ở runtime | `disableConcurrentBuilds()`; khoá trong script deploy trên VPS |
@@ -63,7 +63,7 @@ Tên credential, cách xoay vòng và quyền của tài khoản robot: repo inf
 | Quy tắc Git và status check | PR vào `main`; không có status check từ Jenkins. `main` chưa bật branch protection (kiểm 2026-10-15; chủ quán chưa cần, khuyến nghị cân nhắc sau). |
 | Agent và vùng tin cậy | Agent nhãn `docker` trên máy CI, trong mạng riêng |
 | `Jenkinsfile`, người review | `Jenkinsfile`, `Dockerfile`, `ci/` đi qua PR như code |
-| Registry và lưu giữ | Harbor trên máy CI, project `nokto`, repository `web`; chính sách giữ image ở repo infra |
+| Registry và lưu giữ | Harbor trên máy CI, project `thehot`, repository `web`; chính sách giữ image ở repo infra |
 | Lệnh kiểm, build | `bash ci/sitemap-lastmod.sh`; `docker build --target check`; `docker build --target runner --pull`; `ci/smoke-test.sh` |
 | Quét, ký, xác minh | Chưa có trong pipeline ([chính sách, mục 0](../ci-cd-core.md#0-áp-dụng-ở-dự-án-này)) |
 | Lưu bằng chứng | Log build Jenkins (20 build gần nhất), thông báo Discord |

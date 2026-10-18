@@ -1,6 +1,6 @@
 # Runbook 001: Build Jenkins hỏng ngay ở bước checkout với lỗi "object file … is empty"
 
-> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-15 · Liên quan: [Mục lục runbook](README.md), [Triển khai](../deployment.md), [Jenkins + Harbor](../providers/jenkins-registry.md), [Postmortem 001](../postmortems/001-wsl-restart-corrupted-jenkins-git-cache.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-18 · Liên quan: [Mục lục runbook](README.md), [Triển khai](../deployment.md), [Jenkins + Harbor](../providers/jenkins-registry.md), [Postmortem 001](../postmortems/001-wsl-restart-corrupted-jenkins-git-cache.md)
 
 **Mức:** P2 (không deploy được; site đang chạy không bị ảnh hưởng, vì mọi lỗi trước stage Deploy không chạm VPS).
 
@@ -28,7 +28,7 @@ Chạy trên máy CI, ở nơi thấy được thư mục Jenkins (trong contain
 # 1. Cache git của controller ứng với repo này (tìm theo remote.origin.url)
 CACHE_DIR=$(for d in "$JENKINS_HOME"/caches/*/; do
   case "$(git -C "$d" config --get remote.origin.url 2>/dev/null)" in
-    *qkenn04/nokto-clone-v2*) printf '%s\n' "${d%/}" ;;
+    *qkenn04/thehot|*qkenn04/thehot.git|*qkenn04/nokto-clone-v2|*qkenn04/nokto-clone-v2.git) printf '%s\n' "${d%/}" ;;
   esac
 done)
 echo "cache: ${CACHE_DIR:-không tìm thấy}"
@@ -48,7 +48,7 @@ Xoá hai bản sao hỏng để Jenkins clone lại từ GitHub. Không mất d�
 2. Xoá thư mục cache đã tìm ở bước 1 (chỉ thư mục đó, không xoá cả `caches/`):
 
    ```bash
-   git -C "$CACHE_DIR" config --get remote.origin.url   # phải là repo qkenn04/nokto-clone-v2, và CACHE_DIR chỉ có một dòng
+   git -C "$CACHE_DIR" config --get remote.origin.url   # phải là repo qkenn04/thehot (hoặc tên cũ qkenn04/nokto-clone-v2), và CACHE_DIR chỉ có một dòng
    rm -rf -- "$CACHE_DIR"
    ```
 
@@ -101,3 +101,4 @@ Nếu job khác trên cùng Jenkins cũng hỏng cùng kiểu, lặp lại cho t
 | 2026-10-14 | Tạo sau sự cố cùng ngày |
 | 2026-10-15 | Link tới postmortem 001; WSL tự tắt (chủ repo xác nhận); thông báo Discord chỉ có khi đã cấu hình webhook |
 | 2026-10-15 | Ghi lần WSL tự khởi động lại thứ hai (build #26), cache không hỏng |
+| 2026-10-18 | Repo đổi tên thành `qkenn04/thehot`: lệnh tìm cache khớp đúng URL mới và cả URL cũ `qkenn04/nokto-clone-v2`, vì job Jenkins còn dùng URL cũ tới khi đổi ở repo infra |

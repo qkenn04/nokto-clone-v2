@@ -1,5 +1,5 @@
 {
-  "name": "nokto-clone-v2",
+  "name": "thehot",
   "version": "0.6.1",
   "private": true,
   "description": "Next.js recreation of the NOKTO restaurant template, built and deployed through Jenkins + Harbor",
@@ -7,11 +7,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/qkenn04/nokto-clone-v2.git"
+    "url": "https://github.com/qkenn04/thehot.git"
   },
   "homepage": "https://thehot.vn",
   "bugs": {
-    "url": "https://github.com/qkenn04/nokto-clone-v2/issues"
+    "url": "https://github.com/qkenn04/thehot/issues"
   },
   "keywords": [
     "claude-code",

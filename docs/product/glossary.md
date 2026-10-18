@@ -1,6 +1,6 @@
 # Thuật ngữ
 
-> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-15 · Liên quan: [Đặc tả sản phẩm](spec.md), [Yêu cầu phi chức năng](nfr.md), [Kiến trúc](../architecture/ARCHITECTURE.md), [Tài liệu](../README.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-18 · Liên quan: [Đặc tả sản phẩm](spec.md), [Yêu cầu phi chức năng](nfr.md), [Kiến trúc](../architecture/ARCHITECTURE.md), [Tài liệu](../README.md)
 
 Chỉ gồm thuật ngữ dùng trong repo và tài liệu này. Dùng thuật ngữ nhất quán trong tài liệu và code; đổi tên thì đổi ở đây trước.
 
@@ -67,7 +67,7 @@ Mục lục: [Miền nghiệp vụ](#miền-nghiệp-vụ) · [Tìm kiếm và c
 | **Cloudflare proxy** | Đám mây cam | Cloudflare đứng giữa khách và máy chủ: DNS, TLS, cache, chặn bot | Mọi traffic vào `thehot.vn` đi qua Cloudflare |
 | **Full (strict)** | Chế độ SSL chặt | Cloudflare kết nối tới máy chủ bằng HTTPS và kiểm chứng chỉ của máy chủ | Máy chủ dùng chứng chỉ Cloudflare Origin CA ([Kiến trúc](../architecture/ARCHITECTURE.md)) |
 | **Standalone output** | Bản chạy độc lập | Chế độ build của Next.js gom server và phụ thuộc tối thiểu vào `.next/standalone`, chạy bằng `node server.js` | `output: "standalone"` trong `next.config.ts` |
-| **Harbor** | Kho image | Container registry tự cài, lưu image `nokto/web:<commit sha>` | Chạy trên máy CI |
+| **Harbor** | Kho image | Container registry tự cài, lưu image `thehot/web:<commit sha>` | Chạy trên máy CI |
 | **Poll** | Hỏi định kỳ | Jenkins tự kiểm GitHub mỗi 5 phút xem `main` có commit mới không | `pollSCM('H/5 * * * *')` |
 | **Smoke test** | Kiểm nhanh image | Chạy image vừa build, gọi mọi trang và kiểm sitemap trước khi đẩy lên registry | `ci/smoke-test.sh` |
 | **Forced command** | Lệnh bị ép | Khoá SSH chỉ được chạy đúng một lệnh định sẵn trên máy chủ | Jenkins deploy bằng khoá chỉ chạy được script deploy (chi tiết ở `qkenn04/infra-qkenn`) |
