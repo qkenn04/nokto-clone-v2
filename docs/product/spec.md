@@ -1,6 +1,6 @@
 # Đặc tả sản phẩm: The Hot Beer Garden (thehot.vn)
 
-> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-15 · Liên quan: [Yêu cầu phi chức năng](nfr.md), [Thuật ngữ](glossary.md), [Kiến trúc](../architecture/ARCHITECTURE.md), [Mô hình dữ liệu nội dung](../architecture/data-model.md), [Mục lục ADR](../adr/README.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-19 · Liên quan: [Yêu cầu phi chức năng](nfr.md), [Thuật ngữ](glossary.md), [Kiến trúc](../architecture/ARCHITECTURE.md), [Mô hình dữ liệu nội dung](../architecture/data-model.md), [Mục lục ADR](../adr/README.md)
 
 ## 1. Tóm tắt một đoạn
 
@@ -40,7 +40,7 @@ Tính tới 2026-10-14:
 | G3 | Khách liên hệ chốt bàn bằng một chạm từ mọi trang | Nút liên hệ nổi (Messenger, Facebook, Zalo, Gọi) và nút Đặt bàn trên mọi trang; sau khi có analytics: sự kiện `contact_click` | Đạt (kiểm tay); chưa đo được |
 | G4 | Tên, địa chỉ, hotline, giờ mở cửa giống nhau ở site, JSON-LD và Google Business Profile | Kiểm tay; Rich Results Test | Chưa đạt: giờ mở cửa lệch Google Maps (mục 10) |
 | G5 | Trang nhanh trên điện thoại | Ngân sách PERF ở [yêu cầu phi chức năng](nfr.md) | Chưa đạt: LCP 2,9 s trước PR #4; số sau PR #4 chưa đo |
-| G6 | Biết khách đến từ đâu và bao nhiêu người bấm liên hệ | Umami và GA4 theo [ADR 0007](../adr/0007-use-umami-and-consent-gated-ga4.md) | Chưa triển khai |
+| G6 | Biết khách đến từ đâu và bao nhiêu người bấm liên hệ | Umami và GA4 theo [ADR 0007](../adr/0007-use-umami-and-consent-gated-ga4.md) | Umami chạy từ 2026-10-15 (PR #13, #14); GA4 chưa triển khai |
 | G7 | Cho khách thấy không gian và chương trình của quán | Gallery và dòng sự kiện ở trang chủ; sự kiện có lịch thật thay cho chương trình minh hoạ | Ba sự kiện có lịch thật (10/10, 16/10, 17/10/2026; hai sự kiện sau bỏ nhãn minh hoạ ở PR #8); hai chương trình còn là minh hoạ (`illustrative: true`) |
 
 ## 5. Không làm
