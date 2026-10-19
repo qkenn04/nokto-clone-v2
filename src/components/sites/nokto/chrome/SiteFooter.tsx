@@ -3,6 +3,8 @@ import { trackAttrs, type TrackAttrs } from "@/lib/analytics";
 import { site } from "../site";
 import { Stack, Text } from "../ui";
 
+const infoLinkClassName = "hover:text-accent focus-visible:outline focus-visible:outline-accent";
+
 /** Shared business detail in the footer and navigation. */
 export function InfoItem({ label, value, href, align = "left", tracking }: {
   label: string;
@@ -17,12 +19,37 @@ export function InfoItem({ label, value, href, align = "left", tracking }: {
       <Stack gap={1}>
         <Text variant="label" tone="muted">{label}</Text>
         <Text variant="small" tone="faded">
-          {href ? <a href={href} {...tracking} className="hover:text-accent focus-visible:outline focus-visible:outline-accent">{value}</a> : value}
+          {href ? <a href={href} {...tracking} className={infoLinkClassName}>{value}</a> : value}
         </Text>
       </Stack>
     </div>
   );
 }
+
+type InfoLink = { label: string; href: string; tracking: TrackAttrs };
+
+function InfoLinks({ label, links }: { label: string; links: readonly InfoLink[] }) {
+  return (
+    <div className="text-left">
+      <Stack gap={1}>
+        <Text variant="label" tone="muted">{label}</Text>
+        <Text as="ul" variant="small" tone="faded" className="flex flex-wrap gap-x-6 gap-y-1">
+          {links.map((link) => (
+            <li key={link.href}>
+              <a href={link.href} {...link.tracking} className={infoLinkClassName}>{link.label}</a>
+            </li>
+          ))}
+        </Text>
+      </Stack>
+    </div>
+  );
+}
+
+const socialLinks: readonly InfoLink[] = [
+  { label: "Facebook", href: site.socialHref, tracking: trackAttrs("contact_click", { method: "facebook", location: "footer" }) },
+  { label: "Instagram", href: site.profiles.instagram, tracking: trackAttrs("social_click", { network: "instagram" }) },
+  { label: "TikTok", href: site.profiles.tiktok, tracking: trackAttrs("social_click", { network: "tiktok" }) },
+];
 
 export function SiteFooter() {
   return (
@@ -31,7 +58,7 @@ export function SiteFooter() {
         <InfoItem label="Giờ mở cửa" value={site.hours.display} />
         <InfoItem label="Địa chỉ" value={site.address.display} />
         <InfoItem label="Hotline đặt bàn" value={site.phone} href={site.phoneHref} tracking={trackAttrs("contact_click", { method: "phone", location: "footer" })} />
-        <InfoItem label="Facebook" value={site.social} href={site.socialHref} tracking={trackAttrs("contact_click", { method: "facebook", location: "footer" })} />
+        <InfoLinks label="Mạng xã hội" links={socialLinks} />
       </div>
       <nav aria-label="Các trang trong website">
         <ul className="flex flex-wrap items-center gap-x-8">
