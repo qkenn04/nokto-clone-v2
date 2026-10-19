@@ -7,9 +7,9 @@ export type AboutNumber = { value: number; suffix: string; label: string };
 export const about = {
   chapter: "THE HOT · CHỖ HẸN CỦA HỘI MÌNH",
   headline: ["Đúng hội bạn.", "Đúng chỗ vui."],
-  editorial: "Tan làm, sinh nhật hay đơn giản là lâu rồi chưa gặp — có hội là có kèo.",
+  editorial: "Tan làm, sinh nhật hay chỉ là lâu rồi chưa gặp, có hội là có kèo.",
   body: [
-    `Ở ${site.name}, kèo vui bắt đầu từ một tin nhắn: “Tối nay đi đâu?”. Một bàn mồi ngon, bia lạnh và đám bạn hợp cạ là đủ.`,
+    `Ở ${site.name}, kèo vui bắt đầu từ một tin nhắn: "Tối nay đi đâu?". Một bàn mồi ngon, bia lạnh và đám bạn hợp cạ là đủ.`,
     `Gọi món theo gu cả bàn: chút đồ giòn để lai rai, món đậm đà để nhắm bia, thêm cơm hay mì cho hội đang đói. Vừa ăn vừa kể chuyện, nhạc lên là cùng nhập cuộc.`,
     `Hẹn hội mình ở ${site.address.display}, từ ${site.hours.opens} đến khuya. Gọi ${site.phone} hoặc nhắn Facebook để chốt bàn trước khi tới.`,
   ],
