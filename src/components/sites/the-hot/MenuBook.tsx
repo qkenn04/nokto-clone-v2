@@ -722,13 +722,13 @@ export function MenuBook() {
       <div className={styles.layout}>
         <motion.header className={styles.intro} initial={reduce ? { opacity: 0 } : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease: EASE_CINEMA }}>
           <Stack gap={4} className="sm:gap-6">
-            <Text variant="label" tone="muted">Menu nhậu — The Hot</Text>
+            <Text variant="label" tone="muted">Menu nhậu · The Hot</Text>
             <Heading as="h1" level="h1" id="hot-menu-title" balance={false}>
               <span className="block">Lật menu.</span>
               {" "}
               <span className="block text-accent">Chốt món.</span>
             </Heading>
-            <Text variant="body" tone="muted" measure="comfort">Mồi bén, bia lạnh — đủ gu cho cả hội.</Text>
+            <Text variant="body" tone="muted" measure="comfort">Mồi bén, bia lạnh, đủ gu cho cả hội.</Text>
             <MenuViewSwitcher active="book" />
             <div className={styles.introNote}>
               <Text variant="small" tone="muted">Mồi từ 39K · Bia từ 19K*</Text>

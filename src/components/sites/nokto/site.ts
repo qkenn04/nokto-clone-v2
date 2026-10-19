@@ -24,7 +24,7 @@ export const site = {
     `${slogan} Quán nhậu cho hội bạn ở Đà Lạt: mồi bén, bia lạnh, nhạc lên. Ghé 28 Sương Nguyệt Ánh, P. Lâm Viên từ 17:30. Đặt bàn: 0967 539 939.`,
   rootOgDescription: `${slogan} Mồi bén, bia lạnh và những đêm nhạc giữa Đà Lạt.`,
   schemaDescription: "The Hot Beer Garden tại 28 Sương Nguyệt Ánh, P. Lâm Viên, Đà Lạt. Nhà hàng nhậu cho giới trẻ, phục vụ món ăn, bia và âm nhạc từ 17:30 đến khuya.",
-  label: "BEER GARDEN — ĐÀ LẠT",
+  label: "BEER GARDEN · ĐÀ LẠT",
   tagline: "Đà Lạt Chill Zone",
   logo: { src: `${THE_HOT_ASSET_BASE}/images/logo.png`, width: 640, height: 479 },
   nav: [pageLinks.menu, pageLinks.about, pageLinks.reservation],

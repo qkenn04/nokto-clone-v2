@@ -69,7 +69,7 @@ export const homeEvents: HomeEvent[] = [
     subtitle: "Quẩy bất chấp",
     description: "DJ Performance, special game và một đêm lên mood ở The Hot. Xem trọn poster để khám phá chương trình.",
     poster: "/images/main.jpg",
-    posterAlt: "Poster 10/10 — Sạc pin đêm, Quẩy bất chấp tại The Hot Beer Garden Đà Lạt",
+    posterAlt: "Poster 10/10: Sạc pin đêm, Quẩy bất chấp tại The Hot Beer Garden Đà Lạt",
     tags: ["DJ Performance", "Special game"],
     timing: { kind: "scheduled", startsAt: "2026-10-10T00:00:00+07:00", endsAt: "2026-10-11T00:00:00+07:00", dateOnly: true },
   },

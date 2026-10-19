@@ -49,7 +49,7 @@ const anChoi: MenuGroup = {
     },
     {
       name: "Mực",
-      tagline: "Mực trứng, răng mực — bơ cay, mắm hay sate?",
+      tagline: "Mực trứng, răng mực. Chọn bơ cay, mắm hay sate?",
       items: [
         { name: "Răng mực sốt bơ cay", price: 99000 },
         { name: "Răng mực chiên mắm", price: 89000 },
@@ -149,7 +149,7 @@ const premium: MenuGroup = {
     {
       name: "Món ăn khai vị",
       short: "Khai vị",
-      tagline: "Gỏi, trộn, bóp — mở màn cho cả bàn.",
+      tagline: "Gỏi, trộn, bóp mở màn cho cả bàn.",
       items: [
         { name: "Gỏi rau má trộn tép đồng", subtitle: "Pennywort Salad With Freshwater Shrimp", price: 122000 },
         { name: "Gỏi xoài cá khô bò", subtitle: "Dried Triggerfish & Mango Salad", price: 122000 },
@@ -169,7 +169,7 @@ const premium: MenuGroup = {
     {
       name: "Mồi bén lai rai",
       short: "Mồi bén",
-      tagline: "Hàu, nghêu, mực, cá — nhâm nhi cùng bia lạnh.",
+      tagline: "Hàu, nghêu, mực, cá để nhâm nhi cùng bia lạnh.",
       items: [
         { name: "Cá bò khô nướng", subtitle: "Grilled Dried Triggerfish", price: 146000 },
         { name: "Hàu nướng mỡ hành", subtitle: "Grilled Oysters With Scallion Oil", price: 213000 },
@@ -212,7 +212,7 @@ const premium: MenuGroup = {
     {
       name: "Chuyện nhà heo",
       short: "Heo",
-      tagline: "Tóp mỡ, nọng, diềm, ba chỉ, sườn — đủ món cho hội mê heo.",
+      tagline: "Hội mê heo có đủ: tóp mỡ, nọng, diềm, ba chỉ, sườn.",
       items: [
         { name: "Tóp mỡ Triều Khúc", subtitle: "Crackling Trieu Khuc Style", price: 162000 },
         { name: "Phèo non xào dưa cải chua", subtitle: "Stir-fried Pork Intestines With Pickled Mustard Greens", price: 162000 },
@@ -245,7 +245,7 @@ const premium: MenuGroup = {
     {
       name: "Chuyện nhà gà",
       short: "Gà",
-      tagline: "Gà tre mắm nhĩ, chân, sụn, cánh — chiên mắm hay rang muối?",
+      tagline: "Gà tre mắm nhĩ, chân, sụn, cánh. Chiên mắm hay rang muối?",
       items: [
         { name: "Gà tre mắm nhĩ", subtitle: "Free-range Chicken With Fish Sauce", price: 278000 },
         { name: "Chân gà chiên mắm", subtitle: "Fried Chicken Feet With Fish Sauce", price: 137000 },
@@ -302,7 +302,7 @@ const premium: MenuGroup = {
     {
       name: "Bền bỉ",
       short: "Cơm, mì, cháo",
-      tagline: "Cơm chiên, mì xào, cháo — ăn no để còn chơi tiếp.",
+      tagline: "Ăn no cơm chiên, mì xào, cháo rồi chơi tiếp.",
       items: [
         { name: "Mì xào hải sản", subtitle: "Stir-fried Seafood Noodles", price: 200000 },
         { name: "Mì xào bò", subtitle: "Stir-fried Beef Noodles", price: 188000 },
@@ -359,7 +359,7 @@ const premium: MenuGroup = {
 };
 
 export const menu: MenuContent = {
-  label: "MENU NHẬU — THE HOT",
+  label: "MENU NHẬU · THE HOT",
   headline: "Mồi bén. Bia lạnh.",
   editorial: "Từ món lai rai đến món ăn no, gọi theo gu của cả bàn.",
   groups: [anChoi, premium],
