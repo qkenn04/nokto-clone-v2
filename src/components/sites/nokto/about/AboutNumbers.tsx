@@ -43,7 +43,7 @@ export function AboutNumbers() {
       padY="lg-tight"
       className="flex items-center lg:min-h-[60dvh]"
     >
-      <dl className="grid w-full grid-cols-1 items-baseline gap-y-12 lg:grid-cols-12 lg:gap-x-6 lg:gap-y-0">
+      <dl className="@container grid w-full grid-cols-1 items-baseline gap-y-12 lg:grid-cols-12 lg:gap-x-6 lg:gap-y-0">
         {about.numbers.map((stat, index) => (
           <motion.div
             key={stat.label}
@@ -53,7 +53,7 @@ export function AboutNumbers() {
             transition={{ duration: 0.6, delay: 0.08 * index, ease: EASE_CINEMA }}
             className={cx("flex flex-col gap-3", statPlacement[index])}
           >
-            <Heading as="dt" level="stat" family="display">
+            <Heading as="dt" level="stat" family="display" className="lg:text-[length:min(var(--text-stat),calc((100cqi_-_3rem)/5))]">
               <CountUp target={stat.value} delay={0.12 * index} />{stat.suffix}
             </Heading>
             <Text as="dd" variant="label" tone="muted">
