@@ -1,6 +1,6 @@
 # Thuật ngữ
 
-> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-18 · Liên quan: [Đặc tả sản phẩm](spec.md), [Yêu cầu phi chức năng](nfr.md), [Kiến trúc](../architecture/ARCHITECTURE.md), [Tài liệu](../README.md)
+> Trạng thái: Đang áp dụng · Cập nhật: 2026-10-19 · Liên quan: [Đặc tả sản phẩm](spec.md), [Yêu cầu phi chức năng](nfr.md), [Kiến trúc](../architecture/ARCHITECTURE.md), [Tài liệu](../README.md)
 
 Chỉ gồm thuật ngữ dùng trong repo và tài liệu này. Dùng thuật ngữ nhất quán trong tài liệu và code; đổi tên thì đổi ở đây trước.
 
@@ -56,7 +56,7 @@ Mục lục: [Miền nghiệp vụ](#miền-nghiệp-vụ) · [Tìm kiếm và c
 | **UTM** | Tham số nguồn | Tham số `utm_source`, `utm_medium`, `utm_campaign` gắn vào link để công cụ đo biết khách đến từ đâu | Quy ước trong spec `004-analytics` |
 | **Consent** | Sự đồng ý | Khách đồng ý (hoặc từ chối) cho site dùng cookie thống kê | GA4 chỉ tải sau khi khách bấm Đồng ý ([ADR 0007](../adr/0007-use-umami-and-consent-gated-ga4.md)) |
 | **Consent Mode (basic)** | Chế độ đồng ý cơ bản | Cách tích hợp của Google: chưa đồng ý thì không tải tag Google, không gửi gì | ADR 0007 |
-| **Umami** | Công cụ đếm truy cập | Công cụ analytics mã nguồn mở, tự cài, không dùng cookie | ADR 0007 (chưa triển khai) |
+| **Umami** | Công cụ đếm truy cập | Công cụ analytics mã nguồn mở, tự cài, không dùng cookie | ADR 0007 (đang chạy từ 2026-10-15) |
 | **GA4** | Google Analytics 4 | Công cụ analytics của Google, dùng cookie `_ga` | ADR 0007 (chưa triển khai) |
 | **Cloudflare Web Analytics** | Beacon Cloudflare | Thống kê không cookie và đo Core Web Vitals của khách thật; Cloudflare tự chèn script `beacon.min.js` vào trang | Đang bật trên zone `thehot.vn` (2026-10-14) |
 
