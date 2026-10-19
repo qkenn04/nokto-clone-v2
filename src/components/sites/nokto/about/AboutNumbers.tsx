@@ -13,13 +13,16 @@ function CountUp({ target, delay = 0 }: { target: number; delay?: number }) {
   const reduce = useReducedMotion();
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: "-15% 0px" });
-  const value = useMotionValue(0);
+  const value = useMotionValue(target);
   const rounded = useTransform(value, (latest) => Math.round(latest));
 
   useEffect(() => {
-    if (!inView) return;
     if (reduce || target === 0) {
       value.set(target);
+      return;
+    }
+    if (!inView) {
+      value.set(0);
       return;
     }
     const controls = animate(value, target, { duration: 1.6, delay, ease: EASE_CINEMA });
