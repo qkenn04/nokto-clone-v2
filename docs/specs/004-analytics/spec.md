@@ -1,6 +1,6 @@
 # 004: Đo lường truy cập (Umami + GA4)
 
-> Trạng thái: Đề xuất · Cập nhật: 2026-10-18 · Liên quan: [Mục lục spec](../README.md), [plan.md](plan.md), [tasks.md](tasks.md), [Mục lục ADR](../../adr/README.md) (ADR 0007), [Lộ trình M4](../../plan/roadmap.md#m4-analytics)
+> Trạng thái: Đề xuất · Cập nhật: 2026-10-19 · Liên quan: [Mục lục spec](../README.md), [plan.md](plan.md), [tasks.md](tasks.md), [Mục lục ADR](../../adr/README.md) (ADR 0007), [Lộ trình M4](../../plan/roadmap.md#m4-analytics)
 
 Chủ quán cần biết bao nhiêu người vào web, họ đến từ đâu (Google, Maps, Facebook, Instagram, TikTok, QR tại quán) và bao nhiêu người bấm Gọi, Zalo, Messenger hay Đặt bàn. Quyết định ngày 2026-10-14 dùng hai công cụ:
 
@@ -110,7 +110,7 @@ Vị trí gắn:
 | `menu_view_mode` | `MenuViewSwitcher` |
 | `menu_tab_select` | `MenuBook` (sách lật), `MenuList` (danh sách), qua `MenuTabs`; gọi `track()` vì phím mũi tên cũng đổi tab, `ClickTracker` chỉ nghe click |
 | `event_view` | `EventTimeline` (ảnh poster, nút "Xem poster") |
-| `social_click` | `EventTimeline` (lịch và bài sự kiện trên Facebook); Instagram, TikTok khi thêm link |
+| `social_click` | `EventTimeline` (lịch và bài sự kiện trên Facebook), `SiteFooter` (Instagram, TikTok) |
 
 GA4: custom dimension phạm vi Event cho `method`, `location`, `mode`, `tab`, `event_id`, `network`; `party_size` tuỳ chọn làm custom metric.
 
