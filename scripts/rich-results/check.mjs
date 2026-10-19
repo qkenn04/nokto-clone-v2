@@ -93,7 +93,7 @@ function linesOf(text) {
   return text
     .split("\n")
     .map((line) => line.trim())
-    .filter((line) => line !== "" && !ICON_WORDS.has(line) && !/^[-]$/.test(line));
+    .filter((line) => line !== "" && !ICON_WORDS.has(line) && !/^[\uE000-\uF8FF]$/.test(line));
 }
 
 async function refusalShown(page) {
